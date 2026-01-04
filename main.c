@@ -17,16 +17,23 @@
  * Non-Features:
  * complex, rational, bytevec, vector, ports
  */
+#include <err.h>
+#include <errno.h>
+#include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "read.h"
+#include "display.h"
 
 int main(void)
 {
 	while (1) {
 		printf("scheme> ");
 		fflush(stdout);
-		double x = scm_read_expr();
-		printf("%f\n", x);
+		double x = scm_read();
+		scm_display(x);
+		scm_newline();
 	}
 }

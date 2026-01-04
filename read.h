@@ -4,6 +4,6 @@
 #ifndef __READ_H__
 #define __READ_H__
 
-extern double scm_read_expr(void);
+extern double scm_read(void);
 
 #endif
