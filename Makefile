@@ -11,7 +11,7 @@ scheme: scheme.c
 
 scheme.c: display.c object.h read.c scheme.h
 
-test: test_read.test fuzz scheme
+test: scheme test_read.test fuzz
 
 # test golden reference and round-trip invariant
 %.test: %.scm
