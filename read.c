@@ -1,17 +1,9 @@
 /* (c) guenter.ebermann@htl-hl.ac.at
  * Tiny Scheme Interpreter
+ *
+ * Recursive descent parser
+ * exports the read procedure
  */
-
-#include <err.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "box.h"
-#include "cell.h"
-#include "read.h"
-#include "pair.h"
 
 #if 0
 #define CLOS 6U /* closure - idx to cell with pair variables . body in env - a user defined function */
@@ -298,7 +290,7 @@ static double scm_read_sign(char c)
 		errx(EXIT_FAILURE, "read: unexpected %s", buf);
 }
 
-double scm_read(void)
+extern double scm_read(void)
 {
 	int c;
 

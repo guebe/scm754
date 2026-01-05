@@ -4,21 +4,16 @@ CFLAGS = -Wall -Wextra -Werror -O3 -fjump-tables -fsanitize=address,undefined
 
 all: scheme
 
-scheme: main.o read.o display.o cell.o
-	${CC} ${CFLAGS} -o $@ $^
-
 clean:
 	rm -f scheme *.o *.out
 
-main.o: main.c read.h display.h
-read.o: read.c read.h box.h cell.h pair.h
-display.o: display.c display.h box.h cell.h
-cell.o: cell.c cell.h
+scheme: scheme.c
+
+scheme.c: display.c object.h read.c scheme.h
 
 test: test_read.test fuzz scheme
 
-# 1. test against a golden reference file
-# 2. test round-trip invariant
+# test golden reference and round-trip invariant
 %.test: %.scm
 	./scheme < $< > $*.out
 	diff $*.ref $*.out

@@ -17,10 +17,11 @@
  * Non-Features:
  * complex, rational, bytevec, vector, ports
  */
-#include <stdio.h>
 
-#include "read.h"
-#include "display.h"
+#include "scheme.h"
+
+#include "read.c"
+#include "display.c"
 
 int main(void)
 {

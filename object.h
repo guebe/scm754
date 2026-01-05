@@ -1,13 +1,13 @@
 /* (c) guenter.ebermann@htl-hl.ac.at
  * Tiny Scheme Interpreter
  *
- * NaN boxing
+ * Scheme implementations object representation
  */
-#ifndef __BOX_H__
-#define __BOX_H__
 
-#include <inttypes.h>
-#include <string.h>
+#ifndef __OBJECT_H__
+#define __OBJECT_H__
+
+/* NaN boxing */
 
 #define SCM_NIL 0xfff8U /* '() - the empty list */
 #define SCM_BOOLEAN 0xfff9U /* LSB: 0 ... #f, 1 ... #t */
@@ -49,6 +49,25 @@ static inline uint64_t scm_unbox(double d)
 	uint64_t u;
 	memcpy(&u, &d, sizeof(u));
 	return u;
+}
+
+/* Memory handling */
+
+#define SCM_CELL_NUM 8192U
+static double scm_cell[SCM_CELL_NUM];
+static size_t scm_i = 0;
+
+static inline size_t scm_cell_put(const char *buf, size_t size) {
+	size_t i = scm_i;
+	size_t free = SCM_CELL_NUM - i;
+
+	if (size * 8 <= free) {
+		memcpy(&scm_cell[i], buf, size);
+		scm_i = i + (size + 7) / 8;
+		return i;
+	}
+
+	return SCM_CELL_NUM;
 }
 
 #endif

@@ -1,12 +1,8 @@
 /* (c) guenter.ebermann@htl-hl.ac.at
  * Tiny Scheme Interpreter
+ *
+ * display procedure
  */
-#include <stdio.h>
-
-#include "box.h"
-#include "cell.h"
-#include "display.h"
-#include "pair.h"
 
 static void scm_display_list(double obj)
 {
@@ -31,7 +27,7 @@ static void scm_display_list(double obj)
 	putchar(')');
 }
 
-void scm_display(double obj)
+extern void scm_display(double obj)
 {
 	uint64_t x, value;
 	unsigned int tag;
