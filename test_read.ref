@@ -1,0 +1,27 @@
+scheme> 123
+scheme> -45
+scheme> 3.14
+scheme> -0.1
+scheme> 57005
+scheme> 174
+scheme> 5
+scheme> 1000
+scheme> #t
+scheme> #f
+scheme> #\a
+scheme> #\ 
+scheme> "s1 s2"
+scheme> "l1
+l2"
+scheme> abc
+scheme> +
+scheme> -
+scheme> ()
+scheme> (1 . 2)
+scheme> (1 2 3)
+scheme> (1 2 3)
+scheme> (1 2 . 3)
+scheme> ((a b) (c d))
+scheme> (1 (2 (3)))
+scheme> (1 2 . 3)
+scheme> 

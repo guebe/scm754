@@ -47,7 +47,9 @@ void scm_display(double obj)
 	case SCM_BOOLEAN:
 		fputs(value ? "#t" : "#f", stdout);
 		break;
-	case SCM_SYMBOL: /* fall-through */
+	case SCM_SYMBOL:
+		fputs((char *)&scm_cell[value], stdout);
+		break;
 	case SCM_STRING:
 		putchar('\"');
 		fputs((char *)&scm_cell[value], stdout);
