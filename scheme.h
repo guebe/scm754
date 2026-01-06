@@ -25,7 +25,7 @@ static inline double scm_cons(double a, double b)
 	scm_cell[i++] = a;
 	scm_cell[i++] = b;
 	scm_i = i;
-	return scm_box(SCM_LIST, tmp);
+	return scm_box(SCM_PAIR, tmp);
 }
 
 static inline double scm_car(double a)
@@ -37,7 +37,7 @@ static inline double scm_car(double a)
 	tag = scm_get_tag(x);
 	value = scm_value(x);
 
-	if (tag != SCM_LIST)
+	if (tag != SCM_PAIR)
 		errx(EXIT_FAILURE, "car: bad argument type");
 
 	return scm_cell[value];
@@ -52,7 +52,7 @@ static inline double scm_cdr(double a)
 	tag = scm_get_tag(x);
 	value = scm_value(x);
 
-	if (tag != SCM_LIST)
+	if (tag != SCM_PAIR)
 		errx(EXIT_FAILURE, "car: bad argument type");
 
 	return scm_cell[value+1];

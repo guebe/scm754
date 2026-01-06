@@ -14,7 +14,7 @@
 #define SCM_SYMBOL 0xfff3U /* index to len/8 cells */
 #define SCM_STRING 0xfff4U /* index to len/8 cells */
 #define SCM_CHARACTER 0xfff5U /* LSB: character */
-#define SCM_LIST 0xfff6U /* list: index to two cells */
+#define SCM_PAIR 0xfff6U /* list: index to two cells */
 
 #define SCM_TAG_SHIFT 48U
 #define SCM_TAG_MASK 0xffffU

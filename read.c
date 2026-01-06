@@ -9,7 +9,6 @@
 #define CLOS 6U /* closure - idx to cell with pair variables . body in env - a user defined function */
 #define PRIM 7U /* primitive - idx to func ptr table - special forms - control evaluation - the primitive itself (callee) evaluates its arguments according to special rules */
 #define PROC 8U /* procedure - idx to func ptr table - builtins - eval args then apply procedure - the caller already evaluated all arguments - the callee takes already evaluated arguments */
-#define IS_BOX(d) (((d) & 0xfff8000000000000ULL) == 0xfff8000000000000ULL)
 /* symbol table: list of strings key = symbol index (a b c) (cons a (cons b (cons c '()))) */
 double symbols;
 /* environments: list of list of pairs (symbol index . value|procedure) (((a . 3) (b . proc)) ((a . 5) (b . 8)) */

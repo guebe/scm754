@@ -16,7 +16,7 @@ static void scm_display_list(double obj)
 		
 		if (tag == SCM_EMPTY_LIST)
 			break;
-		else if (tag == SCM_LIST)
+		else if (tag == SCM_PAIR)
 			putchar(' ');
 		else {
 			fputs(" . ", stdout);
@@ -55,7 +55,7 @@ extern void scm_display(double obj)
 		fputs("#\\", stdout);
 		putchar(value);
 		break;
-	case SCM_LIST:
+	case SCM_PAIR:
 		scm_display_list(obj);
 		break;
 	default:
