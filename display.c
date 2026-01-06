@@ -14,7 +14,7 @@ static void scm_display_list(double obj)
 		obj = scm_cdr(obj);
 		tag = scm_get_tag(scm_unbox(obj));
 		
-		if (tag == SCM_NIL)
+		if (tag == SCM_EMPTY_LIST)
 			break;
 		else if (tag == SCM_LIST)
 			putchar(' ');
@@ -37,7 +37,7 @@ extern void scm_display(double obj)
 	value = scm_value(x);
 
 	switch (tag) {
-	case SCM_NIL:
+	case SCM_EMPTY_LIST:
 		fputs("()", stdout);
 		break;
 	case SCM_BOOLEAN:

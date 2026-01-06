@@ -9,7 +9,7 @@
 
 /* NaN boxing */
 
-#define SCM_NIL 0xfff1U /* '() - the empty list */
+#define SCM_EMPTY_LIST 0xfff1U /* '() - the empty list */
 #define SCM_BOOLEAN 0xfff2U /* LSB: 0 ... #f, 1 ... #t */
 #define SCM_SYMBOL 0xfff3U /* index to len/8 cells */
 #define SCM_STRING 0xfff4U /* index to len/8 cells */

@@ -197,17 +197,17 @@ static double scm_make_symbol(const char *buf, size_t size)
 static double scm_read_list(void)
 {
 	int c;
-	double tmp, head, last, tail, nil;
-	nil = scm_box(SCM_NIL, 0);
+	double tmp, head, last, tail, empty_list;
+	empty_list = scm_box(SCM_EMPTY_LIST, 0);
 
 	c = scm_skip_whitespace();
 	if (c == ')') {
 		(void) scm_read_char();
-		return nil;
+		return empty_list;
 	}
 
   	tmp = scm_read();
-	head = last = scm_cons(tmp, nil);
+	head = last = scm_cons(tmp, empty_list);
 
 	while (1) {
 		c = scm_skip_whitespace();
@@ -227,7 +227,7 @@ static double scm_read_list(void)
 		}
 		else {
 			tmp = scm_read();
-			tail = scm_cons(tmp, nil);
+			tail = scm_cons(tmp, empty_list);
 			scm_set_cdr(last, tail);
 			last = tail;
 		}
