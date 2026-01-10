@@ -1,5 +1,8 @@
 *.o
 *.out
 *.swp
+*.plist
 .gdb_history
 scheme
+scheme_debug
+fuzz_whitebox
