@@ -22,7 +22,7 @@ analyze:
 	clang --analyze $(SRC_SCHEME)
 
 fuzz_blackbox:
-	./fuzz.sh
+	./fuzz_blackbox
 
 scheme: $(SRC_SCHEME) scheme.h
 	$(CC) $(CFLAGS) -o $@ $(SRC_SCHEME)
