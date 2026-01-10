@@ -24,6 +24,9 @@ typedef uint64_t scm_obj_t;
 #define SCM_PAIR         0xfffc000000000000
 #define SCM_CHAR         0xfffd000000000000
 
+#define SCM_SIZE_MASK  0xFFFF
+#define SCM_SIZE_SHIFT 32U
+
 /* type predicates */
 static inline _Bool scm_is_empty_list(scm_obj_t obj)   { return (obj & SCM_MASK) == SCM_EMPTY_LIST; }
 static inline _Bool scm_is_boolean(scm_obj_t obj)      { return ((obj & SCM_MASK) == SCM_TRUE) || ((obj & SCM_MASK) == SCM_FALSE); }
@@ -38,17 +41,16 @@ static inline _Bool scm_is_char(scm_obj_t obj)         { return (obj & SCM_MASK)
 
 /* accessors */
 static inline _Bool scm_boolean_value(scm_obj_t obj) { return obj != SCM_FALSE; }
-static inline uint32_t scm_string_length(scm_obj_t string) { return (string >> 32) & 0xFFFF; }
+static inline size_t scm_string_length(scm_obj_t string) { return (string >> SCM_SIZE_SHIFT) & SCM_SIZE_MASK; }
 static inline double scm_number_value(scm_obj_t number) { double d; memcpy(&d, &number, sizeof d); return d; }
-static inline unsigned char scm_char_value(scm_obj_t c) { return c; }
+static inline char scm_char_value(scm_obj_t c) { return c; }
 extern scm_obj_t scm_car(scm_obj_t pair);
 extern scm_obj_t scm_cdr(scm_obj_t pair);
-extern unsigned char scm_string_ref(scm_obj_t string, size_t k);
+extern char scm_string_ref(scm_obj_t string, size_t k);
 
 /* mutators */
 extern void scm_set_car(scm_obj_t pair, scm_obj_t obj);
 extern void scm_set_cdr(scm_obj_t pair, scm_obj_t obj);
-extern void scm_string_set(scm_obj_t string, uint32_t k, unsigned char c);
 
 /* constructors */
 static inline scm_obj_t scm_empty_list(void) { return SCM_EMPTY_LIST; }
@@ -60,10 +62,10 @@ static inline scm_obj_t scm_dot(void) { return SCM_DOT; }
 static inline scm_obj_t scm_rparen(void) { return SCM_RPAREN; }
 static inline scm_obj_t scm_string_to_symbol(scm_obj_t string) { return (string & ~SCM_MASK) | SCM_SYMBOL; }
 static inline scm_obj_t scm_symbol_to_string(scm_obj_t symbol) { return (symbol & ~SCM_MASK) | SCM_STRING; }
-static inline scm_obj_t scm_char(unsigned char c) { return SCM_CHAR | c; }
+static inline scm_obj_t scm_char(char c) { return SCM_CHAR | (scm_obj_t)c; }
 extern scm_obj_t __attribute__((format(printf, 1, 2))) scm_error(const char *message, ...);
 extern scm_obj_t scm_string_to_number(const char *string, int radix);
-extern scm_obj_t scm_string(const char *x, uint32_t k);
+extern scm_obj_t scm_string(const char *string, size_t k);
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2);
 
 /* primitives */

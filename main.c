@@ -12,7 +12,7 @@ int main(void)
 		fflush(stdout);
 
 		obj = scm_read();
-		if (scm_is_eof_object(obj)) break;
+		if (scm_is_eof_object(obj)) { putchar('\n'); break; }
 
 		scm_write(obj);
 		putchar('\n');

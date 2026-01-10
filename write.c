@@ -21,7 +21,7 @@ static void write_list(scm_obj_t obj)
 
 static void write_string(scm_obj_t obj)
 {
-	uint32_t i, n = scm_string_length(obj);
+	size_t i, n = scm_string_length(obj);
 	
 	for (i = 0; i < n; i++) {
 		putchar(scm_string_ref(obj, i));

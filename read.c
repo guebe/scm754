@@ -50,7 +50,7 @@ static scm_obj_t read_char(void)
 	return scm_error("read_char: unexpected #\\%c%c", c, c1);
 }
 
-static size_t scan_token(char *buf, size_t size)
+static ssize_t scan_token(char *buf, size_t size)
 {
 	size_t i = 0;
 	int c;
@@ -60,7 +60,7 @@ static size_t scan_token(char *buf, size_t size)
 		buf[i++] = c;
 	}
 
-	if (i >= size) i = 0;
+	if (i >= size) return -1;
 
 	buf[i] = '\0';
 	return i;
@@ -69,14 +69,11 @@ static size_t scan_token(char *buf, size_t size)
 static scm_obj_t read_number_radix(int radix)
 {
 	char buf[SCM_TOKEN_SIZE];
-	scm_obj_t obj;
 
-	scan_token(buf, sizeof buf);
+	if (scan_token(buf, sizeof buf) <= 0)
+		return scm_error("read_number_radix: scan error");
 
-	obj = scm_string_to_number(buf, radix);
-	if (!scm_boolean_value(obj)) return scm_error("read_number_radix: parse error %s (%d)", buf, radix);
-
-	return obj;
+	return scm_string_to_number(buf, radix);
 }
 
 static scm_obj_t read_sharp(void)
@@ -102,15 +99,12 @@ static scm_obj_t read_sharp(void)
 static scm_obj_t read_number(int c)
 {
 	char buf[SCM_TOKEN_SIZE];
-	scm_obj_t obj;
 
 	buf[0] = c;
-	scan_token(buf + 1, sizeof buf - 1);
+	if (scan_token(buf + 1, sizeof buf - 1) < 0)
+		return scm_error("read_number: scan error");
 
-	obj = scm_string_to_number(buf, 0);
-	if (!scm_boolean_value(obj)) return scm_error("read_number: parse error %s", buf);
-
-	return obj;
+	return scm_string_to_number(buf, 0);
 }
 
 static scm_obj_t read_symbol(int c)
@@ -120,8 +114,8 @@ static scm_obj_t read_symbol(int c)
 	scm_obj_t obj;
 
 	buf[0] = c;
-	len = scan_token(buf + 1, sizeof buf - 1);
-	if (len == 0) return scm_error("read_symbol: parse error");
+	if ((len = scan_token(buf + 1, sizeof buf - 1)) < 0)
+		return scm_error("read_symbol: scan error");
 
 	obj = scm_string(buf, len+1);
 	if (scm_is_error_object(obj)) return obj;
@@ -152,21 +146,28 @@ static scm_obj_t read_list(void)
 	scm_obj_t obj, head, last;
 
   	obj = scm_read();
+	if (scm_is_error_object(obj)) return obj;
 	if (scm_is_rparen(obj)) return scm_empty_list();
 	head = last = scm_cons(obj, scm_empty_list());
 
 	while (1) {
 		obj = scm_read();
 
+		if (scm_is_error_object(obj)) {
+			return obj;
+		}
 		if (scm_is_rparen(obj)) {
 			return head;
 		}
 		else if (scm_is_dot(obj)) {
-			scm_set_cdr(last, scm_read());
+			obj = scm_read();
+			if (scm_is_error_object(obj)) return obj;
+			scm_set_cdr(last, obj);
 			return scm_is_rparen(scm_read()) ? head: scm_error("read: missing )");
 		}
 		else {
 			obj = scm_cons(obj, scm_empty_list());
+			if (scm_is_error_object(obj)) return obj;
 			scm_set_cdr(last, obj);
 			last = obj;
 		}
