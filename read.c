@@ -45,22 +45,22 @@ static scm_obj_t read_char(void)
 
 	c1 = scm_read_char();
 	if (c1 == EOF || is_delimiter(c1))
-		return scm_char(c);
+		return scm_char((char)c);
 
 	return scm_error("read_char: unexpected #\\%c%c", c, c1);
 }
 
 static ssize_t scan_token(char *buf, size_t size)
 {
-	size_t i = 0;
+	ssize_t i = 0, ssize = (ssize_t)size;
 	int c;
 
-	while (((c = scm_peek_char()) != EOF) && !is_delimiter(c) && (i < size)) {
+	while (((c = scm_peek_char()) != EOF) && !is_delimiter(c) && (i < ssize)) {
 		scm_read_char();
-		buf[i++] = c;
+		buf[i++] = (char)c;
 	}
 
-	if (i >= size) return -1;
+	if (i >= ssize) return -1;
 
 	buf[i] = '\0';
 	return i;
@@ -96,7 +96,7 @@ static scm_obj_t read_sharp(void)
 		return scm_error("read: unexpected #%c", c);
 }
 
-static scm_obj_t read_number(int c)
+static scm_obj_t read_number(char c)
 {
 	char buf[SCM_TOKEN_SIZE];
 
@@ -107,7 +107,7 @@ static scm_obj_t read_number(int c)
 	return scm_string_to_number(buf, 0);
 }
 
-static scm_obj_t read_symbol(int c)
+static scm_obj_t read_symbol(char c)
 {
 	char buf[SCM_TOKEN_SIZE];
 	ssize_t len;
@@ -117,13 +117,13 @@ static scm_obj_t read_symbol(int c)
 	if ((len = scan_token(buf + 1, sizeof buf - 1)) < 0)
 		return scm_error("read_symbol: scan error");
 
-	obj = scm_string(buf, len+1);
+	obj = scm_string(buf, (size_t)len+1);
 	if (scm_is_error_object(obj)) return obj;
 
 	return scm_string_to_symbol(obj);
 }
 
-static scm_obj_t read_symbol_or_number(int c)
+static scm_obj_t read_symbol_or_number(char c)
 {
 	char buf[SCM_TOKEN_SIZE];
 	ssize_t len;
@@ -136,7 +136,7 @@ static scm_obj_t read_symbol_or_number(int c)
 	obj = scm_string_to_number(buf, 0);
 	if (scm_boolean_value(obj)) return obj;
 
-	obj = scm_string(buf, len+1);
+	obj = scm_string(buf, (size_t)len+1);
 	if (scm_is_error_object(obj)) return obj;
 	       
 	return scm_string_to_symbol(obj);
@@ -182,7 +182,7 @@ static scm_obj_t read_string(void)
 	int c;
 
 	while (((c = scm_read_char()) != EOF) && (c != '"') && (n < sizeof buf))
-		buf[n++] = c;
+		buf[n++] = (char)c;
 
 	if (n >= sizeof buf) return scm_error("read_string: string too long");
 
@@ -228,11 +228,11 @@ extern scm_obj_t scm_read(void)
 		else if (c == '#')
 			return read_sharp();
 		else if (is_digit(c))
-			return read_number(c);
+			return read_number((char)c);
 		else if (is_initial(c))
-			return read_symbol(c);
+			return read_symbol((char)c);
 		else if (is_explicit_sign(c))		
-			return read_symbol_or_number(c);
+			return read_symbol_or_number((char)c);
 		else
 			return scm_error("read: unexpected %c", c);
 	}

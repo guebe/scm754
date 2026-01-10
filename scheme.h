@@ -43,7 +43,7 @@ static inline _Bool scm_is_char(scm_obj_t obj)         { return (obj & SCM_MASK)
 static inline _Bool scm_boolean_value(scm_obj_t obj) { return obj != SCM_FALSE; }
 static inline size_t scm_string_length(scm_obj_t string) { return (string >> SCM_SIZE_SHIFT) & SCM_SIZE_MASK; }
 static inline double scm_number_value(scm_obj_t number) { double d; memcpy(&d, &number, sizeof d); return d; }
-static inline char scm_char_value(scm_obj_t c) { return c; }
+static inline char scm_char_value(scm_obj_t c) { return (char)c; }
 extern scm_obj_t scm_car(scm_obj_t pair);
 extern scm_obj_t scm_cdr(scm_obj_t pair);
 extern char scm_string_ref(scm_obj_t string, size_t k);
