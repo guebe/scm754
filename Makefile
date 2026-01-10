@@ -9,9 +9,9 @@ scheme: error.c number.c pair.c port.c read.c write.c main.c scheme.h
 	$(CC) $(CFLAGS) -o $@ error.c number.c pair.c port.c read.c write.c main.c
 
 clean:
-	rm -f scheme *.out
+	rm -f scheme fuzz_read *.out
 
-test: scheme test_read.test fuzz fuzz_read
+test: scheme test_read.test fuzz_read fuzz
 
 # test golden reference and round-trip invariant
 %.test: %.scm
