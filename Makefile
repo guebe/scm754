@@ -13,13 +13,16 @@ CFLAGS_EXTRA_FUZZ = -O1 -g -fsanitize=fuzzer,address,undefined
 
 all: scheme
 
-test: scheme_debug test_read.test fuzz_whitebox fuzz_blackbox analyze
+test: scheme scheme_debug test_read.test fuzz_whitebox fuzz_blackbox analyze tidy
 
 clean:
 	rm -f scheme scheme_debug fuzz_whitebox *.out *.plist
 
 analyze:
 	clang --analyze $(SRC_SCHEME)
+
+tidy:
+	clang-tidy $(SRC_SCHEME) -checks=misc-unused-functions,misc-unused-parameters,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling -- -I.
 
 fuzz_blackbox:
 	./fuzz_blackbox
