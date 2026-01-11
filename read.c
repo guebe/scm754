@@ -26,7 +26,7 @@ static scm_obj_t read_boolean(int c)
 {
 	int c1;
 
-	c1 = scm_read_char();
+	c1 = scm_peek_char();
 	if (c1 == EOF || is_delimiter(c1)) {
 		if (c == 't') return scm_true();
 		else if (c == 'f') return scm_false();
@@ -43,7 +43,7 @@ static scm_obj_t read_char(void)
 	if (c == EOF)
 		return scm_error("read_char: unexpected EOF after #\\");
 
-	c1 = scm_read_char();
+	c1 = scm_peek_char();
 	if (c1 == EOF || is_delimiter(c1))
 		return scm_char((char)c);
 
@@ -150,6 +150,7 @@ static scm_obj_t read_list(void)
 
 	obj = read(1);
 	if (scm_is_error_object(obj)) return obj;
+	else if (scm_is_eof_object(obj)) return scm_error("read_list: EOF while scanning list head");
 	else if (scm_is_rparen(obj)) return scm_empty_list();
 	head = last = scm_cons(obj, scm_empty_list());
 
@@ -159,12 +160,16 @@ static scm_obj_t read_list(void)
 		if (scm_is_error_object(obj)) {
 			return obj;
 		}
-		if (scm_is_rparen(obj)) {
+		else if (scm_is_eof_object(obj)) {
+			return scm_error("read_list: EOF while scanning list body");
+		}
+		else if (scm_is_rparen(obj)) {
 			return head;
 		}
 		else if (scm_is_dot(obj)) {
 			obj = read(1);
 			if (scm_is_error_object(obj)) return obj;
+			else if (scm_is_eof_object(obj)) return scm_error("read_list: EOF while scanning last pair");
 			scm_set_cdr(last, obj);
 			return scm_is_rparen(read(1)) ? head: scm_error("read_list: missing )");
 		}
@@ -202,6 +207,7 @@ static scm_obj_t read_quote(void)
 
 	datum = read(0);
 	if (scm_is_error_object(datum)) return datum;
+	else if (scm_is_eof_object(datum)) return scm_error("read_quote: EOF");
 
 	args = scm_cons(datum, scm_empty_list());
 	if (scm_is_error_object(args)) return args;
