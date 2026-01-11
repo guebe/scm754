@@ -1,27 +1,77 @@
-> 123
-> -45
-> 3.14
-> -0.1
-> 57005
-> 174
-> 5
-> 1000
+> +
+> +soup+
+> <=?
+> ->string
+> a34kTMNs
+> lambda
+> list->vector
+> q
+> V17a
+> the-word-recursion-has-many-meanings
+> a
+> a
+> a
+> a
+> a
+> a
+> 28
+> 28
+> (8 13)
+> (8 13)
+> (+ 2 6)
+> (quote a)
+> (quote ())
+> (quote (+ 1 2))
+> (quote (quote a))
+> (quote (quote a))
+> (quote 145932)
+> (quote "abc")
+> (quote #t)
+> 100
+> -100
+> 100
+> 3.14159265358979
+> -3.14159265358979
+> 256
+> 64
+> 4
+> 100
 > #t
 > #f
-> #\a
-> #\ 
-> "s1 s2"
-> "l1
-l2"
-> abc
+> (quote #f)
+> ()
+> (())
+> ((()))
+> (() ())
+> (() () ())
+> (a b c d e)
+> (a b c d e)
+> (a b c . d)
+> (a b c . d)
+> (a . b)
+> (a)
+> (a)
+> ((a) b c d)
+> ((a) b c d)
+> ("a" b c)
+> ("a" b c)
+> ((a b) . c)
+> (a (b) (c d e))
+> ((a 1) (b 2) (c 3))
+> (a (b (c (d (e)))))
+> foo
+> a
+> nil
+> flying-fish
+> Martin
+> Malvina
 > +
 > -
-> ()
-> (1 . 2)
-> (1 2 3)
-> (1 2 3)
-> (1 2 . 3)
-> ((a b) (c d))
-> (1 (2 (3)))
-> (1 2 . 3)
+> #\a
+> #\A
+> #\(
+> #\ 
+> "Another example: one line of text"
+> "Here's text 
+containing two lines"
 > 
