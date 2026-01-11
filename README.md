@@ -2,7 +2,7 @@
 
 `scm754` is a Scheme implemented on top of IEEE-754.
 
-The project focuses on a minimal, efficient reader and an `eval/apply` core with tight invariants, no malloc in the runtime, and simple, provable control flow.  
+The project focuses on a minimal, efficient `read` and an `eval/apply` core with tight invariants, no malloc in the runtime, and simple, provable control flow.  
 
 All Scheme objects are represented as 64-bit values, leveraging unused NaN space to implement the Scheme programming language.
 
