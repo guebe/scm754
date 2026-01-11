@@ -7,7 +7,7 @@ SRC_FUZZ = $(SRC) fuzz.c
 CC = clang
 CFLAGS = -Wall -Wextra -Wshadow -Wconversion -Wpedantic -Wstrict-prototypes -Wsign-compare -Wformat-security -Wmisleading-indentation -Wnonnull -Wold-style-definition -Wnested-externs -Werror -O3 -fjump-tables
 CFLAGS_EXTRA_DEBUG = -O0 -g -fsanitize=address,undefined
-CFLAGS_EXTRA_FUZZ = -DSCM_READ_DEPTH=128 -O1 -g -fsanitize=fuzzer,address,undefined
+CFLAGS_EXTRA_FUZZ = -O1 -g -fsanitize=fuzzer,address,undefined
 
 .PHONY: all test clean analyze fuzz_blackbox
 
