@@ -169,9 +169,9 @@ static scm_obj_t read_list(void)
 		else if (scm_is_dot(obj)) {
 			obj = read(1);
 			if (scm_is_error_object(obj)) return obj;
-			else if (scm_is_eof_object(obj)) return scm_error("read_list: EOF while scanning last pair");
+			else if (scm_is_eof_object(obj)) return scm_error("read_list: EOF while scanning right side after dot (.)");
 			scm_set_cdr(last, obj);
-			return scm_is_rparen(read(1)) ? head: scm_error("read_list: missing )");
+			return scm_is_rparen(read(1)) ? head: scm_error("read_list: closing rparen ) not found after dot (.)");
 		}
 		else {
 			obj = scm_cons(obj, scm_empty_list());
@@ -231,9 +231,9 @@ static scm_obj_t read(_Bool is_list)
 		else if (c == '(')
 			return read_list();
 		else if (c == ')')
-			return is_list ? scm_rparen() : scm_error("read: unexpected )");
+			return is_list ? scm_rparen() : scm_error("read: too many )");
 		else if (c == '.')
-			return is_list ? scm_dot() : scm_error("read: unexpected .");
+			return is_list ? scm_dot() : scm_error("read: unexpected dot (.)");
 		else if (c == '"')
 			return read_string();
 		else if (c == '\'')
