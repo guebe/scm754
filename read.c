@@ -31,8 +31,8 @@ static scm_obj_t read_boolean(int c)
 
 	c1 = scm_peek_char();
 	if (c1 == EOF || is_delimiter(c1)) {
-		if (c == 't') return scm_true();
-		else if (c == 'f') return scm_false();
+		if (c == 't' || c == 'T') return scm_true();
+		else if (c == 'f' || c == 'F') return scm_false();
 	}
 
 	return scm_error("read_boolean: unexpected #%c%c", c, c1);
@@ -84,7 +84,7 @@ static scm_obj_t read_sharp(void)
 {
 	int c = scm_read_char();
 
-	if (c == 'f' || c == 't')
+	if (c == 'f' || c == 'F' || c == 't' || c == 'T')
 		return read_boolean(c);
 	else if (c == '\\')
 		return read_char();

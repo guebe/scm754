@@ -1,4 +1,9 @@
+; regression tests
+
 (+ 1 (+ 2.5 (+ 3 (+ 4.5 (+ 5 (+ 6.25 (+ 7 (+ 8.75 (+ 9 (+ 10.5 (+ 11 (+ 12.25)))))))))))) ; 80.75
+
+#T ; #t
+#F ; #f
 
 ; The following tests are from:
 ; Scheme 9 from Empty Space Test Suite
