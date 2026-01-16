@@ -24,7 +24,7 @@ static void write_string(scm_obj_t string)
 	fwrite(scm_string_value(string), 1, scm_string_length(string), stdout);
 }
 
-extern void scm_write(scm_obj_t obj)
+extern scm_obj_t scm_write(scm_obj_t obj)
 {
 	if (scm_is_empty_list(obj)) {
        		fputs("()", stdout);
@@ -41,8 +41,17 @@ extern void scm_write(scm_obj_t obj)
 	else if (scm_is_rparen(obj)) {
 		fputs("#!rparen", stdout);
 	}
+	else if (scm_is_unspecified(obj)) {
+		fputs("#!unspecified", stdout);
+	}
 	else if (scm_is_error_object(obj)) {
 		fputs("#!error", stdout);
+	}
+	else if (scm_is_procedure(obj)) {
+		fputs("#!procedure", stdout);
+	}
+	else if (scm_is_closure(obj)) {
+		fputs("#!closure", stdout);
 	}
 	else if (scm_is_symbol(obj)) {
 		write_string(scm_symbol_to_string(obj));
@@ -62,4 +71,5 @@ extern void scm_write(scm_obj_t obj)
 	else {
 		printf("%.16g", scm_number_value(obj));
 	}
+	return scm_unspecified();
 }

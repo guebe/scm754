@@ -1,8 +1,8 @@
 # (c) guenter.ebermann@htl-hl.ac.at
 
 SRC = error.c number.c pair.c port.c read.c
-SRC_SCHEME = $(SRC) write.c eval.c main.c
-SRC_FUZZ = $(SRC) fuzz.c
+SRC_SCHEME = $(SRC) write.c environment.c eval.c main.c
+SRC_FUZZ = $(SRC) environment.c fuzz.c
 
 CC = clang
 CFLAGS = -Wall -Wextra -Wshadow -Wconversion -Wpedantic -Wstrict-prototypes -Wsign-compare -Wformat-security -Wmisleading-indentation -Wnonnull -Wold-style-definition -Wnested-externs -Werror -O3 -fjump-tables

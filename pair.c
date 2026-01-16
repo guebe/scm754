@@ -64,16 +64,20 @@ extern scm_obj_t scm_cdr(scm_obj_t pair)
 	return scm_is_pair(pair) ? cell[i] : scm_error("cdr: not a pair");
 }
 
-extern void scm_set_car(scm_obj_t pair, scm_obj_t obj)
+extern scm_obj_t scm_set_car(scm_obj_t pair, scm_obj_t obj)
 {
-	size_t i = pair & SCM_CELL_MASK;
-	if (scm_is_pair(pair)) cell[i] = obj;
-	else fputs("error: set-car! called on non-pair object\n", stderr);
+	if (!scm_is_pair(pair)) return scm_error("set-car: called on non pair object");
+
+	cell[pair & SCM_CELL_MASK] = obj;
+
+	return scm_unspecified();
 }
 
-extern void scm_set_cdr(scm_obj_t pair, scm_obj_t obj)
+extern scm_obj_t scm_set_cdr(scm_obj_t pair, scm_obj_t obj)
 {
-	size_t i = (pair & SCM_CELL_MASK) + 1U;
-	if (scm_is_pair(pair)) cell[i] = obj;
-	else fputs("error: set-cdr! called on non-pair object\n", stderr);
+	if (!scm_is_pair(pair)) return scm_error("set-cdr: called on non pair object");
+
+	cell[(pair & SCM_CELL_MASK) + 1U] = obj;
+
+	return scm_unspecified();
 }

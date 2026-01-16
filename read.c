@@ -210,10 +210,7 @@ static scm_obj_t read_list(void)
 
 static scm_obj_t read_quote(void)
 {
-	scm_obj_t quote, datum, args;
-
-	quote = scm_string("quote", 5);
-	if (scm_is_error_object(quote)) return quote;
+	scm_obj_t datum, args;
 
 	datum = read(0, 0, 0);
 	if (scm_is_error_object(datum)) return datum;
@@ -221,7 +218,7 @@ static scm_obj_t read_quote(void)
 	args = scm_cons(datum, scm_empty_list());
 	if (scm_is_error_object(args)) return args;
 
-	return scm_cons(scm_string_to_symbol(quote), args);
+	return scm_cons(scm_quote, args);
 }
 
 static scm_obj_t read(_Bool dot_ok, _Bool rparen_ok, _Bool eof_ok)

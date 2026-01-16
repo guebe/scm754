@@ -3,6 +3,7 @@
 #ifndef __SCM754_H__
 #define __SCM754_H__
 
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -17,15 +18,41 @@ typedef uint64_t scm_obj_t;
 #define SCM_EOF          0xfff4000000000000
 #define SCM_DOT          0xfff5000000000000
 #define SCM_RPAREN       0xfff6000000000000
+#define SCM_UNSPECIFIED  0xfff7000000000000
 /* do not use: -nan      0xfff8000000000000 */
 #define SCM_ERROR        0xfff9000000000000
 #define SCM_SYMBOL       0xfffa000000000000
 #define SCM_STRING       0xfffb000000000000
 #define SCM_PAIR         0xfffc000000000000
 #define SCM_CHAR         0xfffd000000000000
+/* procedure is a built-in - evaluate arguments then apply procedure - the
+ * caller already evaluated all arguments - the callee takes already evaluated
+ * arguments */
+#define SCM_PROCEDURE    0xfffe000000000000
+/* closure is a user defined function (lambda or define special form) - index
+ * to cell with a pair ((variables) . (body)) stored in the environment */
+#define SCM_CLOSURE      0xffff000000000000
 
 #define SCM_SIZE_MASK  0xFFFF
 #define SCM_SIZE_SHIFT 32U
+
+/* primitives - special forms which control evaluation and thus are kept
+ * separate from procedures. Each primitive itself (callee) evaluates its
+ * arguments according to special rules defined by the specification. Those
+ * primitives are interned to speed-up evaluation but _not_ stored in any
+ * environment. */
+extern scm_obj_t scm_if;
+extern scm_obj_t scm_quote;
+extern scm_obj_t scm_lambda;
+extern scm_obj_t scm_define;
+
+#define SCM_PROCEDURE_ADD 1
+#define SCM_PROCEDURE_SUB 2
+#define SCM_PROCEDURE_MUL 3
+#define SCM_PROCEDURE_DIV 4
+#define SCM_PROCEDURE_WRITE 5
+#define SCM_PROCEDURE_CAR 6
+#define SCM_PROCEDURE_CDR 7
 
 /* type predicates */
 static inline _Bool scm_is_empty_list(scm_obj_t obj)   { return (obj & SCM_MASK) == SCM_EMPTY_LIST; }
@@ -33,66 +60,81 @@ static inline _Bool scm_is_boolean(scm_obj_t obj)      { return ((obj & SCM_MASK
 static inline _Bool scm_is_eof_object(scm_obj_t obj)   { return (obj & SCM_MASK) == SCM_EOF; }
 static inline _Bool scm_is_dot(scm_obj_t obj)          { return (obj & SCM_MASK) == SCM_DOT; }
 static inline _Bool scm_is_rparen(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_RPAREN; }
+static inline _Bool scm_is_unspecified(scm_obj_t obj)  { return (obj & SCM_MASK) == SCM_UNSPECIFIED; }
 static inline _Bool scm_is_error_object(scm_obj_t obj) { return (obj & SCM_MASK) == SCM_ERROR; }
 static inline _Bool scm_is_symbol(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_SYMBOL; }
 static inline _Bool scm_is_string(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_STRING; }
 static inline _Bool scm_is_pair(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_PAIR; }
 static inline _Bool scm_is_char(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_CHAR; }
-static inline _Bool scm_is_number(scm_obj_t obj) {
+static inline _Bool scm_is_procedure(scm_obj_t obj)    { return (obj & SCM_MASK) == SCM_PROCEDURE; }
+static inline _Bool scm_is_closure(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_CLOSURE; }
+static inline _Bool scm_is_number(scm_obj_t obj)
+{
 	scm_obj_t exp = (obj >> 52) & 0x7FF;
 	scm_obj_t tag = (obj >> 48) & 0xF;
 	return (exp != 0x7FF) || (((tag == 0) || (tag == 8)) && (exp == 0x7FF));
 }
 
 /* accessors */
-static inline _Bool scm_boolean_value(scm_obj_t obj) { return obj != SCM_FALSE; }
-static inline size_t scm_string_length(scm_obj_t string) { return (string >> SCM_SIZE_SHIFT) & SCM_SIZE_MASK; }
-static inline double scm_number_value(scm_obj_t number) { double d; memcpy(&d, &number, sizeof d); return d; }
-static inline char scm_char_value(scm_obj_t c) { return (char)c; }
+static inline _Bool scm_boolean_value(scm_obj_t obj)         { return obj != SCM_FALSE; }
+static inline size_t scm_string_length(scm_obj_t string)     { assert(scm_is_string(string)); return (string >> SCM_SIZE_SHIFT) & SCM_SIZE_MASK; }
+static inline double scm_number_value(scm_obj_t number)      { double d; memcpy(&d, &number, sizeof d); return d; }
+static inline char scm_char_value(scm_obj_t c)               { return (char)c; }
+static inline uint32_t scm_procedure_id(scm_obj_t procedure) { return (uint32_t)procedure; }
+static inline uint32_t scm_closure_idx(scm_obj_t closure)    { return (uint32_t)closure; }
 extern scm_obj_t scm_car(scm_obj_t pair);
 extern scm_obj_t scm_cdr(scm_obj_t pair);
 extern const char *scm_string_value(scm_obj_t string);
 extern const char *scm_error_object_message(scm_obj_t error_object);
 
 /* mutators */
-extern void scm_set_car(scm_obj_t pair, scm_obj_t obj);
-extern void scm_set_cdr(scm_obj_t pair, scm_obj_t obj);
+extern scm_obj_t scm_set_car(scm_obj_t pair, scm_obj_t obj);
+extern scm_obj_t scm_set_cdr(scm_obj_t pair, scm_obj_t obj);
 
 /* constructors */
-static inline scm_obj_t scm_empty_list(void) { return SCM_EMPTY_LIST; }
-static inline scm_obj_t scm_boolean(_Bool x) { return x?SCM_TRUE:SCM_FALSE; }
-static inline scm_obj_t scm_true(void) { return SCM_TRUE; }
-static inline scm_obj_t scm_false(void) { return SCM_FALSE; }
-static inline scm_obj_t scm_eof_object(void) { return SCM_EOF; }
-static inline scm_obj_t scm_dot(void) { return SCM_DOT; }
-static inline scm_obj_t scm_rparen(void) { return SCM_RPAREN; }
-static inline scm_obj_t scm_string_to_symbol(scm_obj_t string) { return (string & ~SCM_MASK) | SCM_SYMBOL; }
-static inline scm_obj_t scm_symbol_to_string(scm_obj_t symbol) { return (symbol & ~SCM_MASK) | SCM_STRING; }
-static inline scm_obj_t scm_number(double number) { scm_obj_t d; memcpy(&d, &number, sizeof d); return d; }
-static inline scm_obj_t scm_char(char c) { return SCM_CHAR | (scm_obj_t)c; }
-__attribute__((warn_unused_result))
-extern scm_obj_t scm_error(const char *message, ...);
+static inline scm_obj_t scm_empty_list(void)       { return SCM_EMPTY_LIST; }
+static inline scm_obj_t scm_boolean(_Bool x)       { return x?SCM_TRUE:SCM_FALSE; }
+static inline scm_obj_t scm_true(void)             { return SCM_TRUE; }
+static inline scm_obj_t scm_false(void)            { return SCM_FALSE; }
+static inline scm_obj_t scm_eof_object(void)       { return SCM_EOF; }
+static inline scm_obj_t scm_dot(void)              { return SCM_DOT; }
+static inline scm_obj_t scm_rparen(void)           { return SCM_RPAREN; }
+static inline scm_obj_t scm_unspecified(void)      { return SCM_UNSPECIFIED; }
+static inline scm_obj_t scm_number(double number)  { scm_obj_t d; memcpy(&d, &number, sizeof d); return d; }
+static inline scm_obj_t scm_char(char c)           { return SCM_CHAR | (scm_obj_t)c; }
+static inline scm_obj_t scm_procedure(uint32_t id) { return SCM_PROCEDURE | id; }
+static inline scm_obj_t scm_closure(uint32_t idx)  { return SCM_CLOSURE | idx; }
 extern scm_obj_t scm_string_to_number(const char *string, int radix);
 extern scm_obj_t scm_string(const char *string, size_t k);
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2);
 
 /* primitives */
-extern void scm_write(scm_obj_t obj);
+__attribute__((warn_unused_result))
+extern scm_obj_t scm_error(const char *message, ...);
+extern scm_obj_t scm_write(scm_obj_t obj);
 extern scm_obj_t scm_read(void);
 extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier);
-extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, scm_obj_t environment_specifier);
+extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args);
 extern int scm_read_char(void);
 extern int scm_peek_char(void);
+extern scm_obj_t scm_environment_create(void);
+extern scm_obj_t scm_environment_lookup(scm_obj_t env, scm_obj_t symbol);
+extern void scm_environment_define(scm_obj_t env, scm_obj_t symbol, scm_obj_t value);
+extern scm_obj_t scm_environment_extend(scm_obj_t env, scm_obj_t params, scm_obj_t args);
+extern scm_obj_t scm_intern(scm_obj_t symbol);
+static inline scm_obj_t scm_string_to_symbol(scm_obj_t string)
+{
+	if (!scm_is_string(string)) return scm_error("not a string");
+	return scm_intern((string & ~SCM_MASK) | SCM_SYMBOL);
+}
+static inline scm_obj_t scm_symbol_to_string(scm_obj_t symbol)
+{
+	if (!scm_is_symbol(symbol)) return scm_error("not a symbol");
+	return ((symbol & ~SCM_MASK) | SCM_STRING);
+}
+extern scm_obj_t scm_add(scm_obj_t args);
+extern scm_obj_t scm_sub(scm_obj_t args);
+extern scm_obj_t scm_mul(scm_obj_t args);
+extern scm_obj_t scm_div(scm_obj_t args);
 
-#if 0
-#define CLOS 6U /* closure - idx to cell with pair variables . body in env - a user defined function */
-#define PRIM 7U /* primitive - idx to func ptr table - special forms - control evaluation - the primitive itself (callee) evaluates its arguments according to special rules */
-#define PROC 8U /* procedure - idx to func ptr table - builtins - eval args then apply procedure - the caller already evaluated all arguments - the callee takes already evaluated arguments */
-/* symbol table: list of strings key = symbol index (a b c) (cons a (cons b (cons c '()))) */
-scm_obj_t symbols;
-/* environments: list of list of pairs (symbol index . value|procedure) (((a . 3) (b . proc)) ((a . 5) (b . 8)) */
-scm_obj_t env;
 #endif
-
-#endif
-

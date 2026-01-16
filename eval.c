@@ -1,6 +1,11 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
 
+#undef DEBUG
+
 #include "scm754.h"
+#ifdef DEBUG
+#include <stdio.h>
+#endif
 
 static scm_obj_t eval_list(scm_obj_t list, scm_obj_t environment_specifier)
 {
@@ -16,24 +21,14 @@ static scm_obj_t eval_list(scm_obj_t list, scm_obj_t environment_specifier)
 
 extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier)
 {
-	scm_obj_t op, args, string, evaled_args;
-	const char *symbol;
-	size_t symbol_length;
+	scm_obj_t op, args, evaled_args;
 
 	if (scm_is_empty_list(expr_or_def)) {
 		return scm_error("eval: can not apply empty-list-object ()");
 	}
 	else if (scm_is_symbol(expr_or_def)) {
-		/* variable, note: also procedures are mapped in the environment */
-		string = scm_symbol_to_string(expr_or_def);
-		symbol = scm_string_value(string);
-		symbol_length = scm_string_length(string);
-
-		if ((symbol_length == 1) && (memcmp(symbol, "+", 1) == 0)) {
-			return expr_or_def; /* return the symbol as "procedure" */
-		}
-
-		return scm_error("lookup(environment_specifier, expr_or_def) not yet supported");
+		/* symbols are bound to values or procedures in the environment */
+		return scm_environment_lookup(environment_specifier, scm_intern(expr_or_def));
 	}
 	else if (scm_is_pair(expr_or_def)) {
 		op = scm_car(expr_or_def);
@@ -41,25 +36,48 @@ extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier
 
 		if (scm_is_symbol(op)) {
 			/* special forms */
-			string = scm_symbol_to_string(op);
-			symbol = scm_string_value(string);
-			symbol_length = scm_string_length(string);
-
-			/* if */
-			if ((symbol_length == 2) && (memcmp(symbol, "if", 2) == 0)) {
-				return scm_error("eval: if not implemented");
+			if (op == scm_if) {
+				if (!scm_is_pair(args)) return scm_error("eval: error in if form");
+				scm_obj_t cond = scm_eval(scm_car(args), environment_specifier);
+				args = scm_cdr(args);
+				if (!scm_is_pair(args)) return scm_error("eval: error in if form");
+				scm_obj_t then = scm_car(args);
+				scm_obj_t else_ = scm_cdr(args);
+				if (scm_boolean_value(cond))
+					return scm_eval(then, environment_specifier);
+				else if (!scm_is_empty_list(else_))
+					return scm_eval(scm_car(else_), environment_specifier);
+				else
+					return scm_unspecified();
 			}
-			/* quoted */
-			if ((symbol_length == 5) && (memcmp(symbol, "quote", 5) == 0)) {
+			if (op == scm_quote) {
 				return scm_is_empty_list(scm_cdr(args)) ? scm_car(args) : scm_error("eval: bad quote form");
 			}
-			/* definition */
-			if ((symbol_length == 6) && (memcmp(symbol, "define", 6) == 0)) {
-				return scm_error("eval: define not implemented");
+			if (op == scm_define) {
+				scm_obj_t var = scm_car(args);
+
+				/* de-sugar define special form to lambda */
+				if (scm_is_pair(var) && scm_is_symbol(scm_car(var))) {
+					scm_obj_t name   = scm_car(var);
+					scm_obj_t params = scm_cdr(var);
+					scm_obj_t rest = scm_cdr(args);
+					scm_obj_t lambda = scm_cons(scm_lambda, scm_cons(params, rest));
+					return scm_eval(scm_cons(scm_define, scm_cons(name, scm_cons(lambda, scm_empty_list()))), environment_specifier);
+				}
+
+				if (!scm_is_symbol(var)) return scm_error("eval: bad define form: variable is not a symbol");
+				scm_obj_t tmp = scm_cdr(args);
+				if (!scm_is_empty_list(scm_cdr(tmp))) return scm_error("eval: bad define form: too many arguments");
+
+				scm_obj_t val = scm_eval(scm_car(tmp), environment_specifier);
+				if (scm_is_error_object(val)) return val;
+				scm_environment_define(environment_specifier, scm_intern(var), val);
+				return scm_unspecified();
 			}
-			/* lambda */
-			if ((symbol_length == 6) && (memcmp(symbol, "lambda", 6) == 0)) {
-				return scm_error("eval: lambda not implemented");
+			if (op == scm_lambda) {
+				scm_obj_t params = scm_car(args); /* (a b) */
+				scm_obj_t body = scm_cdr(args); /* ((+ a b)) */
+				return scm_closure((uint32_t)scm_cons(params, scm_cons(body, scm_cons(environment_specifier, scm_empty_list())))); /* create a list of (params body environment) */
 			}
 		}
 
@@ -68,7 +86,10 @@ extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier
 		if (scm_is_error_object(proc)) return proc;
 		evaled_args = eval_list(args, environment_specifier);
 		if (scm_is_error_object(evaled_args)) return evaled_args;
-		return scm_apply(proc, evaled_args, environment_specifier);
+#ifdef DEBUG
+		printf("; eval: calling (apply "); scm_write(proc); printf(" "); scm_write(evaled_args); printf(")\n");
+#endif
+		return scm_apply(proc, evaled_args);
 	}
 	else {
 		/* self-evaluating */
@@ -76,33 +97,109 @@ extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier
 	}
 }
 
-extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, scm_obj_t environment_specifier)
+extern scm_obj_t scm_add(scm_obj_t args)
 {
-	scm_obj_t string;
-	const char *symbol;
-	size_t symbol_length;
-	(void)environment_specifier;
-
-	if (scm_is_symbol(proc)) {
-		/* primitive */
-		string = scm_symbol_to_string(proc);
-		symbol = scm_string_value(string);
-		symbol_length = scm_string_length(string);
-
-		/* + */
-		if ((symbol_length == 1) && (memcmp(symbol, "+", 1) == 0)) {
-			double result = 0;
-			while (!scm_is_empty_list(args)) {
-				scm_obj_t arg = scm_car(args);
-				if (scm_is_number(arg)) {
-					double value = scm_number_value(arg);
-					result += value;
-				}
-				else return scm_error("+: argument is not a number");
-				args = scm_cdr(args);
-			}
-			return scm_number(result);
-		}
+	double result = 0;
+	while (scm_is_pair(args)) {
+		scm_obj_t arg = scm_car(args);
+		if (!scm_is_number(arg)) return scm_error("+: needs a number");
+		result += scm_number_value(arg);
+		args = scm_cdr(args);
 	}
-	return scm_error("apply: not implemented");
+	return scm_number(result);
+}
+
+extern scm_obj_t scm_sub(scm_obj_t args)
+{
+	if (!scm_is_pair(args)) return scm_error("-: needs an argument");
+	scm_obj_t arg = scm_car(args);
+	if (!scm_is_number(arg)) return scm_error("-: needs a number");
+	double result = scm_number_value(arg);
+
+	args = scm_cdr(args);
+
+	if (scm_is_empty_list(args)) return scm_number(-result);
+
+	while (scm_is_pair(args)) {
+		arg = scm_car(args);
+		if (!scm_is_number(arg)) return scm_error("-: needs a number");
+		result -= scm_number_value(arg);
+		args = scm_cdr(args);
+	}
+	return scm_number(result);
+}
+
+extern scm_obj_t scm_mul(scm_obj_t args)
+{
+	double result = 1;
+	while (scm_is_pair(args)) {
+		scm_obj_t arg = scm_car(args);
+		if (!scm_is_number(arg)) return scm_error("*: needs a number");
+		result *= scm_number_value(arg);
+		args = scm_cdr(args);
+	}
+	return scm_number(result);
+}
+
+extern scm_obj_t scm_div(scm_obj_t args)
+{
+	if (!scm_is_pair(args)) return scm_error("/: needs an argument");
+	scm_obj_t arg = scm_car(args);
+	if (!scm_is_number(arg)) return scm_error("/: needs a number");
+	double result = scm_number_value(arg);
+
+	args = scm_cdr(args);
+
+	while (scm_is_pair(args)) {
+		arg = scm_car(args);
+		if (!scm_is_number(arg)) return scm_error("/: needs a number");
+		result /= scm_number_value(arg);
+		args = scm_cdr(args);
+	}
+	return scm_number(result);
+}
+
+extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
+{
+	uint32_t procedure;
+
+	if (scm_is_procedure(proc)) {
+		procedure = scm_procedure_id(proc);
+		if (procedure == SCM_PROCEDURE_ADD) return scm_add(args);
+		if (procedure == SCM_PROCEDURE_SUB) return scm_sub(args);
+		if (procedure == SCM_PROCEDURE_MUL) return scm_mul(args);
+		if (procedure == SCM_PROCEDURE_DIV) return scm_div(args);
+		if (procedure == SCM_PROCEDURE_WRITE) return scm_write(args);
+		if (procedure == SCM_PROCEDURE_CAR) return scm_car(scm_car(args));
+		if (procedure == SCM_PROCEDURE_CDR) return scm_cdr(scm_car(args));
+		else return scm_error("unknown procedure");
+	}
+	else if (scm_is_closure(proc)) {
+		proc = (proc & ~SCM_MASK) | SCM_PAIR;
+		scm_obj_t params = scm_car(proc);
+		scm_obj_t body = scm_car(scm_cdr(proc));
+		scm_obj_t env = scm_car(scm_cdr(scm_cdr((proc))));
+
+		/* extend environment: bind params to args */
+		scm_obj_t new_environment = scm_environment_extend(env, params, args);
+		if (scm_is_error_object(new_environment)) return new_environment;
+
+		/* eval body expressions in order, return last */
+		scm_obj_t result = scm_unspecified();
+		while (scm_is_pair(body)) {
+#ifdef DEBUG
+			printf("; apply: calling (eval "); scm_write(scm_car(body)); printf(" "); scm_write(new_environment); printf(")\n");
+#endif
+			result = scm_eval(scm_car(body), new_environment);
+			if (scm_is_error_object(result)) return result;
+			body = scm_cdr(body);
+		}
+		return result;
+	}
+	else {
+#ifdef DEBUG
+		printf("; error: apply: attempt to apply non-procedure: "); scm_write(proc); printf("\n");
+#endif
+		return scm_error("apply: attempt to apply non-procedure");
+	}
 }
