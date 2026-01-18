@@ -65,6 +65,9 @@ extern scm_obj_t scm_define;
 #define SCM_PROCEDURE_CONS 17
 #define SCM_PROCEDURE_SET_CAR 18
 #define SCM_PROCEDURE_SET_CDR 19
+#define SCM_PROCEDURE_NUMERIC_EQUAL 20
+#define SCM_PROCEDURE_QUOTIENT 21
+#define SCM_PROCEDURE_MODULO 22
 
 /* type predicates */
 static inline _Bool scm_is_empty_list(scm_obj_t obj)   { return (obj & SCM_MASK) == SCM_EMPTY_LIST; }

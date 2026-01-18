@@ -28,16 +28,16 @@ fuzz-blackbox:
 	./fuzz-blackbox
 
 scm754: $(SRC_SCHEME) scm754.h
-	$(CC) $(CFLAGS) -o $@ $(SRC_SCHEME)
+	$(CC) $(CFLAGS) -o $@ $(SRC_SCHEME) -lm
 
 scm754-debug: $(SRC_SCHEME) scm754.h
-	$(CC) $(CFLAGS) $(CFLAGS_EXTRA_DEBUG) -o $@ $(SRC_SCHEME)
+	$(CC) $(CFLAGS) $(CFLAGS_EXTRA_DEBUG) -o $@ $(SRC_SCHEME) -lm
 
 fuzz-whitebox: $(SRC_FUZZ) scm754.h
 	$(CC) $(CFLAGS) $(CFLAGS_EXTRA_FUZZ) -o $@ $(SRC_FUZZ)
 
 test-read: $(SRC_SCHEME) scm754.h
-	$(CC) $(CFLAGS) -DSCM_NO_EVAL -o $@ $(SRC_SCHEME)
+	$(CC) $(CFLAGS) -DSCM_NO_EVAL -o $@ $(SRC_SCHEME) -lm
 
 # test (read) and its round-trip invariant
 test-read.test: test-read.scm
