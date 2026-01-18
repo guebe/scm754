@@ -48,7 +48,7 @@ extern scm_obj_t scm_write(scm_obj_t obj)
 		fputs("#!error", stdout);
 	}
 	else if (scm_is_procedure(obj)) {
-		fputs("#!procedure", stdout);
+		printf("#!procedure%u", scm_procedure_id(obj));
 	}
 	else if (scm_is_closure(obj)) {
 		fputs("#!closure", stdout);

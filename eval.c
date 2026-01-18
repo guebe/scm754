@@ -181,6 +181,9 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 		if (procedure == SCM_PROCEDURE_IS_PAIR) return scm_boolean(scm_is_pair(scm_car(args)));
 		if (procedure == SCM_PROCEDURE_IS_CHAR) return scm_boolean(scm_is_char(scm_car(args)));
 		if (procedure == SCM_PROCEDURE_IS_NUMBER) return scm_boolean(scm_is_number(scm_car(args)));
+		if (procedure == SCM_PROCEDURE_CONS) return scm_cons(scm_car(args), scm_car(scm_cdr(args)));
+		if (procedure == SCM_PROCEDURE_SET_CAR) return scm_set_car(scm_car(args), scm_car(scm_cdr(args)));
+		if (procedure == SCM_PROCEDURE_SET_CDR) return scm_set_cdr(scm_car(args), scm_car(scm_cdr(args)));
 		else return scm_error("unknown procedure");
 	}
 	else if (scm_is_closure(proc)) {

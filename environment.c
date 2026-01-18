@@ -64,6 +64,9 @@ extern scm_obj_t scm_environment_create(void)
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("pair?", 5)), scm_procedure(SCM_PROCEDURE_IS_PAIR));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("char?", 5)), scm_procedure(SCM_PROCEDURE_IS_CHAR));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("number?", 7)), scm_procedure(SCM_PROCEDURE_IS_NUMBER));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("cons", 4)), scm_procedure(SCM_PROCEDURE_CONS));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-car!", 8)), scm_procedure(SCM_PROCEDURE_SET_CAR));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-cdr!", 8)), scm_procedure(SCM_PROCEDURE_SET_CDR));
 
 	return environment;
 }

@@ -3,22 +3,22 @@
 ; In the public domain
 
 ;(define *Verbose* #f)
-;
+
 ;(define testfile "test.tmp")
-;
+
 ;(if (file-exists? testfile)
 ;    (delete-file testfile))
-;
+
 ;(define Errors 0)
-;
+
 ;(define (void) (if #f #f))
-;
+
 ;(define (seq)
 ;  (let ((n 0))
 ;    (lambda ()
 ;      (set! n (+ 1 n))
 ;      n)))
-;
+
 ;(define (fail expr result expected)
 ;  (display "test failed: ")
 ;  (write expr)
@@ -30,7 +30,7 @@
 ;  (write expected)
 ;  (newline)
 ;  (set! Errors (+ 1 Errors)))
-;
+
 ;(define (test3 expr result expected)
 ;  (cond (*Verbose*
 ;          (write expr)
@@ -39,7 +39,7 @@
 ;          (newline)))
 ;  (if (not (equal? result expected))
 ;      (fail expr result expected)))
-;
+
 ;(define-syntax (test form expected)
 ;  `(test3 ',form ,form ,expected))
 
@@ -48,15 +48,15 @@
 ;  This is a comment
 
 ;#| This is a block comment |#
-;
+
 ;   #| Nested #| block |# comment |#
-;
+
 ;   #| Nested
 ;      #| multi-line |#
 ;         block comment |#
-;
+
 ;	 #|#|#||#|# nonsense |#
-;
+
 ;	 #| #|#||#|# more nonsense #|## |||#|#
 
 ;;; Syntax
@@ -379,19 +379,19 @@
 ((lambda () '())) ; '()
 ((lambda (x) x) 1) ; 1
 ;(test ((lambda (x y z) (list x y z)) 1 2 3) '(1 2 3))
-;
-;(test (((lambda (x) (lambda (y) (cons x y))) 1) 2) '(1 . 2))
-;
+
+(((lambda (x) (lambda (y) (cons x y))) 1) 2) ; '(1 . 2)
+
 ;((lambda (a . b) a) 'foo) ; 'foo
 ;((lambda (a . b) b) 'foo) ; '()
 ;((lambda (a . b) b) 'foo 'bar) ; '(bar)
 ;((lambda (a . b) b) 'foo 'bar 'baz) ; '(bar baz)
-;
+
 ;((lambda (a b . c) a) 'foo 'bar) ; 'foo
 ;((lambda (a b . c) b) 'foo 'bar) ; 'bar
 ;((lambda (a b . c) c) 'foo 'bar) ; '()
 ;((lambda (a b . c) c) 'foo 'bar 'baz) ; '(baz)
-;
+
 ;((lambda a a)) ; '()
 ;((lambda a a) 'foo) ; '(foo)
 ;((lambda a a) 'foo 'bar) ; '(foo bar)
@@ -406,28 +406,28 @@
 ; regression tests
 
 ;(define x 1)
-;
+
 ;(define (g) x)
-;
+
 ;(define (f0)
 ;  (let ((x 0))
 ;    (set! x (g))
 ;    x))
-;
+
 ;(define (f1)
 ;  (let ((x 0))
 ;    (let ()
 ;      (set! x (g))
 ;      x)))
-;
+
 ;(test (f0) 1)
 ;(test (f1) 1)
-;
+
 ;(define (f2)
 ;  (let ((x 2))
 ;    (let ((r (g)))
 ;      r)))
-;
+
 ;(test (f2) 1)
 
 ((lambda (x)
@@ -442,7 +442,7 @@
 ;(test (let () 1 2 3) 3)
 ;(test (let ((x 1)) x) 1)
 ;(test (let ((x 1) (y 2) (z 3)) (list x y z)) '(1 2 3))
-;
+
 ;(test (let ((x 0))
 ;         (let ((x 1)
 ;               (y (* x 1)))
@@ -453,7 +453,7 @@
 ;           (let ((y (* x 1)))
 ;             y)))
 ;       1)
-;
+
 ;(test (let ((x 'lexical))
 ;        (let ((f (lambda () x)))
 ;          (let ((x 'dynamic))
@@ -466,7 +466,7 @@
 ;(test (letrec () 1 2 3) 3)
 ;(test (letrec ((x 1)) x) 1)
 ;(test (letrec ((x 1) (y 2) (z 3)) (list x y z)) '(1 2 3))
-;
+
 ;(test (letrec
 ;         ((even-p
 ;            (lambda (x)
@@ -551,7 +551,7 @@
 ;(test (begin (let* ((x 'void)) (set! x 0)) x) 1)
 ;(test (begin (letrec ((x 'void)) (set! x 0)) x) 1)
 ;(test (begin (set! x 2) x) 2)
-;
+
 ;(test ((lambda (f)
 ;         ((lambda (x)
 ;            (set! f x)
@@ -743,31 +743,31 @@
 ;(test (char->integer #\z) 122)
 ;(test (char->integer #\newline) 10)
 ;(test (char->integer #\space) 32)
-;
+
 ;(test (integer->char 65) #\A)
 ;(test (integer->char 122) #\z)
 ;(test (integer->char 10) #\newline)
 ;(test (integer->char 32) #\space)
-;
+
 ;(test (list->string '(#\S #\t #\r #\i #\n #\g)) "String")
 ;(test (list->string '()) "")
-;
+
 ;(test (list->vector '(#t foo 1 #\c "s" (1 2 3) #(u v)))
 ;      '#(#t foo 1 #\c "s" (1 2 3) #(u v)))
 ;(test (list->vector '()) '#())
-;
+
 ;(test (string->list "String") '(#\S #\t #\r #\i #\n #\g))
 ;(test (string->list "") '())
-;
+
 ;(test (string->symbol "foo") 'foo)
 ;(test (string->symbol "string->symbol") 'string->symbol)
-;
+
 ;(test (symbol->string 'foo) "foo")
 ;(test (symbol->string 'symbol->string) "symbol->string")
 ;(test (symbol->string (string->symbol "miSSissiPPi")) "miSSissiPPi")
-;
+
 ;(test (eq? (string->symbol "foo") 'foo) #t)
-;
+
 ;(test (vector->list '#(#t foo 1 #\c "s" (1 2 3) #(u v)))
 ;      '(#t foo 1 #\c "s" (1 2 3) #(u v)))
 ;(test (vector->list '#()) '())
@@ -786,12 +786,12 @@
 ;;; Call-with-current-continuation
 
 ;(test (call/cc (lambda (k) 'foo)) 'foo)
-;
+
 ;(test (cons 'foo (call/cc (lambda (k) (k 'bar)))) '(foo . bar))
-;
+
 ;(test (cons 'foo (call/cc (lambda (k) (cons 'zzz (k 'bar)))))
 ;      '(foo . bar))
-;
+
 ;(test (letrec ((x (call/cc (lambda (k) (cons 'a k)))))
 ;        (let ((v (car x))
 ;              (k (cdr x)))
@@ -800,7 +800,7 @@
 ;                ((eq? v 'c) 'foo)
 ;                (else  #f))))
 ;      'foo)
-;
+
 ;(define (ctak x y z)
 ;  (define (ctak-aux k x y z)
 ;    (if (not (< y x))
@@ -817,7 +817,7 @@
 ;                (lambda (k) (ctak-aux k (- z 1) x y))))))))
 ;  (call-with-current-continuation
 ;    (lambda (k) (ctak-aux k x y z))))
-;
+
 ;(test (ctak 6 4 2) 3)
 
 ; Following CALL/CC tests by Al* Petrofsky
@@ -827,14 +827,14 @@
 ;            (x 'foo)
 ;            x))
 ;      'foo)
-;
+
 ;(test ((lambda (x)
 ;         (if (pair? x)
 ;             ((car x) (lambda () x))
 ;             (pair? (x))))
 ;       (call/cc list))
 ;      #t)
-;
+
 ;(test (letrec ((x (call/cc list))
 ;               (y (call/cc list)))
 ;        (cond ((procedure? x) (x (pair? y)))
@@ -842,7 +842,7 @@
 ;              ((call/cc (car x)) (call/cc (car y)))
 ;              (else #f)))
 ;      #t)
-;
+
 ;(test (letrec ((x (call/cc (lambda (c) (list #t c)))))
 ;        (if (car x)
 ;            ((cadr x) (list #f (lambda () x)))
@@ -859,7 +859,7 @@
 ;         (for-each (lambda (x y) (set-car! x y)) a '(x y z))
 ;         a)
 ;      '((x) (y) (z)))
-;
+
 ;(test (map - '(1 2 3)) '(-1 -2 -3))
 ;(test (map cons '(1 2 3) '(a b c))
 ;      '((1 . a) (2 . b) (3 . c)))
@@ -902,7 +902,7 @@
 ;(test (append '(a b) 'c) '(a b . c))
 ;(test (append '(a) 'b) '(a . b))
 ;(test (append 'a) 'a)
-;
+
 ;(test (assoc 'c '((a . a) (b . b))) #f)
 ;(test (assoc 'b '((a . a) (b . b))) '(b . b))
 ;(test (assoc 'a '((a . a) (b . b))) '(a . a))
@@ -911,19 +911,19 @@
 ;(test (assoc "x" '(("x" . x))) '("x" . x))
 ;(test (assoc 1 '((1 . x))) '(1 . x))
 ;(test (assoc #\x '((#\x . x))) '(#\x . x))
-;
+
 ;(test (assv 'c '((a . a) (b . b))) #f)
 ;(test (assv 'b '((a . a) (b . b))) '(b . b))
 ;(test (assv 'a '((a . a) (b . b))) '(a . a))
 ;(test (assv 'x '()) #f)
 ;(test (assv 1 '((1 . x))) '(1 . x))
 ;(test (assv #\x '((#\x . x))) '(#\x . x))
-;
+
 ;(test (assq 'c '((a . a) (b . b))) #f)
 ;(test (assq 'b '((a . a) (b . b))) '(b . b))
 ;(test (assq 'a '((a . a) (b . b))) '(a . a))
 ;(test (assq 'x '()) #f)
-;
+
 ;(define tree '((((1 . 2) . (3 . 4)) . ((5 . 6) . (7 . 8)))
 ;              .
 ;              (((9 . 10) . (11 . 12)) . ((13 . 14) . (15 . 16)))))
@@ -960,14 +960,14 @@
 (car '(1 . 2)) ; 1
 (cdr '(1 2)) ; '(2)
 (cdr '(1 . 2)) ; 2
-;(test (cons 1 2) '(1 . 2))
-;(test (cons 1 '(2)) '(1 2))
-;(test (cons 1 (cons 2 '())) '(1 2))
-;
+(cons 1 2) ; '(1 . 2)
+(cons 1 '(2)) ; '(1 2)
+(cons 1 (cons 2 '())) ; '(1 2)
+
 ;(test (length '()) 0)
 ;(test (length '(1)) 1)
 ;(test (length '(1 2 3)) 3)
-;
+
 ;(test (list) '())
 ;(test (list '()) '(()))
 ;(test (list 'x) '(x))
@@ -976,16 +976,16 @@
 ;(test (list 'a 'b 'c) '(a b c))
 ;(test (list 'a 'b 'c 'd) '(a b c d))
 ;(test (list 'a 'b 'c 'd 'e) '(a b c d e))
-;
+
 ;(test (list-ref '(1 2 3) 0) 1)
 ;(test (list-ref '(1 2 3) 1) 2)
 ;(test (list-ref '(1 2 3) 2) 3)
-;
+
 ;(test (list-tail '(1 2 3) 0) '(1 2 3))
 ;(test (list-tail '(1 2 3) 1) '(2 3))
 ;(test (list-tail '(1 2 3) 2) '(3))
 ;(test (list-tail '(1 2 3) 3) '())
-;
+
 ;(test (list? #f) #f)
 ;(test (list? #\c) #f)
 ;(test (list? 1) #f)
@@ -1012,7 +1012,7 @@
 ;  (if (list? cyclic3)
 ;      (fail '(list? cyclic3) #t)
 ;      (test (list? 'cyclic3) #f)))
-;
+
 ;(test (member 'c '(a b)) #f)
 ;(test (member 'b '(a b)) '(b))
 ;(test (member 'a '(a b)) '(a b))
@@ -1021,14 +1021,14 @@
 ;(test (member "x" '("x")) '("x"))
 ;(test (member 1 '(1)) '(1))
 ;(test (member #\x '(#\x)) '(#\x))
-;
+
 ;(test (memv 'c '(a b)) #f)
 ;(test (memv 'b '(a b)) '(b))
 ;(test (memv 'a '(a b)) '(a b))
 ;(test (memv 'x '()) #f)
 ;(test (memv 1 '(1)) '(1))
 ;(test (memv #\x '(#\x)) '(#\x))
-;
+
 ;(test (memq 'c '(a b)) #f)
 ;(test (memq 'b '(a b)) '(b))
 ;(test (memq 'a '(a b)) '(a b))
@@ -1174,18 +1174,18 @@
 ;(test (>= 0 1234567890) #f)
 ;(test (>= 9 8 7 6 5 4 3 2 1 0) #t)
 ;(test (>= 9 8 7 6 5 4 3 2 1 1) #t)
-;
+
 ;(test (abs 1234567890) 1234567890)
 ;(test (abs -1234567890) 1234567890)
 ;(test (abs 0) 0)
-;
+
 ;(test (even? -1) #f)
 ;(test (even? 0) #t)
 ;(test (even? 1) #f)
 ;(test (even? 2) #t)
 ;(test (even? 1234567890) #t)
 ;(test (even? 1234567891) #f)
-;
+
 ;(test (expt 0 2) 0)
 ;(test (expt 2 0) 1)
 ;(test (expt 2 1) 2)
@@ -1194,25 +1194,25 @@
 ;(test (expt -2 3) -8)
 ;(test (expt -2 4) 16)
 ;(test (expt 2 100) 1267650600228229401496703205376)
-;
+
 ;(test (gcd) 0)
 ;(test (gcd 17) 17)
 ;(test (gcd 18 12) 6)
 ;(test (gcd 289 85 34) 17)
-;
+
 ;(test (lcm) 1)
 ;(test (lcm 17) 17)
 ;(test (lcm 12 18) 36)
 ;(test (lcm 5 12 18) 180)
-;
+
 ;(test (min 1) 1)
 ;(test (min 2 1 3) 1)
 ;(test (min 2 1 -2 -1 3) -2)
-;
+
 ;(test (max 1) 1)
 ;(test (max 2 3 1) 3)
 ;(test (max 2 -2 5 -1 3) 5)
-;
+
 ;(test (modulo  1234567890  12345)  6165)
 ;(test (modulo  1234567890 -12345) -6180)
 ;(test (modulo -1234567890  12345)  6180)
@@ -1225,11 +1225,11 @@
 ;(test (modulo  12345 -12345) 0)
 ;(test (modulo -12345  12345) 0)
 ;(test (modulo -12345 -12345) 0)
-;
+
 ;(test (negative? -1) #t)
 ;(test (negative?  0) #f)
 ;(test (negative?  1) #f)
-;
+
 ;(test (not #f) #t)
 ;(test (not #\c) #f)
 ;(test (not 1) #f)
@@ -1241,18 +1241,18 @@
 ;(test (not '#(vector)) #f)
 ;(test (not (current-input-port)) #f)
 ;(test (not (current-output-port)) #f)
-;
+
 ;(test (odd? -1) #t)
 ;(test (odd? 0) #f)
 ;(test (odd? 1) #t)
 ;(test (odd? 2) #f)
 ;(test (odd? 1234567890) #f)
 ;(test (odd? 1234567891) #t)
-;
+
 ;(test (positive? -1) #f)
 ;(test (positive?  0) #f)
 ;(test (positive?  1) #t)
-;
+
 ;(test (quotient  1234567890  12345)  100005)
 ;(test (quotient  1234567890 -12345) -100005)
 ;(test (quotient -1234567890  12345) -100005)
@@ -1265,7 +1265,7 @@
 ;(test (quotient  12345 -12345) -1)
 ;(test (quotient -12345  12345) -1)
 ;(test (quotient -12345 -12345)  1)
-;
+
 ;(test (remainder  1234567890  12345)  6165)
 ;(test (remainder  1234567890 -12345)  6165)
 ;(test (remainder -1234567890  12345) -6165)
@@ -1278,7 +1278,7 @@
 ;(test (remainder  12345 -12345) 0)
 ;(test (remainder -12345  12345) 0)
 ;(test (remainder -12345 -12345) 0)
-;
+
 ;(test (zero? -1) #f)
 ;(test (zero?  0) #t)
 ;(test (zero?  1) #f)
@@ -1306,7 +1306,7 @@
 ;(test (eqv? 1   1.0) #f)
 ;(test (eqv? 1.0 1  ) #f)
 ;(test (eqv? 1.0 1.0) #t)
-;
+
 ;(test (equal? 'x 'y) #f)
 ;(test (equal? #f #f) #t)
 ;(test (equal? #\c #\c) #t)
@@ -1321,7 +1321,7 @@
 ;(test (equal? '#(vector #(vector) vector) #(vector #(vector) vector)) #t)
 ;(test (equal? '#(vector #(vec1) vector) #(vector #(vec2) vector)) #f)
 ;(test (equal? tree tree) #t)
-;
+
 ;(test (equal? #f #\c) #f)
 ;(test (equal? #f 1) #f)
 ;(test (equal? #f '(pair)) #f)
@@ -1370,9 +1370,9 @@
 ;(test (equal? 1   1.0) #f)
 ;(test (equal? 1.0 1  ) #f)
 ;(test (equal? 1.0 1.0) #t)
-;
+
 ;(test (let ((x (list 1))) (equal? x x)) #t)
-;
+
 ;(test (equal? '(a (b c) (d (e . f) g)) '(a (b c) (d (e . f) g))) #t)
 ;(test (equal? '(a (b c) (d (e . x) g)) '(a (b c) (d (e . f) g))) #f)
 ;(test (equal? '#(a (b c) (d (e . f) g)) '#(a (b c) (d (e . f) g))) #t)
@@ -1388,7 +1388,7 @@
 ;(test (char-alphabetic? #\[) #f)
 ;(test (char-alphabetic? #\`) #f)
 ;(test (char-alphabetic? #\{) #f)
-;
+
 ;(test (char-ci<? #\+ #\+) #f)
 ;(test (char-ci<? #\+ #\-) #t)
 ;(test (char-ci<? #\A #\A) #f)
@@ -1407,7 +1407,7 @@
 ;(test (char-ci<? #\a #\b #\b) #f)
 ;(test (char-ci<? #\b #\b #\a) #f)
 ;(test (char-ci<? #\c #\b #\a) #f)
-;
+
 ;(test (char-ci<=? #\+ #\+) #t)
 ;(test (char-ci<=? #\+ #\-) #t)
 ;(test (char-ci<=? #\A #\A) #t)
@@ -1426,7 +1426,7 @@
 ;(test (char-ci<=? #\a #\b #\b) #t)
 ;(test (char-ci<=? #\b #\b #\a) #f)
 ;(test (char-ci<=? #\c #\b #\a) #f)
-;
+
 ;(test (char-ci=? #\+ #\+) #t)
 ;(test (char-ci=? #\+ #\-) #f)
 ;(test (char-ci=? #\A #\A) #t)
@@ -1439,7 +1439,7 @@
 ;(test (char-ci=? #\a #\z) #f)
 ;(test (char-ci=? #\a #\A #\a) #t)
 ;(test (char-ci=? #\a #\A #\b) #f)
-;
+
 ;(test (char-ci>? #\+ #\+) #f)
 ;(test (char-ci>? #\+ #\-) #f)
 ;(test (char-ci>? #\A #\A) #f)
@@ -1458,7 +1458,7 @@
 ;(test (char-ci>? #\a #\b #\b) #f)
 ;(test (char-ci>? #\b #\b #\a) #f)
 ;(test (char-ci>? #\c #\b #\a) #t)
-;
+
 ;(test (char-ci>=? #\+ #\+) #t)
 ;(test (char-ci>=? #\+ #\-) #f)
 ;(test (char-ci>=? #\A #\A) #t)
@@ -1477,7 +1477,7 @@
 ;(test (char-ci>=? #\a #\b #\b) #f)
 ;(test (char-ci>=? #\b #\b #\a) #t)
 ;(test (char-ci>=? #\c #\b #\a) #t)
-;
+
 ;(test (char-downcase #\a) #\a)
 ;(test (char-downcase #\A) #\a)
 ;(test (char-downcase #\z) #\z)
@@ -1486,7 +1486,7 @@
 ;(test (char-downcase #\[) #\[)
 ;(test (char-downcase #\`) #\`)
 ;(test (char-downcase #\{) #\{)
-;
+
 ;(test (char-lower-case? #\a) #t)
 ;(test (char-lower-case? #\A) #f)
 ;(test (char-lower-case? #\z) #t)
@@ -1495,12 +1495,12 @@
 ;(test (char-lower-case? #\[) #f)
 ;(test (char-lower-case? #\`) #f)
 ;(test (char-lower-case? #\{) #f)
-;
+
 ;(test (char-numeric? #\0) #t)
 ;(test (char-numeric? #\9) #t)
 ;(test (char-numeric? #\/) #f)
 ;(test (char-numeric? #\:) #f)
-;
+
 ;(test (char-upcase #\a) #\A)
 ;(test (char-upcase #\A) #\A)
 ;(test (char-upcase #\z) #\Z)
@@ -1509,7 +1509,7 @@
 ;(test (char-upcase #\[) #\[)
 ;(test (char-upcase #\`) #\`)
 ;(test (char-upcase #\{) #\{)
-;
+
 ;(test (char-upper-case? #\a) #f)
 ;(test (char-upper-case? #\A) #t)
 ;(test (char-upper-case? #\z) #f)
@@ -1518,7 +1518,7 @@
 ;(test (char-upper-case? #\[) #f)
 ;(test (char-upper-case? #\`) #f)
 ;(test (char-upper-case? #\{) #f)
-;
+
 ;(test (char-whitespace? #\0) #f)
 ;(test (char-whitespace? #\9) #f)
 ;(test (char-whitespace? #\a) #f)
@@ -1530,7 +1530,7 @@
 ;(test (char-whitespace? (integer->char 10)) #t)
 ;(test (char-whitespace? (integer->char 12)) #t)
 ;(test (char-whitespace? (integer->char 13)) #t)
-;
+
 ;(test (char<? #\+ #\+) #f)
 ;(test (char<? #\+ #\-) #t)
 ;(test (char<? #\A #\A) #f)
@@ -1549,7 +1549,7 @@
 ;(test (char<? #\a #\a #\b) #f)
 ;(test (char<? #\c #\c #\b) #f)
 ;(test (char<? #\c #\b #\a) #f)
-;
+
 ;(test (char<=? #\+ #\+) #t)
 ;(test (char<=? #\+ #\-) #t)
 ;(test (char<=? #\A #\A) #t)
@@ -1568,7 +1568,7 @@
 ;(test (char<=? #\a #\a #\b) #t)
 ;(test (char<=? #\c #\c #\b) #f)
 ;(test (char<=? #\c #\b #\a) #f)
-;
+
 ;(test (char=? #\+ #\+) #t)
 ;(test (char=? #\+ #\-) #f)
 ;(test (char=? #\A #\A) #t)
@@ -1585,7 +1585,7 @@
 ;(test (char=? #\z #\a) #f)
 ;(test (char=? #\a #\a #\a) #t)
 ;(test (char=? #\a #\a #\b #\a) #f)
-;
+
 ;(test (char>? #\+ #\+) #f)
 ;(test (char>? #\+ #\-) #f)
 ;(test (char>? #\A #\A) #f)
@@ -1604,7 +1604,7 @@
 ;(test (char>? #\a #\a #\b) #f)
 ;(test (char>? #\c #\c #\b) #f)
 ;(test (char>? #\c #\b #\a) #t)
-;
+
 ;(test (char>=? #\+ #\+) #t)
 ;(test (char>=? #\+ #\-) #f)
 ;(test (char>=? #\A #\A) #t)
@@ -1628,11 +1628,11 @@
 
 ;(define (string-downcase s)
 ;  (list->string (map char-downcase (string->list s))))
-;
+
 ;(test (make-string 0) "")
 ;(test (make-string 1) " ")
 ;(test (make-string 3 #\x) "xxx")
-;
+
 ;(test (number->string 0) "0")
 ;(test (number->string 123) "123")
 ;(test (number->string 165 2) "10100101")
@@ -1647,12 +1647,12 @@
 ;(test (number->string -375 8) "-567")
 ;(test (number->string -789 10) "-789")
 ;(test (string-downcase (number->string -11259375 16)) "-abcdef")
-;
+
 ;(define (numstr=? a b)
 ;  (<= (abs (- (string->number a)
 ;              (string->number b)))
 ;      *epsilon*))
-;
+
 ;(test (numstr=? (number->string 1.0) "1.0") #t)
 ;(test (numstr=? (number->string 123.0) "123.0") #t)
 ;(test (numstr=? (number->string 123.4) "123.4") #t)
@@ -1675,11 +1675,11 @@
 ;(test (numstr=? (number->string -0.00123) "-0.00123") #t)
 ;(test (numstr=? (number->string -0.000123) "-0.000123") #t)
 ;(test (numstr=? (number->string -0.0000123) "-1.23e-5") #t)
-;
+
 ;(test (string) "")
 ;(test (string #\x) "x")
 ;(test (string #\a #\b #\c) "abc")
-;
+
 ;(test (string->number "") #f)
 ;(test (string->number "+") #f)
 ;(test (string->number "-") #f)
@@ -1697,7 +1697,7 @@
 ;(test (string->number "-123" 8) -83)
 ;(test (string->number "-123" 10) -123)
 ;(test (string->number "-123" 16) -291)
-;
+
 ;(test (string->number "0.0") 0.0)
 ;(test (string->number "1.0") 1.0)
 ;(test (string->number "-1.0") -1.0)
@@ -1746,7 +1746,7 @@
 ;(test (string->number "1.23F5") 1.23e+5)
 ;(test (string->number "1.23L5") 1.23e+5)
 ;(test (string->number "1.23S5") 1.23e+5)
-;
+
 ;(test (string->number "02" 2) #f)
 ;(test (string->number "08" 8) #f)
 ;(test (string->number "0a" 10) #f)
@@ -1755,7 +1755,7 @@
 ;(test (string->number "1 ") #f)
 ;(test (string->number "+1 ") #f)
 ;(test (string->number "-1 ") #f)
-;
+
 ;(test (string-append "" "") "")
 ;(test (string-append "abc" "") "abc")
 ;(test (string-append "" "def") "def")
@@ -1763,7 +1763,7 @@
 ;(test (string-append "abc") "abc")
 ;(test (string-append "abc" "def") "abcdef")
 ;(test (string-append "abc" "def" "xyz") "abcdefxyz")
-;
+
 ;(test (string-ci<? "test" "test") #f)
 ;(test (string-ci<? "test" "tesa") #f)
 ;(test (string-ci<? "test" "tesz") #t)
@@ -1780,7 +1780,7 @@
 ;(test (string-ci<? "ab" "ab" "cd") #f)
 ;(test (string-ci<? "cd" "cd" "ab") #f)
 ;(test (string-ci<? "ef" "cd" "ab") #f)
-;
+
 ;(test (string-ci<=? "test" "test") #t)
 ;(test (string-ci<=? "test" "tesa") #f)
 ;(test (string-ci<=? "test" "tesz") #t)
@@ -1797,7 +1797,7 @@
 ;(test (string-ci<=? "ab" "ab" "cd") #t)
 ;(test (string-ci<=? "cd" "cd" "ab") #f)
 ;(test (string-ci<=? "ef" "cd" "ab") #f)
-;
+
 ;(test (string-ci=? "abc" "abc") #t)
 ;(test (string-ci=? "abC" "abc") #t)
 ;(test (string-ci=? "aBc" "abc") #t)
@@ -1812,7 +1812,7 @@
 ;(test (string-ci=? "abcd" "abc") #f)
 ;(test (string-ci=? "abc" "abc" "abc") #t)
 ;(test (string-ci=? "abc" "abc" "cba") #f)
-;
+
 ;(test (string-ci>? "test" "test") #f)
 ;(test (string-ci>? "test" "tesa") #t)
 ;(test (string-ci>? "test" "tesz") #f)
@@ -1829,7 +1829,7 @@
 ;(test (string-ci>? "ab" "ab" "cd") #f)
 ;(test (string-ci>? "cd" "cd" "ab") #f)
 ;(test (string-ci>? "ef" "cd" "ab") #t)
-;
+
 ;(test (string-ci>=? "test" "test") #t)
 ;(test (string-ci>=? "test" "tesa") #t)
 ;(test (string-ci>=? "test" "tesz") #f)
@@ -1846,7 +1846,7 @@
 ;(test (string-ci>=? "ab" "ab" "cd") #f)
 ;(test (string-ci>=? "cd" "cd" "ab") #t)
 ;(test (string-ci>=? "ef" "cd" "ab") #t)
-;
+
 ;(test (string-copy "") "")
 ;(test (string-copy "abcdef") "abcdef")
 ;(test (begin (let ((s "abc"))
@@ -1854,25 +1854,25 @@
 ;                  (string-set! s2 1 #\x)
 ;                  s)))
 ;      "abc")
-;
+
 ;(test (let ((s (make-string 1))) (string-fill! s #\x) s) "x")
 ;(test (let ((s (make-string 3))) (string-fill! s #\z) s) "zzz")
-;
+
 ;(test (string-length "") 0)
 ;(test (string-length "a") 1)
 ;(test (string-length "ab") 2)
 ;(test (string-length "abc") 3)
 ;(test (string-length "Hello, World!") 13)
-;
+
 ;(test (string-ref "abc" 0) #\a)
 ;(test (string-ref "abc" 1) #\b)
 ;(test (string-ref "abc" 2) #\c)
-;
+
 ;(define s (string #\1 #\2 #\3))
 ;(test (begin (string-set! s 0 #\a) s) "a23")
 ;(test (begin (string-set! s 2 #\c) s) "a2c")
 ;(test (begin (string-set! s 1 #\b) s) "abc")
-;
+
 ;(test (string<? "test" "test") #f)
 ;(test (string<? "test" "tesa") #f)
 ;(test (string<? "test" "tesz") #t)
@@ -1889,7 +1889,7 @@
 ;(test (string<? "ab" "ab" "cd") #f)
 ;(test (string<? "cd" "cd" "ab") #f)
 ;(test (string<? "ef" "cd" "ab") #f)
-;
+
 ;(test (string<=? "test" "test") #t)
 ;(test (string<=? "test" "tesa") #f)
 ;(test (string<=? "test" "tesz") #t)
@@ -1906,7 +1906,7 @@
 ;(test (string<=? "ab" "ab" "cd") #t)
 ;(test (string<=? "cd" "cd" "ab") #f)
 ;(test (string<=? "ef" "cd" "ab") #f)
-;
+
 ;(test (string=? "abc" "abc") #t)
 ;(test (string=? "aBc" "abc") #f)
 ;(test (string=? "abc" "abd") #f)
@@ -1914,7 +1914,7 @@
 ;(test (string=? "abcd" "abc") #f)
 ;(test (string=? "abc" "abc" "abc") #t)
 ;(test (string=? "abc" "abc" "cba") #f)
-;
+
 ;(test (string>? "test" "test") #f)
 ;(test (string>? "test" "tesa") #t)
 ;(test (string>? "test" "tesz") #f)
@@ -1931,7 +1931,7 @@
 ;(test (string>? "ab" "ab" "cd") #f)
 ;(test (string>? "cd" "cd" "ab") #f)
 ;(test (string>? "ef" "cd" "ab") #t)
-;
+
 ;(test (string>=? "test" "test") #t)
 ;(test (string>=? "test" "tesa") #t)
 ;(test (string>=? "test" "tesz") #f)
@@ -1948,7 +1948,7 @@
 ;(test (string>=? "ab" "ab" "cd") #f)
 ;(test (string>=? "cd" "cd" "ab") #t)
 ;(test (string>=? "ef" "cd" "ab") #t)
-;
+
 ;(test (substring "" 0 0) "")
 ;(test (substring "abc" 0 0) "")
 ;(test (substring "abc" 0 1) "a")
@@ -1966,43 +1966,43 @@
 ;(test (make-vector 0) #())
 ;(test (make-vector 1) #(#f))
 ;(test (make-vector 3 'x) #(x x x))
-;
+
 ;(test (vector) '#())
 ;(test (vector 'x) '#(x))
 ;(test (vector 1 2 3) '#(1 2 3))
 ;(test (vector (vector 'x)) '#(#(x)))
-;
+
 ;(test (let ((v (vector))) (vector-fill! v 'x) v) '#())
 ;(test (let ((v (vector 1 2 3))) (vector-fill! v 'z) v) '#(z z z))
-;
+
 ;(test (vector-length #()) 0)
 ;(test (vector-length #(a)) 1)
 ;(test (vector-length #(a b)) 2)
 ;(test (vector-length #(a b c)) 3)
 ;(test (vector-length #(1 2 3 #(4 5 6) 7 8 9)) 7)
-;
+
 ;(test (vector-ref #(a b c) 0) 'a)
 ;(test (vector-ref #(a b c) 1) 'b)
 ;(test (vector-ref #(a b c) 2) 'c)
-;
+
 ;(define v (vector 1 2 3))
 ;(test (begin (vector-set! v 0 'a) v) '#(a 2 3))
 ;(test (begin (vector-set! v 2 'c) v) '#(a 2 c))
 ;(test (begin (vector-set! v 1 'b) v) '#(a b c))
-;
+
 ;;;; Input/Output
-;
+
 ;(if (file-exists? testfile) (delete-file testfile))
-;
+
 ;(test (call-with-output-file testfile
 ;        (lambda (out)
 ;          (write '(this is a test) out)
 ;          (close-output-port out)
 ;          (call-with-input-file testfile read)))
 ;      '(this is a test))
-;
+
 ;(delete-file testfile)
-;
+
 ;(test (let ((out (open-output-file testfile)))
 ;        (write '(this is a test) out)
 ;        (close-output-port out)
@@ -2011,9 +2011,9 @@
 ;            (close-input-port in)
 ;            x)))
 ;      '(this is a test))
-;
+
 ;(delete-file testfile)
-;
+
 ;(test (let ((out (open-output-file testfile)))
 ;        (display "Hello-World" out)
 ;        (close-output-port out)
@@ -2022,14 +2022,14 @@
 ;            (close-input-port in)
 ;            x)))
 ;      'hello-world)
-;
+
 ;(delete-file testfile)
-;
+
 ;(test (begin (with-output-to-file testfile
 ;               (lambda () (write '(this is a test))))
 ;             (with-input-from-file testfile read))
 ;      '(this is a test))
-;
+
 ;(define (visibility-check x)
 ;  (delete-file testfile)
 ;  (let ((out (open-output-file testfile)))
@@ -2044,7 +2044,7 @@
 ;        (let ((invis (read in)))
 ;          (close-input-port in)
 ;          (list vis invis))))))
-;
+
 ;(test (visibility-check #f) '(#f #f))
 ;(test (visibility-check 1) '(1 1))
 ;(test (visibility-check 12345678901234567890)
@@ -2059,33 +2059,33 @@
 ;(test (visibility-check " ") '(" " the-end))
 ;(test (visibility-check #\space) '(#\space the-end))
 ;(test (visibility-check #\newline) '(#\newline the-end))
-;
+
 ;(delete-file testfile)
-;
+
 ;(test (begin (with-output-to-file testfile newline)
 ;               (with-input-from-file testfile read-char))
 ;      #\newline)
-;
+
 ;(delete-file testfile)
-;
+
 ;(test (begin (call-with-output-file testfile
 ;               (lambda (out)
 ;                 (newline out)
 ;                 (close-output-port out)))
 ;             (call-with-input-file testfile read-char))
 ;      #\newline)
-;
+
 ;(delete-file testfile)
-;
+
 ;(test (begin (close-output-port (open-output-file testfile))
 ;             (let* ((in (open-input-file testfile))
 ;                    (e (read in)))
 ;               (close-input-port in)
 ;               (eof-object? e)))
 ;      #t)
-;
+
 ;(delete-file testfile)
-;
+
 ;(define foo 'bar)
 ;(test (let ((out (open-output-file testfile)))
 ;        (write '(define foo 'baz) out)
@@ -2093,15 +2093,15 @@
 ;        (load testfile)
 ;        foo)
 ;      'baz)
-;
+
 ;(define (with-range lo hi fn)
 ;  (if (< hi lo)
 ;      '()
 ;      (let ((c (fn lo)))
 ;        (cons c (with-range (+ 1 lo) hi fn)))))
-;
+
 ;(delete-file testfile)
-;
+
 ;(test (call-with-output-file testfile
 ;        (lambda (out)
 ;          (with-range 32 126
@@ -2109,22 +2109,22 @@
 ;              (write-char (integer->char x) out)
 ;              (integer->char x)))))
 ;      (with-range 32 126 integer->char))
-;
+
 ;(define (while-not-eof input fn)
 ;  (let ((c (fn input)))
 ;    (if (eof-object? c)
 ;        '()
 ;        (cons c (while-not-eof input fn)))))
-;
+
 ;(test (let ((in (open-input-file testfile)))
 ;        (while-not-eof in read-char))
 ;      (with-range 32 126 integer->char))
-;
+
 ;(test (let ((in (open-input-file testfile)))
 ;        (let ((c (peek-char in)))
 ;          (cons c (while-not-eof in read-char))))
 ;       (cons #\space (with-range 32 126 integer->char)))
-;
+
 ;; Does GC close unused files?
 ;; Set NFILES to a number that is greater than MAX_PORTS in s9.c
 ;(let ((NFILES 100))
@@ -2137,31 +2137,31 @@
 ;                   (open (- n 1))))))
 ;          (open NFILES))
 ;        'okay))
-;
+
 ;;;; S9fES Extensions
-;
+
 ;(test (list? (command-line)) #t)
 ;(test (output-port? (current-error-port)) #t)
 ;(test (symbol? (gensym)) #t)
 ;(test (eq? (gensym) (gensym)) #f)
 ;(test (list? (symbols)) #t)
-;
+
 ;(if (file-exists? testfile) (delete-file testfile))
 ;(test (file-exists? testfile) #f)
 ;(close-output-port (open-output-file testfile))
 ;(test (file-exists? testfile) #t)
 ;(delete-file testfile)
 ;(test (file-exists? testfile) #f)
-;
+
 ;(test (eval '(+ 1 2 3)) 6)
 ;(eval '(define foo 'barbazgoo))
 ;(test (eval 'foo) 'barbazgoo)
-;
+
 ;(test (exponent 1.23) -2)
 ;(test (exponent 1) 0)
 ;(test (mantissa 1.23) 123)
 ;(test (mantissa 1) 1)
-;
+
 ;(let ((of (open-output-file testfile)))
 ;  (write 'append of)
 ;  (close-output-port of))
@@ -2169,26 +2169,26 @@
 ;  (write '-to-file af)
 ;  (close-output-port af))
 ;(test (read (open-input-file testfile)) 'append-to-file)
-;
+
 ;(test (reverse! (list 1 2 3)) '(3 2 1))
 ;(test (reverse! '()) '())
 ;(test (let ((x (list 1 2 3))) (reverse! x) x) '(1))
-;
+
 ;;set-input-port!
 ;;set-output-port!
-;
+
 ;(test (car (stats '(cons 1 2))) '(1 . 2))
-;
+
 ;(test (vector-copy '#(a b c d e f)) '#(a b c d e f))
 ;(test (vector-copy '#(a b c d e f) 2) '#(c d e f))
 ;(test (vector-copy '#(a b c d e f) 2 4) '#(c d))
 ;(test (vector-length (vector-copy '#(a b c d e f) 2 8)) 6)
 ;(test (vector-copy (vector-copy '#(a b c d e f) 0 6)) '#(a b c d e f))
 ;(test (vector-copy '#(a b c d e f) 2 8 'x) '#(c d e f x x))
-;
+
 ;(define (mask x)
 ;  (bit-op 1 #b1111 x))
-;
+
 ;(test (mask (bit-op  0 #b0011 #b0101)) 0)
 ;(test (mask (bit-op  1 #b0011 #b0101)) 1)
 ;(test (mask (bit-op  2 #b0011 #b0101)) 2)
@@ -2205,21 +2205,21 @@
 ;(test (mask (bit-op 13 #b0011 #b0101)) 13)
 ;(test (mask (bit-op 14 #b0011 #b0101)) 14)
 ;(test (mask (bit-op 15 #b0011 #b0101)) 15)
-;
+
 ;(test (vector-append) '#())
 ;(test (vector-append '#(foo)) '#(foo))
 ;(test (vector-append '#(foo) #(bar)) '#(foo bar))
 ;(test (vector-append '#(foo) #(bar) #(baz)) '#(foo bar baz))
-;
+
 ;; catch and throw
-;
+
 ;(test (catch (lambda (k) 'foo)) 'foo)
-;
+
 ;(test (cons 'foo (catch (lambda (k) (throw k 'bar)))) '(foo . bar))
-;
+
 ;(test (cons 'foo (catch (lambda (k) (cons 'zzz (throw k 'bar)))))
 ;      '(foo . bar))
-;
+
 ;(define (ctak x y z)
 ;  (define (ctak-aux k x y z)
 ;    (if (not (< y x))
@@ -2232,9 +2232,9 @@
 ;              (catch (lambda (k) (ctak-aux k (- y 1) z x)))
 ;              (catch (lambda (k) (ctak-aux k (- z 1) x y))))))))
 ;  (catch (lambda (k) (ctak-aux k x y z))))
-;
+
 ;(test (ctak 6 4 2) 3)
-;
+
 ;(define list-length
 ;  (lambda (obj)
 ;    (catch
@@ -2247,26 +2247,26 @@
 ;                            (else
 ;                              (throw improper #f))))))
 ;          (r obj))))))
-;
+
 ;(test (list-length '(1 2 3 4)) 4)
 ;(test (list-length '(a b . c)) #f)
-;
+
 ;(test (catch-errors 'failed (cons 1 2)) '(1 . 2))
 ;(test (catch-errors 'failed (car 'x)) 'failed)
 ;(test (catch-errors 'failed (quotient 1 0)) 'failed)
-;
+
 ;(test (catch-errors 'foo (catch-errors (car 'x) 'bar) 'baz) 'foo)
-;
+
 ;;;; Macros
-;
+
 ;(define-macro (kwote x) (list 'quote x))
 ;(test (kwote (list 1 2 3)) '(list 1 2 3))
 ;(define-macro (kwote x) (list 'quote x))  ; redefine
 ;(test (kwote (list 1 2 3)) '(list 1 2 3))
-;
+
 ;(define-syntax (kwote x) (list 'quote x))
 ;(test (kwote (list 1 2 3)) '(list 1 2 3))
-;
+
 ;(define-syntax (times n)
 ;  (if (zero? n)
 ;      '()
@@ -2274,10 +2274,10 @@
 ;(test (times 0) '())
 ;(test (times 1) '(1))
 ;(test (times 10) '(1 1 1 1 1 1 1 1 1 1))
-;
+
 ;(test (macro-expand '(times 3)) '(cons 1 (cons 1 (cons 1 ()))))
 ;(test (macro-expand-1 '(times 3)) '(cons 1 (times 2)))
-;
+
 ;(define-syntax (letrec* bs x . xs)
 ;  (let ((vs (map car bs))
 ;        (as (map cadr bs)))
@@ -2291,21 +2291,21 @@
 ;         (let ()
 ;           ,x
 ;           ,@xs)))))
-;
+
 ;(test (macro-expand '(letrec* ((a 1) (b 2)) (a b)))
 ;      '((lambda (a b) (set! a 1) (set! b 2) ((lambda () (a b)))) #f #f))
 ;(test (macro-expand-1 '(letrec* ((a 1) (b 2)) (a b)))
 ;      '(let ((a #f) (b #f)) (set! a 1) (set! b 2) (let () (a b))))
-;
+
 ;;;; APPLY of primitive procedures
-;
+
 ;(test (list? (apply command-line '())) #t)
 ;(test (input-port? (apply current-input-port '())) #t)
 ;(test (output-port? (apply current-output-port '())) #t)
 ;(test (output-port? (apply current-error-port '())) #t)
 ;(test (symbol? (apply gensym '())) #t)
 ;(test (list? (apply symbols '())) #t)
-;
+
 ;(test (apply abs '(-1)) 1)
 ;(test (apply boolean? '(#f)) #t)
 ;(test (apply car '((a . b))) 'a)
@@ -2405,7 +2405,7 @@
 ;(test (apply vector-length '(#(foo bar baz))) 3)
 ;(test (apply vector? '(#(foo bar baz))) #t)
 ;(test (apply zero? '(0)) #t)
-;
+
 ;(test (apply assq '(b ((a) (b) (c)))) '(b))
 ;(test (apply assv '(2 ((1) (2) (3)))) '(2))
 ;(test (apply char-ci<? '(#\A #\b)) #t)
@@ -2449,7 +2449,7 @@
 ;              x)
 ;      '#(zzz zzz zzz))
 ;(test (apply vector-ref '(#(a b c) 1)) 'b)
-;
+
 ;(test (let () (define x (string-copy "foo"))
 ;              (apply string-set! `(,x 2 #\b))
 ;              x)
@@ -2473,12 +2473,12 @@
 ;(test (apply make-string '(10 #\x)) "xxxxxxxxxx")
 ;(test (vector-length (apply make-vector '(10))) 10)
 ;(test (apply make-vector '(10 x)) '#(x x x x x x x x x x))
-;
+
 ;(test (apply vector-copy '(#(1 2 3))) '#(1 2 3))
 ;(test (apply vector-copy '(#(1 2 3) 2)) '#(3))
 ;(test (vector-length (apply vector-copy '(#(1 2 3) 2 5))) 3)
 ;(test (apply vector-copy '(#(1 2 3) 2 5 x)) '#(3 x x))
-;
+
 ;(test (apply + '()) 0)
 ;(test (apply + '(1)) 1)
 ;(test (apply + '(1 2)) 3)
@@ -2499,7 +2499,7 @@
 ;(test (apply vector-append '(#(foo))) '#(foo))
 ;(test (apply vector-append '(#(foo) #(bar))) '#(foo bar))
 ;(test (apply vector-append '(#(foo) #(bar) #(baz))) '#(foo bar baz))
-;
+
 ;(test (apply / '(2)) 0.5)
 ;(test (apply / '(2 5)) 0.4)
 ;(test (apply / '(2 5 4)) 0.1)
@@ -2513,7 +2513,7 @@
 ;(test (apply min '(3)) 3)
 ;(test (apply min '(2 3)) 2)
 ;(test (apply min '(3 2 1 5 4)) 1)
-;
+
 ;(test (apply = '(1 1)) #t)
 ;(test (apply = '(1 1 1)) #t)
 ;(test (apply = '(1 1 1 1 1)) #t)
@@ -2529,7 +2529,7 @@
 ;(test (apply >= '(2 1)) #t)
 ;(test (apply >= '(3 2 2)) #t)
 ;(test (apply >= '(5 4 4 2 1)) #t)
-;
+
 ;(test (apply apply `(,cons (a b))) '(a . b))
 ;(test (apply apply `(,list a b (c d))) '(a b c d))
 
@@ -2567,7 +2567,7 @@
 ;(test (let ((p (lambda (x) x)))
 ;        (eqv? p p))
 ;      #t)
-;
+
 ;(define gen-counter
 ;  (lambda ()
 ;    (let ((n 0))
@@ -2576,7 +2576,7 @@
 ;        (eqv? g g))
 ;      #t)
 ;(test (eqv? (gen-counter) (gen-counter)) #f)
-;
+
 ;(define gen-loser
 ;  (lambda ()
 ;    (let ((n 0))
@@ -2584,12 +2584,12 @@
 ;(test (let ((g (gen-loser)))
 ;        (eqv? g g))
 ;      #t)
-;
+
 ;(test (letrec ((f (lambda () (if (eqv? f g) 'f 'both)))
 ;               (g (lambda () (if (eqv? f g) 'g 'both))))
 ;        (eqv? (f) (g)))
 ;      #t)
-;
+
 ;(test (let ((x '(a)))
 ;        (eqv? x x))
 ;      #t)
@@ -2642,11 +2642,11 @@
 (pair? '()) ; #f
 ;(pair? '#(a b)) ; #f
 
-;(test (cons 'a '()) '(a))
-;(test (cons '(a) '(b c d)) '((a) b c d))
-;(test (cons "a" '(b c)) '("a" b c))
-;(test (cons 'a 3) '(a . 3))
-;(test (cons '(a b) 'c) '((a b) . c))
+(cons 'a '()) ; '(a)
+(cons '(a) '(b c d)) ; '((a) b c d)
+(cons "a" '(b c)) ; '("a" b c)
+(cons 'a 3) ; '(a . 3)
+(cons '(a b) 'c) ; '((a b) . c)
 
 (car '(a b c)) ; 'a
 (car '((a) b c d)) ; '(a)
@@ -2666,26 +2666,26 @@
 ;        (set-cdr! x x)
 ;        (list? x))
 ;      #f)
-;
+
 ;(test (list 'a (+ 3 4) 'c) '(a 7 c))
 ;(test (list) '())
-;
+
 ;(test (length '(a b c)) 3)
 ;(test (length '(a (b) (c d e))) 3)
 ;(test (length '()) 0)
-;
+
 ;(test (append '(x) '(y)) '(x y))
 ;(test (append '(a) '(b c d)) '(a b c d))
 ;(test (append '(a (b)) '((c))) '(a (b) (c)))
-;
+
 ;(test (append '(a b) '(c . d)) '(a b c . d))
 ;(test (append '() 'a) 'a)
-;
+
 ;(test (reverse '(a b c)) '(c b a))
 ;(test (reverse '(a (b c) d (e (f)))) '((e (f)) d (b c) a))
-;
+
 ;(test (list-ref '(a b c d) 2) 'c)
-;
+
 ;(test (memq 'a '(a b c)) '(a b c))
 ;(test (memq 'b '(a b c)) '(b c))
 ;(test (memq 'a '(b c d)) #f)
@@ -2694,7 +2694,7 @@
 ;              '(b (a) c))
 ;      '((a) c))
 ;(test (memv 101 '(100 101 102)) '(101 102))
-;
+
 ;(define e '((a 1) (b 2) (c 3)))
 ;(test (assq 'a e) '(a 1))
 ;(test (assq 'b e) '(b 2))
@@ -2738,24 +2738,24 @@
 (- 3) ; -3
 
 ;(test (abs -7) 7)
-;
+
 ;(test (modulo 13 4) 1)
 ;(test (remainder 13 4) 1)
-;
+
 ;(test (modulo -13 4) 3)
 ;(test (remainder -13 4) -1)
-;
+
 ;(test (modulo 13 -4) -3)
 ;(test (remainder 13 -4) 1)
-;
+
 ;(test (modulo -13 -4) -1)
 ;(test (remainder -13 -4) -1)
-;
+
 ;(test (gcd 32 -36) 4)
 ;(test (gcd) 0)
 ;(test (lcm 32 -36) 288)
 ;(test (lcm) 1)
-;
+
 ;(test (string->number "100") 100)
 ;(test (string->number "100" 16) 256)
 
@@ -2772,7 +2772,7 @@
 
 ;(test "The word \"recursion\" has many meanings."
 ;      "The word \"recursion\" has many meanings.")
-;
+
 ;(define s (make-string 3 #\*))
 ;(string-set! s 0 #\?)
 ;(test s "?**")
@@ -2780,16 +2780,16 @@
 ; R4RS tests, 6.8 vectors
 
 ;(test '#(0 (2 2 2 2) "Anna")  #(0 (2 2 2 2) "Anna"))
-;
+
 ;(test (vector 'a 'b 'c) #(a b c))
-;
+
 ;(test (vector-ref '#(1 1 2 3 5 8 13 21) 5) 8)
-;
+
 ;(test (let ((vec (vector 0 '(2 2 2 2) "Anna")))
 ;        (vector-set! vec 1 '("Sue" "Sue"))
 ;        vec)      
 ;      #(0 ("Sue" "Sue") "Anna"))
-;
+
 ;(test (vector->list '#(dah dah didah)) '(dah dah didah))
 ;(test (list->vector '(dididit dah)) '#(dididit dah))
 
@@ -2799,14 +2799,14 @@
 ;(test (procedure? 'car) #f)
 ;(test (procedure? (lambda (x) (* x x))) #t)
 ;(test (procedure? '(lambda (x) (* x x))) #f)
-;
+
 ;(test (apply + (list 3 4)) 7)
-;
+
 ;(define compose
 ;  (lambda (f g)
 ;    (lambda args
 ;      (f (apply g args)))))
-;
+
 ;(define (isqrt square)
 ;  (letrec
 ;    ((sqrt2 (lambda (x last)
@@ -2820,29 +2820,29 @@
 ;                         2)
 ;                      x))))))
 ;    (sqrt2 square 0)))
-;
+
 ;(test ((compose isqrt *) 12 75) 30)
-;
+
 ;(test (map cadr '((a b) (d e) (g h))) '(b e h))
-;
+
 ;(test (map (lambda (n) (expt n n))
 ;           '(1 2 3 4 5))                
 ;      '(1 4 27 256 3125))
-;
+
 ;(test (map + '(1 2 3) '(4 5 6)) '(5 7 9))
-;
+
 ;(test (let ((v (make-vector 5)))
 ;        (for-each (lambda (i)
 ;                    (vector-set! v i (* i i)))
 ;                  '(0 1 2 3 4))
 ;        v)
 ;      '#(0 1 4 9 16))
-;
+
 ;(test (force (delay (+ 1 2))) 3)
 ;(test (let ((p (delay (+ 1 2))))
 ;        (list (force p) (force p)))  
 ;      '(3 3))
-;
+
 ;(define a-stream
 ;  (letrec ((next
 ;            (lambda (n)
@@ -2851,9 +2851,9 @@
 ;(define head car)
 ;(define tail
 ;  (lambda (stream) (force (cdr stream))))
-;
+
 ;(test (head (tail (tail a-stream))) 2)
-;
+
 ;(define count 0)
 ;(define p
 ;  (delay (begin (set! count (+ count 1))
@@ -2865,7 +2865,7 @@
 ;(test (begin (set! x 10)
 ;             (force p))
 ;      6)
-;
+
 ;(test (call-with-current-continuation
 ;        (lambda (exit)
 ;          (for-each (lambda (x)
@@ -2874,7 +2874,7 @@
 ;                    '(54 0 37 -3 245 19))
 ;          #t))
 ;      -3)
-;
+
 ;(define list-length
 ;  (lambda (obj)
 ;    (call-with-current-continuation
@@ -2887,7 +2887,7 @@
 ;                            (else
 ;                              (return #f))))))
 ;          (r obj))))))
-;
+
 ;(test (list-length '(1 2 3 4)) 4)
 ;(test (list-length '(a b . c)) #f)
 
@@ -2901,5 +2901,5 @@
 ;            (display " errors.")
 ;            (display " error."))))
 ;(display #\newline)
-;
+
 ;(if (file-exists? testfile) (delete-file testfile))
