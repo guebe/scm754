@@ -76,9 +76,8 @@ extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier
 				return scm_unspecified();
 			}
 			if (op == scm_lambda) {
-				scm_obj_t params = scm_car(args); /* (a b) */
-				scm_obj_t body = scm_cdr(args); /* ((+ a b)) */
-				return scm_closure((uint32_t)scm_cons(params, scm_cons(body, scm_cons(environment_specifier, scm_empty_list())))); /* create a list of (params body environment) */
+				/* convert the lambda to a closure for later application: capture the environment at lamda definition time */
+				return scm_closure((uint32_t)scm_cons(environment_specifier, args));
 			}
 		}
 
@@ -246,9 +245,9 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 	}
 	else if (scm_is_closure(proc)) {
 		proc = (proc & ~SCM_MASK) | SCM_PAIR;
-		scm_obj_t params = scm_car(proc);
-		scm_obj_t body = scm_car(scm_cdr(proc));
-		scm_obj_t env = scm_car(scm_cdr(scm_cdr((proc))));
+		scm_obj_t env = scm_car(proc);
+		scm_obj_t params = scm_car(scm_cdr(proc));
+		scm_obj_t body = scm_cdr(scm_cdr((proc)));
 
 		/* extend environment: bind params to args */
 		scm_obj_t new_environment = scm_environment_extend(env, params, args);
