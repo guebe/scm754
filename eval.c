@@ -57,25 +57,29 @@ extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier
 			if (op == scm_define) {
 				scm_obj_t var = scm_car(args);
 
-				/* de-sugar define special form to lambda */
+				/* de-sugar define special form to lambda (define (name params) body)*/
 				if (scm_is_pair(var) && scm_is_symbol(scm_car(var))) {
-					scm_obj_t name = scm_car(var);
-					scm_obj_t params = scm_cdr(var);
-					scm_obj_t rest = scm_cdr(args);
-					scm_obj_t lambda = scm_cons(scm_lambda, scm_cons(params, rest));
-					return scm_eval(scm_cons(scm_define, scm_cons(name, scm_cons(lambda, scm_empty_list()))), environment_specifier);
+					scm_obj_t variable = scm_car(var);
+					scm_obj_t formals = scm_cdr(var);
+					scm_obj_t body = scm_cdr(args);
+					scm_obj_t value = scm_eval(scm_cons(scm_lambda, scm_cons(formals, body)), environment_specifier);
+					if (scm_is_error_object(value)) return value;
+					scm_environment_define(environment_specifier, scm_intern(variable), value);
+					return scm_unspecified();
 				}
 
 				if (!scm_is_symbol(var)) return scm_error("eval: bad define form: variable is not a symbol");
-				scm_obj_t tmp = scm_cdr(args);
-				if (!scm_is_empty_list(scm_cdr(tmp))) return scm_error("eval: bad define form: too many arguments");
-
-				scm_obj_t val = scm_eval(scm_car(tmp), environment_specifier);
-				if (scm_is_error_object(val)) return val;
-				scm_environment_define(environment_specifier, scm_intern(var), val);
+				scm_obj_t expression = scm_cdr(args);
+				if (!scm_is_empty_list(scm_cdr(expression))) return scm_error("eval: bad define form: too many expressions");
+				scm_obj_t value = scm_eval(scm_car(expression), environment_specifier);
+				if (scm_is_error_object(value)) return value;
+				scm_environment_define(environment_specifier, scm_intern(var), value);
 				return scm_unspecified();
 			}
 			if (op == scm_lambda) {
+				if (!scm_is_pair(args)) return scm_error("eval: bad lambda form: (lambda) ");
+				if (!scm_is_pair(scm_car(args)) && !scm_is_empty_list(scm_car(args)) && !scm_is_symbol(scm_car(args))) return scm_error("eval: bad lambda parameter list");
+				if (scm_is_empty_list(scm_cdr(args))) return scm_error("eval: lambda body missing (lambda (params))");
 				/* convert the lambda to a closure for later application: capture the environment at lamda definition time */
 				return scm_closure((uint32_t)scm_cons(environment_specifier, args));
 			}
