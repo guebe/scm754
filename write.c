@@ -52,7 +52,6 @@ extern scm_obj_t scm_write(scm_obj_t obj)
 	}
 	else if (scm_is_closure(obj)) {
 		fputs("#!closure", stdout);
-		write_list((obj & ~SCM_MASK) | SCM_PAIR);
 	}
 	else if (scm_is_symbol(obj)) {
 		write_string(scm_symbol_to_string(obj));
