@@ -270,9 +270,6 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 		return result;
 	}
 	else {
-#ifdef DEBUG
-		printf("; error: apply: attempt to apply non-procedure: "); scm_write(proc); printf("\n");
-#endif
 		return scm_error("apply: attempt to apply non-procedure");
 	}
 }
