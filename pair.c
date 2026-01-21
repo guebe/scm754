@@ -5,7 +5,7 @@
 #include <string.h>
 
 #define SCM_CELL_MASK 0xFFFFFFFF
-#define SCM_CELL_NUM 8192U
+#define SCM_CELL_NUM 1048576U
 
 static scm_obj_t cell[SCM_CELL_NUM];
 static size_t cell_idx = 0;

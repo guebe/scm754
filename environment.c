@@ -52,7 +52,6 @@ extern scm_obj_t scm_environment_create(void)
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("-", 1)), scm_procedure(SCM_PROCEDURE_SUB));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("*", 1)), scm_procedure(SCM_PROCEDURE_MUL));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("/", 1)), scm_procedure(SCM_PROCEDURE_DIV));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("write", 5)), scm_procedure(SCM_PROCEDURE_WRITE));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("car", 3)), scm_procedure(SCM_PROCEDURE_CAR));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("cdr", 3)), scm_procedure(SCM_PROCEDURE_CDR));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("eq?", 3)), scm_procedure(SCM_PROCEDURE_IS_EQ));
@@ -99,19 +98,22 @@ extern void scm_environment_define(scm_obj_t env, scm_obj_t symbol, scm_obj_t va
 	scm_set_car(env, scm_cons(scm_cons(symbol, value), scm_car(env)));
 }
 
-extern scm_obj_t scm_environment_extend(scm_obj_t env, scm_obj_t params, scm_obj_t args)
+extern scm_obj_t scm_environment_extend(scm_obj_t env, scm_obj_t params, scm_obj_t argv[], size_t argc)
 {
-	scm_obj_t frame;
-       
-	frame = scm_empty_list();
-	while (scm_is_pair(params) && scm_is_pair(args)) {
-		frame = scm_cons(scm_cons(scm_car(params), scm_car(args)), frame);
-		params = scm_cdr(params);
-		args   = scm_cdr(args);
+	size_t i = 0;
+	scm_obj_t frame = scm_empty_list();
+
+	if (argc == 0) {
+		if (scm_is_empty_list(params)) return env;
+		else return scm_error("environment: parameter/argument mismatch");
 	}
 
-	if (!scm_is_empty_list(params) || !scm_is_empty_list(args))
-		return scm_error("environment: parameter/argument mismatch");
+	while (scm_is_pair(params)) {
+		if (i >= argc) return scm_error("environment: parameter/argument mismatch");
+		frame = scm_cons(scm_cons(scm_car(params), argv[i]), frame);
+		params = scm_cdr(params);
+		i++;
+	}
 
 	return scm_cons(frame, env);
 }

@@ -50,7 +50,7 @@ extern scm_obj_t scm_define;
 #define SCM_PROCEDURE_SUB 2
 #define SCM_PROCEDURE_MUL 3
 #define SCM_PROCEDURE_DIV 4
-#define SCM_PROCEDURE_WRITE 5
+#define SCM_PROCEDURE_MODULO 5
 #define SCM_PROCEDURE_CAR 6
 #define SCM_PROCEDURE_CDR 7
 #define SCM_PROCEDURE_IS_EQ 8
@@ -67,7 +67,6 @@ extern scm_obj_t scm_define;
 #define SCM_PROCEDURE_SET_CDR 19
 #define SCM_PROCEDURE_NUMERIC_EQUAL 20
 #define SCM_PROCEDURE_QUOTIENT 21
-#define SCM_PROCEDURE_MODULO 22
 
 /* type predicates */
 static inline _Bool scm_is_empty_list(scm_obj_t obj)   { return (obj & SCM_MASK) == SCM_EMPTY_LIST; }
@@ -129,13 +128,13 @@ extern scm_obj_t scm_error(const char *message, ...);
 extern scm_obj_t scm_write(scm_obj_t obj);
 extern scm_obj_t scm_read(void);
 extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier);
-extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args);
+extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t argv[], size_t argc);
 extern int scm_read_char(void);
 extern int scm_peek_char(void);
 extern scm_obj_t scm_environment_create(void);
 extern scm_obj_t scm_environment_lookup(scm_obj_t env, scm_obj_t symbol);
 extern void scm_environment_define(scm_obj_t env, scm_obj_t symbol, scm_obj_t value);
-extern scm_obj_t scm_environment_extend(scm_obj_t env, scm_obj_t params, scm_obj_t args);
+extern scm_obj_t scm_environment_extend(scm_obj_t env, scm_obj_t params, scm_obj_t argv[], size_t argc);
 extern scm_obj_t scm_intern(scm_obj_t symbol);
 static inline scm_obj_t scm_string_to_symbol(scm_obj_t string)
 {
@@ -147,10 +146,13 @@ static inline scm_obj_t scm_symbol_to_string(scm_obj_t symbol)
 	if (!scm_is_symbol(symbol)) return scm_error("not a symbol");
 	return ((symbol & ~SCM_MASK) | SCM_STRING);
 }
-extern scm_obj_t scm_add(scm_obj_t args);
-extern scm_obj_t scm_sub(scm_obj_t args);
-extern scm_obj_t scm_mul(scm_obj_t args);
-extern scm_obj_t scm_div(scm_obj_t args);
+extern scm_obj_t scm_add(scm_obj_t argv[], size_t argc);
+extern scm_obj_t scm_sub(scm_obj_t argv[], size_t argc);
+extern scm_obj_t scm_mul(scm_obj_t argv[], size_t argc);
+extern scm_obj_t scm_div(scm_obj_t argv[], size_t argc);
+extern scm_obj_t scm_numeric_equal(scm_obj_t argv[], size_t argc);
+extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b);
+extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b);
 static inline scm_obj_t scm_is_eq(scm_obj_t obj1, scm_obj_t obj2) { return scm_boolean(obj1 == obj2); }
 
 #endif

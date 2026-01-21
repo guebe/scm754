@@ -8,21 +8,32 @@
 #include <stdio.h>
 #endif
 
-static scm_obj_t eval_list(scm_obj_t list, scm_obj_t environment_specifier)
+static size_t list_length(scm_obj_t list)
 {
-	scm_obj_t first, rest;
+	size_t i = 0;
+	while (scm_is_pair(list)) {
+		list = scm_cdr(list);
+		i++;
+	}
+	return i;
+}
 
-	if (scm_is_empty_list(list)) return list;
-	first = scm_eval(scm_car(list), environment_specifier);
-	if (scm_is_error_object(first)) return first;
-	rest = eval_list(scm_cdr(list), environment_specifier);
-	if (scm_is_error_object(rest)) return rest;
-	return scm_cons(first, rest);
+static scm_obj_t eval_list(scm_obj_t list, scm_obj_t environment_specifier, scm_obj_t argv[])
+{
+	size_t i = 0;
+	while (scm_is_pair(list)) {
+		scm_obj_t value = scm_eval(scm_car(list), environment_specifier);
+		if (scm_is_error_object(value)) return value;
+		argv[i] = value;
+		i++;
+		list = scm_cdr(list);
+	}
+	return scm_unspecified();
 }
 
 extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier)
 {
-	scm_obj_t op, args, evaled_args;
+	scm_obj_t op, args;
 
 	if (scm_is_empty_list(expr_or_def)) {
 		return scm_error("eval: can not apply empty-list-object ()");
@@ -62,6 +73,9 @@ extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier
 					scm_obj_t variable = scm_car(var);
 					scm_obj_t formals = scm_cdr(var);
 					scm_obj_t body = scm_cdr(args);
+#ifdef DEBUG
+printf("alloc1: 2\n");
+#endif
 					scm_obj_t value = scm_eval(scm_cons(scm_lambda, scm_cons(formals, body)), environment_specifier);
 					if (scm_is_error_object(value)) return value;
 					scm_environment_define(environment_specifier, scm_intern(variable), value);
@@ -81,6 +95,9 @@ extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier
 				if (!scm_is_pair(scm_car(args)) && !scm_is_empty_list(scm_car(args)) && !scm_is_symbol(scm_car(args))) return scm_error("eval: bad lambda parameter list");
 				if (scm_is_empty_list(scm_cdr(args))) return scm_error("eval: lambda body missing (lambda (params))");
 				/* convert the lambda to a closure for later application: capture the environment at lamda definition time */
+#ifdef DEBUG
+printf("alloc2: 1\n");
+#endif
 				return scm_closure((uint32_t)scm_cons(environment_specifier, args));
 			}
 		}
@@ -88,12 +105,14 @@ extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier
 		/* application */
 		scm_obj_t proc = scm_eval(op, environment_specifier);
 		if (scm_is_error_object(proc)) return proc;
-		evaled_args = eval_list(args, environment_specifier);
-		if (scm_is_error_object(evaled_args)) return evaled_args;
+		size_t argc = list_length(args);
+		scm_obj_t argv[argc > 0 ? argc : 1];
+		scm_obj_t ret = eval_list(args, environment_specifier, argv);
+		if (scm_is_error_object(ret)) return ret;
 #ifdef DEBUG
-		printf("; eval: calling (apply "); scm_write(proc); printf(" "); scm_write(evaled_args); printf(")\n");
+		printf("; eval: calling (apply "); scm_write(proc); printf(")\n");
 #endif
-		return scm_apply(proc, evaled_args);
+		return scm_apply(proc, argv, argc);
 	}
 	else {
 		/* self-evaluating */
@@ -101,150 +120,125 @@ extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier
 	}
 }
 
-extern scm_obj_t scm_add(scm_obj_t args)
+extern scm_obj_t scm_add(scm_obj_t argv[], size_t argc)
 {
-	double a = 0;
-	while (scm_is_pair(args)) {
-		scm_obj_t arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("+: needs a number");
-		a += scm_number_value(arg);
-		args = scm_cdr(args);
+	double x = 0.0;
+	for (size_t i = 0; i < argc; i++) {
+		scm_obj_t a = argv[i];
+		if (!scm_is_number(a)) return scm_error("+: needs a number");
+		x += scm_number_value(a);
 	}
-	return scm_number(a);
+	return scm_number(x);
 }
 
-extern scm_obj_t scm_sub(scm_obj_t args)
+extern scm_obj_t scm_sub(scm_obj_t argv[], size_t argc)
 {
-	if (!scm_is_pair(args)) return scm_error("-: needs an argument");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("-: needs a number");
-	double a = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (scm_is_empty_list(args)) return scm_number(-a);
+	if (argc == 0) return scm_error("-: needs an argument");
+	scm_obj_t a = argv[0];
+	if (!scm_is_number(a)) return scm_error("-: needs a number");
+	double x = scm_number_value(a);
+	if (argc == 1) return scm_number(-x);
 
-	while (scm_is_pair(args)) {
-		arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("-: needs a number");
-		a -= scm_number_value(arg);
-		args = scm_cdr(args);
+	for (size_t i = 1; i < argc; i++) {
+		a = argv[i];
+		if (!scm_is_number(a)) return scm_error("-: needs a number");
+		x -= scm_number_value(a);
 	}
-	return scm_number(a);
+	return scm_number(x);
 }
 
-extern scm_obj_t scm_mul(scm_obj_t args)
+extern scm_obj_t scm_mul(scm_obj_t argv[], size_t argc)
 {
-	double a = 1.0;
-	while (scm_is_pair(args)) {
-		scm_obj_t arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("*: needs a number");
-		a *= scm_number_value(arg);
-		args = scm_cdr(args);
+	double x = 1.0;
+	for (size_t i = 0; i < argc; i++) {
+		scm_obj_t a = argv[i];
+		if (!scm_is_number(a)) return scm_error("*: needs a number");
+		x *= scm_number_value(a);
 	}
-	return scm_number(a);
+	return scm_number(x);
 }
 
-extern scm_obj_t scm_div(scm_obj_t args)
+extern scm_obj_t scm_div(scm_obj_t argv[], size_t argc)
 {
-	if (!scm_is_pair(args)) return scm_error("/: needs an argument");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("/: needs a number");
-	double a = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (scm_is_empty_list(args)) return scm_number(1.0/a);
+	if (argc == 0) return scm_error("/: needs an argument");
+	scm_obj_t a = argv[0];
+	if (!scm_is_number(a)) return scm_error("/: needs a number");
+	double x = scm_number_value(a);
+	if (argc == 1) return scm_number(1.0/x);
 
-	while (scm_is_pair(args)) {
-		arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("/: needs a number");
-		double b = scm_number_value(arg);
-		if (b == 0.0) return scm_error("/: division by zero");
-		a /= b;
-		args = scm_cdr(args);
+	for (size_t i = 1; i < argc; i++) {
+		a = argv[i];
+		if (!scm_is_number(a)) return scm_error("/: needs a number");
+		double y = scm_number_value(a);
+		if (y == 0.0) return scm_error("/: division by zero");
+		x /= y;
 	}
-	return scm_number(a);
+	return scm_number(x);
 }
 
-extern scm_obj_t scm_numeric_equal(scm_obj_t args)
+extern scm_obj_t scm_numeric_equal(scm_obj_t argv[], size_t argc)
 {
-	if (!scm_is_pair(args)) return scm_error("=: needs an argument");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("=: needs a number");
-	double a = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (scm_is_empty_list(args)) return scm_true();
+	if (argc == 0) return scm_error("=: needs an argument");
+	scm_obj_t a = argv[0];
+	if (!scm_is_number(a)) return scm_error("=: needs a number");
+	double x = scm_number_value(a);
+	if (argc == 1) return scm_true();
 
-	while (scm_is_pair(args)) {
-		arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("=: needs a number");
-		if (a != scm_number_value(arg)) return scm_false();
-		args = scm_cdr(args);
+	for (size_t i = 1; i < argc; i++) {
+		a = argv[i];
+		if (!scm_is_number(a)) return scm_error("=: needs a number");
+		if (x != scm_number_value(a)) return scm_false();
 	}
 	return scm_true();
 }
 
-extern scm_obj_t scm_quotient(scm_obj_t args)
+extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b)
 {
-	double a, b;
-	if (!scm_is_pair(args)) return scm_error("quotient: needs 2 numbers");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("quotient: needs a number");
-	a = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (!scm_is_pair(args)) return scm_error("quotient: needs 2 numbers");
-	arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("quotient: needs a number");
-	b = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (!scm_is_empty_list(args)) return scm_error("quotient: needs 2 numbers");
-	if (b == 0.0) return scm_error("quotient: division by zero");
-	return scm_number(trunc(a / b));
+	double x, y;
+	if (!scm_is_number(a) || !scm_is_number(b)) return scm_error("quotient: needs two numbers");
+	x = scm_number_value(a);
+	y = scm_number_value(b);
+	if (y == 0.0) return scm_error("quotient: division by zero");
+	return scm_number(trunc(x / y));
 }
 
-extern scm_obj_t scm_modulo(scm_obj_t args)
+extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b)
 {
-	double a, b;
-	if (!scm_is_pair(args)) return scm_error("modulo: needs 2 numbers");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("modulo: needs a number");
-	a = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (!scm_is_pair(args)) return scm_error("modulo: needs 2 numbers");
-	arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("modulo: needs a number");
-	b = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (!scm_is_empty_list(args)) return scm_error("modulo: needs 2 numbers");
-	if (b == 0.0) return scm_error("modulo: division by zero");
-	return scm_number(a - b * floor(a / b));
+	double x, y;
+	if (!scm_is_number(a) || !scm_is_number(b)) return scm_error("modulo: needs two numbers");
+	x = scm_number_value(a);
+	y = scm_number_value(b);
+	if (y == 0.0) return scm_error("modulo: division by zero");
+	return scm_number(x - y * floor(x / y));
 }
 
-extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
+extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t argv[], size_t argc)
 {
 	uint32_t procedure;
 
 	if (scm_is_procedure(proc)) {
 		procedure = scm_procedure_id(proc);
-		if (procedure == SCM_PROCEDURE_ADD) return scm_add(args);
-		if (procedure == SCM_PROCEDURE_SUB) return scm_sub(args);
-		if (procedure == SCM_PROCEDURE_MUL) return scm_mul(args);
-		if (procedure == SCM_PROCEDURE_DIV) return scm_div(args);
-		if (procedure == SCM_PROCEDURE_WRITE) return scm_write(args);
-		if (procedure == SCM_PROCEDURE_CAR) return scm_car(scm_car(args));
-		if (procedure == SCM_PROCEDURE_CDR) return scm_cdr(scm_car(args));
-		if (procedure == SCM_PROCEDURE_IS_EQ) return scm_is_eq(scm_car(args), scm_car(scm_cdr(args)));
-		if (procedure == SCM_PROCEDURE_IS_NULL) return scm_boolean(scm_is_empty_list(scm_car(args)));
-		if (procedure == SCM_PROCEDURE_IS_BOOLEAN) return scm_boolean(scm_is_boolean(scm_car(args)));
-		if (procedure == SCM_PROCEDURE_IS_EOF_OBJECT) return scm_boolean(scm_is_eof_object(scm_car(args)));
-		if (procedure == SCM_PROCEDURE_IS_SYMBOL) return scm_boolean(scm_is_symbol(scm_car(args)));
-		if (procedure == SCM_PROCEDURE_IS_STRING) return scm_boolean(scm_is_string(scm_car(args)));
-		if (procedure == SCM_PROCEDURE_IS_PAIR) return scm_boolean(scm_is_pair(scm_car(args)));
-		if (procedure == SCM_PROCEDURE_IS_CHAR) return scm_boolean(scm_is_char(scm_car(args)));
-		if (procedure == SCM_PROCEDURE_IS_NUMBER) return scm_boolean(scm_is_number(scm_car(args)));
-		if (procedure == SCM_PROCEDURE_CONS) return scm_cons(scm_car(args), scm_car(scm_cdr(args)));
-		if (procedure == SCM_PROCEDURE_SET_CAR) return scm_set_car(scm_car(args), scm_car(scm_cdr(args)));
-		if (procedure == SCM_PROCEDURE_SET_CDR) return scm_set_cdr(scm_car(args), scm_car(scm_cdr(args)));
-		if (procedure == SCM_PROCEDURE_NUMERIC_EQUAL) return scm_numeric_equal(args);
-		if (procedure == SCM_PROCEDURE_MODULO) return scm_modulo(args);
-		if (procedure == SCM_PROCEDURE_QUOTIENT) return scm_quotient(args);
+		if (procedure == SCM_PROCEDURE_ADD) return scm_add(argv, argc);
+		if (procedure == SCM_PROCEDURE_SUB) return scm_sub(argv, argc);
+		if (procedure == SCM_PROCEDURE_MUL) return scm_mul(argv, argc);
+		if (procedure == SCM_PROCEDURE_DIV) return scm_div(argv, argc);
+		if (procedure == SCM_PROCEDURE_CAR) return argc == 1 ? scm_car(argv[0]) : scm_error("apply: car: takes one parameter");
+		if (procedure == SCM_PROCEDURE_CDR) return argc == 1 ? scm_cdr(argv[0]) : scm_error("apply: cdr: takes one parameter");
+		if (procedure == SCM_PROCEDURE_IS_EQ) return argc == 2 ? scm_is_eq(argv[0], argv[1]) : scm_error("apply: eq?: takes two parameter");
+		if (procedure == SCM_PROCEDURE_IS_NULL) return argc == 1 ? scm_boolean(scm_is_empty_list(argv[0])) : scm_error("apply: null?: takes one parameter");
+		if (procedure == SCM_PROCEDURE_IS_BOOLEAN) return argc == 1 ? scm_boolean(scm_is_boolean(argv[0])) : scm_error("apply: boolean?: takes one parameter");
+		if (procedure == SCM_PROCEDURE_IS_EOF_OBJECT) return argc == 1 ? scm_boolean(scm_is_eof_object(argv[0])) : scm_error("apply: eof-object?: takes one parameter");
+		if (procedure == SCM_PROCEDURE_IS_SYMBOL) return argc == 1 ? scm_boolean(scm_is_symbol(argv[0])) : scm_error("apply: symbol?: takes one parameter");
+		if (procedure == SCM_PROCEDURE_IS_STRING) return argc == 1 ? scm_boolean(scm_is_string(argv[0])) : scm_error("apply: string?: takes one parameter");
+		if (procedure == SCM_PROCEDURE_IS_PAIR) return argc == 1 ? scm_boolean(scm_is_pair(argv[0])) : scm_error("apply: pair?: takes one parameter");
+		if (procedure == SCM_PROCEDURE_IS_CHAR) return argc == 1 ? scm_boolean(scm_is_char(argv[0])) : scm_error("apply: char?: takes one parameter");
+		if (procedure == SCM_PROCEDURE_IS_NUMBER) return argc == 1 ? scm_boolean(scm_is_number(argv[0])) : scm_error("apply: number?: takes one parameter");
+		if (procedure == SCM_PROCEDURE_CONS) return argc == 2 ? scm_cons(argv[0], argv[1]) : scm_error("apply: cons: takes two parameter");
+		if (procedure == SCM_PROCEDURE_SET_CAR) return argc == 2 ? scm_set_car(argv[0], argv[1]) : scm_error("apply: set-car!: takes two parameter");
+		if (procedure == SCM_PROCEDURE_SET_CDR) return argc == 2 ? scm_set_cdr(argv[0], argv[1]) : scm_error("apply: set-cdr!: takes two parameter");
+		if (procedure == SCM_PROCEDURE_NUMERIC_EQUAL) return scm_numeric_equal(argv, argc);
+		if (procedure == SCM_PROCEDURE_MODULO) return argc == 2 ? scm_modulo(argv[0], argv[1]) : scm_error("apply: modulo: takes two parameter");
+		if (procedure == SCM_PROCEDURE_QUOTIENT) return argc == 2 ? scm_quotient(argv[0], argv[1]) : scm_error("apply: quotient: takes two parameter");
 		else return scm_error("unknown procedure");
 	}
 	else if (scm_is_closure(proc)) {
@@ -253,8 +247,11 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 		scm_obj_t params = scm_car(scm_cdr(proc));
 		scm_obj_t body = scm_cdr(scm_cdr((proc)));
 
-		/* extend environment: bind params to args */
-		scm_obj_t new_environment = scm_environment_extend(env, params, args);
+		/* extend environment: bind params to argv, argc */
+#ifdef DEBUG
+printf("alloc3: %lu\n", 2*argc + 1);
+#endif
+		scm_obj_t new_environment = scm_environment_extend(env, params, argv, argc);
 		if (scm_is_error_object(new_environment)) return new_environment;
 
 		/* eval body expressions in order, return last */
