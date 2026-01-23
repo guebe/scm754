@@ -13,79 +13,79 @@ extern size_t scm_length(scm_obj_t list)
 
 extern scm_obj_t scm_add(scm_obj_t args)
 {
-	double a = 0;
+	double x = 0.0;
 	while (scm_is_pair(args)) {
-		scm_obj_t arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("+: needs a number");
-		a += scm_number_value(arg);
+		scm_obj_t a = scm_car(args);
+		if (!scm_is_number(a)) return scm_error("+: needs a number");
+		x += scm_number_value(a);
 		args = scm_cdr(args);
 	}
-	return scm_number(a);
+	return scm_number(x);
 }
 
 extern scm_obj_t scm_sub(scm_obj_t args)
 {
 	if (!scm_is_pair(args)) return scm_error("-: needs an argument");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("-: needs a number");
-	double a = scm_number_value(arg);
+	scm_obj_t a = scm_car(args);
+	if (!scm_is_number(a)) return scm_error("-: needs a number");
+	double x = scm_number_value(a);
 	args = scm_cdr(args);
-	if (scm_is_empty_list(args)) return scm_number(-a);
+	if (scm_is_empty_list(args)) return scm_number(-x);
 
 	while (scm_is_pair(args)) {
-		arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("-: needs a number");
-		a -= scm_number_value(arg);
+		a = scm_car(args);
+		if (!scm_is_number(a)) return scm_error("-: needs a number");
+		x -= scm_number_value(a);
 		args = scm_cdr(args);
 	}
-	return scm_number(a);
+	return scm_number(x);
 }
 
 extern scm_obj_t scm_mul(scm_obj_t args)
 {
-	double a = 1.0;
+	double x = 1.0;
 	while (scm_is_pair(args)) {
-		scm_obj_t arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("*: needs a number");
-		a *= scm_number_value(arg);
+		scm_obj_t a = scm_car(args);
+		if (!scm_is_number(a)) return scm_error("*: needs a number");
+		x *= scm_number_value(a);
 		args = scm_cdr(args);
 	}
-	return scm_number(a);
+	return scm_number(x);
 }
 
 extern scm_obj_t scm_div(scm_obj_t args)
 {
 	if (!scm_is_pair(args)) return scm_error("/: needs an argument");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("/: needs a number");
-	double a = scm_number_value(arg);
+	scm_obj_t a = scm_car(args);
+	if (!scm_is_number(a)) return scm_error("/: needs a number");
+	double x = scm_number_value(a);
 	args = scm_cdr(args);
-	if (scm_is_empty_list(args)) return scm_number(1.0/a);
+	if (scm_is_empty_list(args)) return scm_number(1.0/x);
 
 	while (scm_is_pair(args)) {
-		arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("/: needs a number");
-		double b = scm_number_value(arg);
-		if (b == 0.0) return scm_error("/: division by zero");
-		a /= b;
+		a = scm_car(args);
+		if (!scm_is_number(a)) return scm_error("/: needs a number");
+		double y = scm_number_value(a);
+		if (y == 0.0) return scm_error("/: division by zero");
+		x /= y;
 		args = scm_cdr(args);
 	}
-	return scm_number(a);
+	return scm_number(x);
 }
 
 extern scm_obj_t scm_numeric_equal(scm_obj_t args)
 {
 	if (!scm_is_pair(args)) return scm_error("=: needs an argument");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("=: needs a number");
-	double a = scm_number_value(arg);
+	scm_obj_t a = scm_car(args);
+	if (!scm_is_number(a)) return scm_error("=: needs a number");
+	double x = scm_number_value(a);
 	args = scm_cdr(args);
 	if (scm_is_empty_list(args)) return scm_true();
 
 	while (scm_is_pair(args)) {
-		arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("=: needs a number");
-		if (a != scm_number_value(arg)) return scm_false();
+		a = scm_car(args);
+		if (!scm_is_number(a)) return scm_error("=: needs a number");
+		if (x != scm_number_value(a)) return scm_false();
 		args = scm_cdr(args);
 	}
 	return scm_true();
