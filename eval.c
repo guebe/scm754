@@ -1,7 +1,5 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
-
 #undef DEBUG
-
 #include "scm754.h"
 #ifdef DEBUG
 #include <stdio.h>
@@ -9,19 +7,16 @@
 
 static scm_obj_t eval_list(scm_obj_t list, scm_obj_t environment_specifier)
 {
-	scm_obj_t head = scm_empty_list();
-	scm_obj_t tail = scm_empty_list();
+	scm_obj_t head = scm_nil();
+	scm_obj_t tail = scm_nil();
 
 	while (scm_is_pair(list)) {
 		scm_obj_t val = scm_eval(scm_car(list), environment_specifier);
-		if (scm_is_error_object(val)) return val;
+		if (scm_is_error(val)) return val;
 
-#ifdef DEBUG
-printf("alloc1\n");
-#endif
-		scm_obj_t cell = scm_cons(val, scm_empty_list());
+		scm_obj_t cell = scm_cons(val, scm_nil());
 
-		if (scm_is_empty_list(head)) {
+		if (scm_is_null(head)) {
 			head = cell;
 			tail = cell;
 		} else {
@@ -32,7 +27,7 @@ printf("alloc1\n");
 		list = scm_cdr(list);
 	}
 
-	if (!scm_is_empty_list(list))
+	if (!scm_is_null(list))
 		return scm_error("eval_list: improper list");
 
 	return head;
@@ -41,7 +36,7 @@ printf("alloc1\n");
 extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 {
 	while (1) {
-		if (scm_is_empty_list(expr)) return scm_error("eval: can not apply empty-list-object ()");
+		if (scm_is_null(expr)) return scm_error("eval: can not apply empty list object ()");
 
 		/* symbols are bound to values or procedures in the environment */
 		else if (scm_is_symbol(expr)) return scm_environment_lookup(env, scm_intern(expr));
@@ -76,7 +71,7 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 					/* variable define */
 					if (argc != 2) return scm_error("define: bad form, should be (define x expr)");
 					scm_obj_t value = scm_eval(scm_car(scm_cdr(args)), env);
-					if (scm_is_error_object(value)) return value;
+					if (scm_is_error(value)) return value;
 					scm_environment_define(env, scm_intern(var), value);
 					return scm_unspecified();
 				}
@@ -84,7 +79,7 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 					/* function define - de-sugar to lambda */
 					if (argc < 2) return scm_error("define: bad form, should be (define (f x y) body...)");
 					scm_obj_t value = scm_eval(scm_cons(scm_lambda, scm_cons(scm_cdr(var), scm_cdr(args))), env);
-					if (scm_is_error_object(value)) return value;
+					if (scm_is_error(value)) return value;
 					scm_environment_define(env, scm_intern(scm_car(var)), value);
 					return scm_unspecified();
 				}
@@ -93,7 +88,7 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 			else if (op == scm_lambda) {
 				if (argc < 2) return scm_error("lamdba: bad form, should be (lambda (params...) body...");
 				scm_obj_t param = scm_car(args);
-				if (!scm_is_pair(param) && !scm_is_empty_list(param) && !scm_is_symbol(param)) return scm_error("lambda: param must be a list, null or a symbol");
+				if (!scm_is_pair(param) && !scm_is_null(param) && !scm_is_symbol(param)) return scm_error("lambda: param must be a list, null or a symbol");
 				/* convert the lambda to a closure for later application: capture the environment at lamda definition time */
 				return scm_closure((uint32_t)scm_cons(env, args));
 			}
@@ -101,9 +96,9 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 
 		/* application */
 		scm_obj_t proc = scm_eval(op, env);
-		if (scm_is_error_object(proc)) return proc;
+		if (scm_is_error(proc)) return proc;
 		scm_obj_t evaled_args = eval_list(args, env);
-		if (scm_is_error_object(evaled_args)) return evaled_args;
+		if (scm_is_error(evaled_args)) return evaled_args;
 #ifdef DEBUG
 		printf("; eval: calling (apply "); scm_write(proc); printf(" "); scm_write(evaled_args); printf(")\n");
 #endif
@@ -120,7 +115,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 		if (procedure == SCM_PROCEDURE_CAR) return argc == 1 ? scm_car(arg1) : scm_error("car: takes one parameter");
 		else if (procedure == SCM_PROCEDURE_CDR) return argc == 1 ? scm_cdr(arg1) : scm_error("cdr: takes one parameter");
 		else if (procedure == SCM_PROCEDURE_IS_PROCEDURE) return argc == 1 ? scm_boolean(scm_is_procedure(arg1) || scm_is_closure(arg1)) : scm_error("procedure?: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_IS_NULL) return argc == 1 ? scm_boolean(scm_is_empty_list(arg1)) : scm_error("null?: takes one parameter");
+		else if (procedure == SCM_PROCEDURE_IS_NULL) return argc == 1 ? scm_boolean(scm_is_null(arg1)) : scm_error("null?: takes one parameter");
 		else if (procedure == SCM_PROCEDURE_IS_BOOLEAN) return argc == 1 ? scm_boolean(scm_is_boolean(arg1)) : scm_error("boolean?: takes one parameter");
 		else if (procedure == SCM_PROCEDURE_IS_EOF_OBJECT) return argc == 1 ? scm_boolean(scm_is_eof_object(arg1)) : scm_error("eof-object?: takes one parameter");
 		else if (procedure == SCM_PROCEDURE_IS_SYMBOL) return argc == 1 ? scm_boolean(scm_is_symbol(arg1)) : scm_error("symbol?: takes one parameter");
@@ -151,16 +146,16 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 
 		/* extend environment: bind params to args */
 		scm_obj_t new_env = scm_environment_extend(env, params, args);
-		if (scm_is_error_object(new_env)) return new_env;
+		if (scm_is_error(new_env)) return new_env;
 
 		/* eval body expressions in order, return last */
 		scm_obj_t result = scm_unspecified();
 		while (scm_is_pair(body)) {
 #ifdef DEBUG
-			printf("; apply: calling (eval "); scm_write(scm_car(body)); printf(" "); scm_write(new_environment); printf(")\n");
+			printf("; apply: calling (eval "); scm_write(scm_car(body)); printf(" "); scm_write(new_env); printf(")\n");
 #endif
 			result = scm_eval(scm_car(body), new_env);
-			if (scm_is_error_object(result)) return result;
+			if (scm_is_error(result)) return result;
 			body = scm_cdr(body);
 		}
 		return result;

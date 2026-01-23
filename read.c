@@ -122,7 +122,7 @@ static scm_obj_t read_symbol(char c)
 		return scm_error("read_symbol: scan error");
 
 	obj = scm_string(buf, (size_t)len+1);
-	if (scm_is_error_object(obj)) return obj;
+	if (scm_is_error(obj)) return obj;
 
 	return scm_string_to_symbol(obj);
 }
@@ -147,7 +147,7 @@ static scm_obj_t read_symbol_or_number_or_dot(char c, _Bool dot_ok)
 
 make_symbol:
 	obj = scm_string(buf, (size_t)len+1);
-	if (scm_is_error_object(obj)) return obj;
+	if (scm_is_error(obj)) return obj;
 
 	return scm_string_to_symbol(obj);
 }
@@ -174,33 +174,33 @@ static scm_obj_t read_list(void)
 	scm_obj_t obj, head, last;
 
 	obj = read(0, 1, 0);
-	if (scm_is_error_object(obj)) return obj;
-	if (scm_is_rparen(obj)) return scm_empty_list();
+	if (scm_is_error(obj)) return obj;
+	if (scm_is_rparen(obj)) return scm_nil();
 
-	head = last = scm_cons(obj, scm_empty_list());
-	if (scm_is_error_object(head)) return head;
+	head = last = scm_cons(obj, scm_nil());
+	if (scm_is_error(head)) return head;
 
 	while (1) {
 		obj = read(1, 1, 0);
-		if (scm_is_error_object(obj)) return obj;
+		if (scm_is_error(obj)) return obj;
 		if (scm_is_rparen(obj)) return head;
 		if (scm_is_dot(obj)) {
 			/* Read dotted pair */
 			obj = read(0, 0, 0);
-			if (scm_is_error_object(obj)) return obj;
+			if (scm_is_error(obj)) return obj;
 
 			scm_set_cdr(last, obj);
 
 			/* After dot, next must be rparen */
 			obj = read(0, 1, 0);
-			if (scm_is_error_object(obj)) return obj;
+			if (scm_is_error(obj)) return obj;
 			if (!scm_is_rparen(obj)) return scm_error("read: closing rparen ) missing");
 			return head;
 		}
 		else {
 			/* Normal cons */
-			obj = scm_cons(obj, scm_empty_list());
-			if (scm_is_error_object(obj)) return obj;
+			obj = scm_cons(obj, scm_nil());
+			if (scm_is_error(obj)) return obj;
 
 			scm_set_cdr(last, obj);
 			last = obj;
@@ -213,10 +213,10 @@ static scm_obj_t read_quote(void)
 	scm_obj_t datum, args;
 
 	datum = read(0, 0, 0);
-	if (scm_is_error_object(datum)) return datum;
+	if (scm_is_error(datum)) return datum;
 
-	args = scm_cons(datum, scm_empty_list());
-	if (scm_is_error_object(args)) return args;
+	args = scm_cons(datum, scm_nil());
+	if (scm_is_error(args)) return args;
 
 	return scm_cons(scm_quote, args);
 }

@@ -27,11 +27,11 @@ int main(void)
 
 		obj = scm_read();
 		if (scm_is_eof_object(obj)) { break; }
-		else if (scm_is_error_object(obj)) { puts(scm_error_object_message(obj)); continue; }
+		else if (scm_is_error(obj)) { puts(scm_error_value()); continue; }
 
 #ifndef SCM_NO_EVAL
 		obj = scm_eval(obj, interaction_environment);
-		if (scm_is_error_object(obj)) { puts(scm_error_object_message(obj)); continue; }
+		if (scm_is_error(obj)) { puts(scm_error_value()); continue; }
 #endif
 
 		/* unspecified is returned by e.g. define as per specification. we do _not_ want to print the unspecified value in a REPL */

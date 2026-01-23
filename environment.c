@@ -10,7 +10,7 @@ scm_obj_t scm_define;
 
 /* Symbol table: list of interned symbols
  * (a b c) (cons a (cons b (cons c '()))) */
-static scm_obj_t symbols = SCM_EMPTY_LIST;
+static scm_obj_t symbols = SCM_NIL;
 
 extern scm_obj_t scm_intern(scm_obj_t symbol)
 {
@@ -46,7 +46,7 @@ extern scm_obj_t scm_environment_create(void)
 	scm_lambda = scm_string_to_symbol(scm_string("lambda", 6));
 	scm_define = scm_string_to_symbol(scm_string("define", 6));
 
-	environment = scm_cons(scm_empty_list(), scm_empty_list());
+	environment = scm_cons(scm_nil(), scm_nil());
 
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("+", 1)), scm_procedure(SCM_PROCEDURE_ADD));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("-", 1)), scm_procedure(SCM_PROCEDURE_SUB));
@@ -105,14 +105,14 @@ extern scm_obj_t scm_environment_extend(scm_obj_t env, scm_obj_t params, scm_obj
 {
 	scm_obj_t frame;
        
-	frame = scm_empty_list();
+	frame = scm_nil();
 	while (scm_is_pair(params) && scm_is_pair(args)) {
 		frame = scm_cons(scm_cons(scm_car(params), scm_car(args)), frame);
 		params = scm_cdr(params);
 		args   = scm_cdr(args);
 	}
 
-	if (!scm_is_empty_list(params) || !scm_is_empty_list(args))
+	if (!scm_is_null(params) || !scm_is_null(args))
 		return scm_error("environment: parameter/argument mismatch");
 
 	return scm_cons(frame, env);

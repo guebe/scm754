@@ -12,7 +12,7 @@ static void write_list(scm_obj_t obj)
 		if (!scm_is_pair(obj)) break;
 		putchar(' ');
 	}
-	if (!scm_is_empty_list(obj)) {
+	if (!scm_is_null(obj)) {
 		fputs(" . ", stdout);
 		scm_write(obj);
 	}
@@ -26,7 +26,7 @@ static void write_string(scm_obj_t string)
 
 extern scm_obj_t scm_write(scm_obj_t obj)
 {
-	if (scm_is_empty_list(obj)) {
+	if (scm_is_null(obj)) {
        		fputs("()", stdout);
 	}
 	else if (scm_is_boolean(obj)) {
@@ -44,7 +44,7 @@ extern scm_obj_t scm_write(scm_obj_t obj)
 	else if (scm_is_unspecified(obj)) {
 		fputs("#!unspecified", stdout);
 	}
-	else if (scm_is_error_object(obj)) {
+	else if (scm_is_error(obj)) {
 		fputs("#!error", stdout);
 	}
 	else if (scm_is_procedure(obj)) {

@@ -30,7 +30,7 @@ extern scm_obj_t scm_sub(scm_obj_t args)
 	if (!scm_is_number(a)) return scm_error("-: needs a number");
 	double x = scm_number_value(a);
 	args = scm_cdr(args);
-	if (scm_is_empty_list(args)) return scm_number(-x);
+	if (scm_is_null(args)) return scm_number(-x);
 
 	while (scm_is_pair(args)) {
 		a = scm_car(args);
@@ -60,7 +60,7 @@ extern scm_obj_t scm_div(scm_obj_t args)
 	if (!scm_is_number(a)) return scm_error("/: needs a number");
 	double x = scm_number_value(a);
 	args = scm_cdr(args);
-	if (scm_is_empty_list(args)) return scm_number(1.0/x);
+	if (scm_is_null(args)) return scm_number(1.0/x);
 
 	while (scm_is_pair(args)) {
 		a = scm_car(args);
@@ -80,7 +80,7 @@ extern scm_obj_t scm_numeric_equal(scm_obj_t args)
 	if (!scm_is_number(a)) return scm_error("=: needs a number");
 	double x = scm_number_value(a);
 	args = scm_cdr(args);
-	if (scm_is_empty_list(args)) return scm_true();
+	if (scm_is_null(args)) return scm_true();
 
 	while (scm_is_pair(args)) {
 		a = scm_car(args);

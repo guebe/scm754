@@ -12,7 +12,7 @@ typedef uint64_t scm_obj_t;
 /* tags */
 #define SCM_MASK         0xffff000000000000
 /* do not use: -inf      0xfff0000000000000 */
-#define SCM_EMPTY_LIST   0xfff1000000000000
+#define SCM_NIL          0xfff1000000000000
 #define SCM_TRUE         0xfff2000000000000
 #define SCM_FALSE        0xfff3000000000000
 #define SCM_EOF          0xfff4000000000000
@@ -81,13 +81,13 @@ typedef enum {
 } scm_procedure_t;
 
 /* type predicates */
-static inline _Bool scm_is_empty_list(scm_obj_t obj)   { return (obj & SCM_MASK) == SCM_EMPTY_LIST; }
+static inline _Bool scm_is_null(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_NIL; }
 static inline _Bool scm_is_boolean(scm_obj_t obj)      { return ((obj & SCM_MASK) == SCM_TRUE) || ((obj & SCM_MASK) == SCM_FALSE); }
 static inline _Bool scm_is_eof_object(scm_obj_t obj)   { return (obj & SCM_MASK) == SCM_EOF; }
 static inline _Bool scm_is_dot(scm_obj_t obj)          { return (obj & SCM_MASK) == SCM_DOT; }
 static inline _Bool scm_is_rparen(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_RPAREN; }
 static inline _Bool scm_is_unspecified(scm_obj_t obj)  { return (obj & SCM_MASK) == SCM_UNSPECIFIED; }
-static inline _Bool scm_is_error_object(scm_obj_t obj) { return (obj & SCM_MASK) == SCM_ERROR; }
+static inline _Bool scm_is_error(scm_obj_t obj)        { return (obj & SCM_MASK) == SCM_ERROR; }
 static inline _Bool scm_is_symbol(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_SYMBOL; }
 static inline _Bool scm_is_string(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_STRING; }
 static inline _Bool scm_is_pair(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_PAIR; }
@@ -111,14 +111,14 @@ static inline uint32_t scm_closure_idx(scm_obj_t closure)    { return (uint32_t)
 extern scm_obj_t scm_car(scm_obj_t pair);
 extern scm_obj_t scm_cdr(scm_obj_t pair);
 extern const char *scm_string_value(scm_obj_t string);
-extern const char *scm_error_object_message(scm_obj_t error_object);
+extern const char *scm_error_value(void);
 
 /* mutators */
 extern scm_obj_t scm_set_car(scm_obj_t pair, scm_obj_t obj);
 extern scm_obj_t scm_set_cdr(scm_obj_t pair, scm_obj_t obj);
 
 /* constructors */
-static inline scm_obj_t scm_empty_list(void)       { return SCM_EMPTY_LIST; }
+static inline scm_obj_t scm_nil(void)              { return SCM_NIL; }
 static inline scm_obj_t scm_boolean(_Bool x)       { return x?SCM_TRUE:SCM_FALSE; }
 static inline scm_obj_t scm_true(void)             { return SCM_TRUE; }
 static inline scm_obj_t scm_false(void)            { return SCM_FALSE; }
