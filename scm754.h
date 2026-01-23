@@ -47,8 +47,12 @@ extern scm_obj_t scm_lambda;
 extern scm_obj_t scm_define;
 
 typedef enum {
+	/* sort enum tags by arity - this helps the compiler optimize the eval function */
+
+	/* arity: 1 */
 	SCM_PROCEDURE_CAR = 1,
 	SCM_PROCEDURE_CDR,
+	SCM_PROCEDURE_IS_PROCEDURE,
 	SCM_PROCEDURE_IS_NULL,
 	SCM_PROCEDURE_IS_BOOLEAN,
 	SCM_PROCEDURE_IS_EOF_OBJECT,
@@ -57,18 +61,22 @@ typedef enum {
 	SCM_PROCEDURE_IS_PAIR,
 	SCM_PROCEDURE_IS_CHAR,
 	SCM_PROCEDURE_IS_NUMBER,
+	SCM_PROCEDURE_LENGTH,
+
+	/* arity: 2 */
 	SCM_PROCEDURE_IS_EQ,
 	SCM_PROCEDURE_CONS,
 	SCM_PROCEDURE_SET_CAR,
 	SCM_PROCEDURE_SET_CDR,
 	SCM_PROCEDURE_MODULO,
 	SCM_PROCEDURE_QUOTIENT,
+
+	/* arity: variable length */
 	SCM_PROCEDURE_ADD,
 	SCM_PROCEDURE_SUB,
 	SCM_PROCEDURE_MUL,
 	SCM_PROCEDURE_DIV,
 	SCM_PROCEDURE_WRITE,
-	SCM_PROCEDURE_LENGTH,
 	SCM_PROCEDURE_NUMERIC_EQUAL,
 } scm_procedure_t;
 
@@ -131,7 +139,7 @@ __attribute__((warn_unused_result))
 extern scm_obj_t scm_error(const char *message, ...);
 extern scm_obj_t scm_write(scm_obj_t obj);
 extern scm_obj_t scm_read(void);
-extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier);
+extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env);
 extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc);
 extern int scm_read_char(void);
 extern int scm_peek_char(void);

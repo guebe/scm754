@@ -70,6 +70,7 @@ extern scm_obj_t scm_environment_create(void)
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-car!", 8)), scm_procedure(SCM_PROCEDURE_SET_CAR));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-cdr!", 8)), scm_procedure(SCM_PROCEDURE_SET_CDR));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("quotient", 8)), scm_procedure(SCM_PROCEDURE_QUOTIENT));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("procedure?", 10)), scm_procedure(SCM_PROCEDURE_IS_PROCEDURE));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("eof-object?", 11)), scm_procedure(SCM_PROCEDURE_IS_EOF_OBJECT));
 	return environment;
 }

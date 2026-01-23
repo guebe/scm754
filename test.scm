@@ -672,18 +672,18 @@
 ;(pair? (current-input-port)) ; #f
 ;(pair? (current-output-port)) ; #f
 
-;(test (procedure? #f) #f)
-;(test (procedure? #\c) #f)
-;(test (procedure? 1) #f)
-;(test (procedure? 1.1) #f)
-;(test (procedure? '(procedure)) #f)
-;(test (procedure? (lambda () #f)) #t)
-;(test (procedure? (catch (lambda (ct) ct))) #f)
-;(test (procedure? "string") #f)
-;(test (procedure? 'symbol) #f)
-;(test (procedure? '#(vector)) #f)
-;(test (procedure? (current-input-port)) #f)
-;(test (procedure? (current-output-port)) #f)
+(procedure? #f) ; #f
+(procedure? #\c) ; #f
+(procedure? 1) ; #f
+(procedure? 1.1) ; #f
+(procedure? '(procedure)) ; #f
+(procedure? (lambda () #f)) ; #t
+;(procedure? (catch (lambda (ct) ct))) ; #f
+(procedure? "string") ; #f
+(procedure? 'symbol) ; #f
+;(procedure? '#(vector)) ; #f
+;(procedure? (current-input-port)) ; #f
+;(procedure? (current-output-port)) ; #f
 
 ;(test (real? #f) #f)
 ;(test (real? #\c) #f)
@@ -964,9 +964,9 @@
 (cons 1 '(2)) ; '(1 2)
 (cons 1 (cons 2 '())) ; '(1 2)
 
-;(test (length '()) 0)
-;(test (length '(1)) 1)
-;(test (length '(1 2 3)) 3)
+(length '()) ; 0
+(length '(1)) ; 1
+(length '(1 2 3)) ; 3
 
 ;(test (list) '())
 ;(test (list '()) '(()))
@@ -2670,9 +2670,9 @@
 ;(test (list 'a (+ 3 4) 'c) '(a 7 c))
 ;(test (list) '())
 
-;(test (length '(a b c)) 3)
-;(test (length '(a (b) (c d e))) 3)
-;(test (length '()) 0)
+(length '(a b c)) ; 3
+(length '(a (b) (c d e))) ; 3
+(length '()) ; 0
 
 ;(test (append '(x) '(y)) '(x y))
 ;(test (append '(a) '(b c d)) '(a b c d))
@@ -2795,10 +2795,10 @@
 
 ; R4RS tests, 6.9 control features
 
-;(test (procedure? car) #t)
-;(test (procedure? 'car) #f)
-;(test (procedure? (lambda (x) (* x x))) #t)
-;(test (procedure? '(lambda (x) (* x x))) #f)
+(procedure? car) ; #t
+(procedure? 'car) ; #f
+(procedure? (lambda (x) (* x x))) ; #t
+(procedure? '(lambda (x) (* x x))) ; #f
 
 ;(test (apply + (list 3 4)) 7)
 
