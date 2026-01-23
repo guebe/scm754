@@ -126,12 +126,6 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 
 	if (scm_is_procedure(proc)) {
 		procedure = scm_procedure_id(proc);
-		if (procedure == SCM_PROCEDURE_ADD) return scm_add(args);
-		if (procedure == SCM_PROCEDURE_SUB) return scm_sub(args);
-		if (procedure == SCM_PROCEDURE_MUL) return scm_mul(args);
-		if (procedure == SCM_PROCEDURE_DIV) return scm_div(args);
-		if (procedure == SCM_PROCEDURE_WRITE) return scm_write(args);
-		if (procedure == SCM_PROCEDURE_NUMERIC_EQUAL) return scm_numeric_equal(args);
 		if (procedure == SCM_PROCEDURE_CAR) return argc == 1 ? scm_car(scm_car(args)) : scm_error("apply: car: takes one parameter");
 		if (procedure == SCM_PROCEDURE_CDR) return argc == 1 ? scm_cdr(scm_car(args)) : scm_error("apply: cdr: takes one parameter");
 		if (procedure == SCM_PROCEDURE_IS_NULL) return argc == 1 ? scm_boolean(scm_is_empty_list(scm_car(args))) : scm_error("apply: null?: takes one parameter");
@@ -148,6 +142,13 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 		if (procedure == SCM_PROCEDURE_SET_CDR) return argc == 2 ? scm_set_cdr(scm_car(args), scm_car(scm_cdr(args))) : scm_error("apply: set-cdr!: takes two parameter");
 		if (procedure == SCM_PROCEDURE_MODULO) return argc == 2 ? scm_modulo(scm_car(args), scm_car(scm_cdr(args))) : scm_error("apply: modulo: takes two parameter");
 		if (procedure == SCM_PROCEDURE_QUOTIENT) return argc == 2 ? scm_quotient(scm_car(args), scm_car(scm_cdr(args))) : scm_error("apply: quotient: takes two parameter");
+		if (procedure == SCM_PROCEDURE_ADD) return scm_add(args);
+		if (procedure == SCM_PROCEDURE_SUB) return scm_sub(args);
+		if (procedure == SCM_PROCEDURE_MUL) return scm_mul(args);
+		if (procedure == SCM_PROCEDURE_DIV) return scm_div(args);
+		if (procedure == SCM_PROCEDURE_WRITE) return scm_write(args);
+		if (procedure == SCM_PROCEDURE_LENGTH) return scm_number((double)scm_length(args));
+		if (procedure == SCM_PROCEDURE_NUMERIC_EQUAL) return scm_numeric_equal(args);
 		else return scm_error("unknown procedure");
 	}
 	else if (scm_is_closure(proc)) {
