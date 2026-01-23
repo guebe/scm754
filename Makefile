@@ -1,7 +1,7 @@
 # (c) guenter.ebermann@htl-hl.ac.at
 
 SRC = error.c number.c pair.c port.c read.c
-SRC_SCHEME = $(SRC) write.c environment.c eval.c main.c
+SRC_SCHEME = $(SRC) write.c environment.c procedures.c eval.c main.c
 SRC_FUZZ = $(SRC) environment.c fuzz.c
 
 CC = clang

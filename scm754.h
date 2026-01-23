@@ -152,5 +152,9 @@ extern scm_obj_t scm_sub(scm_obj_t args);
 extern scm_obj_t scm_mul(scm_obj_t args);
 extern scm_obj_t scm_div(scm_obj_t args);
 static inline scm_obj_t scm_is_eq(scm_obj_t obj1, scm_obj_t obj2) { return scm_boolean(obj1 == obj2); }
+extern size_t scm_length(scm_obj_t list);
+extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b);
+extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b);
+extern scm_obj_t scm_numeric_equal(scm_obj_t args);
 
 #endif

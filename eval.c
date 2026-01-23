@@ -3,7 +3,6 @@
 #undef DEBUG
 
 #include "scm754.h"
-#include <math.h>
 #ifdef DEBUG
 #include <stdio.h>
 #endif
@@ -101,122 +100,6 @@ extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier
 	}
 }
 
-extern scm_obj_t scm_add(scm_obj_t args)
-{
-	double a = 0;
-	while (scm_is_pair(args)) {
-		scm_obj_t arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("+: needs a number");
-		a += scm_number_value(arg);
-		args = scm_cdr(args);
-	}
-	return scm_number(a);
-}
-
-extern scm_obj_t scm_sub(scm_obj_t args)
-{
-	if (!scm_is_pair(args)) return scm_error("-: needs an argument");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("-: needs a number");
-	double a = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (scm_is_empty_list(args)) return scm_number(-a);
-
-	while (scm_is_pair(args)) {
-		arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("-: needs a number");
-		a -= scm_number_value(arg);
-		args = scm_cdr(args);
-	}
-	return scm_number(a);
-}
-
-extern scm_obj_t scm_mul(scm_obj_t args)
-{
-	double a = 1.0;
-	while (scm_is_pair(args)) {
-		scm_obj_t arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("*: needs a number");
-		a *= scm_number_value(arg);
-		args = scm_cdr(args);
-	}
-	return scm_number(a);
-}
-
-extern scm_obj_t scm_div(scm_obj_t args)
-{
-	if (!scm_is_pair(args)) return scm_error("/: needs an argument");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("/: needs a number");
-	double a = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (scm_is_empty_list(args)) return scm_number(1.0/a);
-
-	while (scm_is_pair(args)) {
-		arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("/: needs a number");
-		double b = scm_number_value(arg);
-		if (b == 0.0) return scm_error("/: division by zero");
-		a /= b;
-		args = scm_cdr(args);
-	}
-	return scm_number(a);
-}
-
-extern scm_obj_t scm_numeric_equal(scm_obj_t args)
-{
-	if (!scm_is_pair(args)) return scm_error("=: needs an argument");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("=: needs a number");
-	double a = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (scm_is_empty_list(args)) return scm_true();
-
-	while (scm_is_pair(args)) {
-		arg = scm_car(args);
-		if (!scm_is_number(arg)) return scm_error("=: needs a number");
-		if (a != scm_number_value(arg)) return scm_false();
-		args = scm_cdr(args);
-	}
-	return scm_true();
-}
-
-extern scm_obj_t scm_quotient(scm_obj_t args)
-{
-	double a, b;
-	if (!scm_is_pair(args)) return scm_error("quotient: needs 2 numbers");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("quotient: needs a number");
-	a = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (!scm_is_pair(args)) return scm_error("quotient: needs 2 numbers");
-	arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("quotient: needs a number");
-	b = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (!scm_is_empty_list(args)) return scm_error("quotient: needs 2 numbers");
-	if (b == 0.0) return scm_error("quotient: division by zero");
-	return scm_number(trunc(a / b));
-}
-
-extern scm_obj_t scm_modulo(scm_obj_t args)
-{
-	double a, b;
-	if (!scm_is_pair(args)) return scm_error("modulo: needs 2 numbers");
-	scm_obj_t arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("modulo: needs a number");
-	a = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (!scm_is_pair(args)) return scm_error("modulo: needs 2 numbers");
-	arg = scm_car(args);
-	if (!scm_is_number(arg)) return scm_error("modulo: needs a number");
-	b = scm_number_value(arg);
-	args = scm_cdr(args);
-	if (!scm_is_empty_list(args)) return scm_error("modulo: needs 2 numbers");
-	if (b == 0.0) return scm_error("modulo: division by zero");
-	return scm_number(a - b * floor(a / b));
-}
-
 extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 {
 	uint32_t procedure;
@@ -243,8 +126,8 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 		if (procedure == SCM_PROCEDURE_SET_CAR) return scm_set_car(scm_car(args), scm_car(scm_cdr(args)));
 		if (procedure == SCM_PROCEDURE_SET_CDR) return scm_set_cdr(scm_car(args), scm_car(scm_cdr(args)));
 		if (procedure == SCM_PROCEDURE_NUMERIC_EQUAL) return scm_numeric_equal(args);
-		if (procedure == SCM_PROCEDURE_MODULO) return scm_modulo(args);
-		if (procedure == SCM_PROCEDURE_QUOTIENT) return scm_quotient(args);
+		if (procedure == SCM_PROCEDURE_MODULO) return scm_modulo(scm_car(args), scm_car(scm_cdr(args)));
+		if (procedure == SCM_PROCEDURE_QUOTIENT) return scm_quotient(scm_car(args), scm_car(scm_cdr(args)));
 		else return scm_error("unknown procedure");
 	}
 	else if (scm_is_closure(proc)) {
