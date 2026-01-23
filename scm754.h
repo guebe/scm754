@@ -129,7 +129,7 @@ extern scm_obj_t scm_error(const char *message, ...);
 extern scm_obj_t scm_write(scm_obj_t obj);
 extern scm_obj_t scm_read(void);
 extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier);
-extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args);
+extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc);
 extern int scm_read_char(void);
 extern int scm_peek_char(void);
 extern scm_obj_t scm_environment_create(void);
