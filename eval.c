@@ -9,14 +9,33 @@
 
 static scm_obj_t eval_list(scm_obj_t list, scm_obj_t environment_specifier)
 {
-	scm_obj_t first, rest;
+	scm_obj_t head = scm_empty_list();
+	scm_obj_t tail = scm_empty_list();
 
-	if (scm_is_empty_list(list)) return list;
-	first = scm_eval(scm_car(list), environment_specifier);
-	if (scm_is_error_object(first)) return first;
-	rest = eval_list(scm_cdr(list), environment_specifier);
-	if (scm_is_error_object(rest)) return rest;
-	return scm_cons(first, rest);
+	while (scm_is_pair(list)) {
+		scm_obj_t val = scm_eval(scm_car(list), environment_specifier);
+		if (scm_is_error_object(val)) return val;
+
+#ifdef DEBUG
+printf("alloc1\n");
+#endif
+		scm_obj_t cell = scm_cons(val, scm_empty_list());
+
+		if (scm_is_empty_list(head)) {
+			head = cell;
+			tail = cell;
+		} else {
+			scm_set_cdr(tail, cell);
+			tail = cell;
+		}
+
+		list = scm_cdr(list);
+	}
+
+	if (!scm_is_empty_list(list))
+		return scm_error("eval_list: improper list");
+
+	return head;
 }
 
 extern scm_obj_t scm_eval(scm_obj_t expr_or_def, scm_obj_t environment_specifier)
