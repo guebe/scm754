@@ -102,7 +102,14 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 #ifdef DEBUG
 		printf("; eval: calling (apply "); scm_write(proc); printf(" "); scm_write(evaled_args); printf(")\n");
 #endif
-		return scm_apply(proc, evaled_args, argc);
+		scm_obj_t result = scm_apply(proc, evaled_args, argc);
+		/* free value list: the values got copied into environment bindings by apply */
+		while (scm_is_pair(evaled_args)) {
+			scm_obj_t next = scm_cdr(evaled_args);
+			scm_gc_free(evaled_args);
+			evaled_args = next;
+		}
+		return result;
 	}
 }
 
@@ -158,6 +165,19 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 			if (scm_is_error(result)) return result;
 			body = scm_cdr(body);
 		}
+
+		/* free: we may free the new_env if no closure captured it */
+		if (new_env != env && !scm_gc_contains_env(result, new_env, env)) {
+			scm_obj_t frame = scm_car(new_env);
+			scm_gc_free(new_env);
+			while (scm_is_pair(frame)) {
+				scm_obj_t next = scm_cdr(frame);
+				scm_gc_free(scm_car(frame));
+				scm_gc_free(frame);
+				frame = next;
+			}
+		}
+
 		return result;
 	}
 	else {

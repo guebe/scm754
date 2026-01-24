@@ -10,14 +10,14 @@
 static size_t read_depth;
 
 /* R7RS, section 7.1.1, Lexical structure */
-static inline _Bool is_line_ending(int c) { return c == '\r' || c == '\n'; }
-static inline _Bool is_whitespace(int c) { return c == ' ' || c == '\t' || is_line_ending(c); }
-static inline _Bool is_delimiter(int c) { return is_whitespace(c) || c == '|' || c == '(' || c == ')' || c == '"' || c == ';'; }
-static inline _Bool is_digit(int c) { return c >= '0' && c <= '9'; }
-static inline _Bool is_letter(int c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
-static inline _Bool is_special_initial(int c) { return c == '!' || c == '$' || c == '%' || c == '&' || c == '*' || c == '/' || c == ':' || c == '<' || c == '=' || c == '>' || c == '?' || c == '^' || c == '_' || c == '~'; }
-static inline _Bool is_initial(int c) { return is_letter(c) || is_special_initial(c); }
-static inline _Bool is_explicit_sign(int c) { return c == '+' || c == '-'; }
+static inline bool is_line_ending(int c) { return c == '\r' || c == '\n'; }
+static inline bool is_whitespace(int c) { return c == ' ' || c == '\t' || is_line_ending(c); }
+static inline bool is_delimiter(int c) { return is_whitespace(c) || c == '|' || c == '(' || c == ')' || c == '"' || c == ';'; }
+static inline bool is_digit(int c) { return c >= '0' && c <= '9'; }
+static inline bool is_letter(int c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
+static inline bool is_special_initial(int c) { return c == '!' || c == '$' || c == '%' || c == '&' || c == '*' || c == '/' || c == ':' || c == '<' || c == '=' || c == '>' || c == '?' || c == '^' || c == '_' || c == '~'; }
+static inline bool is_initial(int c) { return is_letter(c) || is_special_initial(c); }
+static inline bool is_explicit_sign(int c) { return c == '+' || c == '-'; }
 
 static void skip_comment(void)
 {
@@ -114,20 +114,19 @@ static scm_obj_t read_number(char c)
 static scm_obj_t read_symbol(char c)
 {
 	char buf[SCM_TOKEN_SIZE];
-	ssize_t len;
 	scm_obj_t obj;
 
 	buf[0] = c;
-	if ((len = scan_token(buf + 1, sizeof buf - 1)) < 0)
+	if (scan_token(buf + 1, sizeof buf - 1) < 0)
 		return scm_error("read_symbol: scan error");
 
-	obj = scm_string(buf, (size_t)len+1);
+	obj = scm_string(buf);
 	if (scm_is_error(obj)) return obj;
 
 	return scm_string_to_symbol(obj);
 }
 
-static scm_obj_t read_symbol_or_number_or_dot(char c, _Bool dot_ok)
+static scm_obj_t read_symbol_or_number_or_dot(char c, bool dot_ok)
 {
 	char buf[SCM_TOKEN_SIZE];
 	ssize_t len;
@@ -146,7 +145,7 @@ static scm_obj_t read_symbol_or_number_or_dot(char c, _Bool dot_ok)
 	if (scm_boolean_value(obj)) return obj;
 
 make_symbol:
-	obj = scm_string(buf, (size_t)len+1);
+	obj = scm_string(buf);
 	if (scm_is_error(obj)) return obj;
 
 	return scm_string_to_symbol(obj);
@@ -165,10 +164,10 @@ static scm_obj_t read_string(void)
 
 	buf[n] = 0;
 
-	return scm_string(buf, n);
+	return scm_string(buf);
 }
 
-static scm_obj_t read(_Bool dot_ok, _Bool rparen_ok, _Bool eof_ok);
+static scm_obj_t read(bool dot_ok, bool rparen_ok, bool eof_ok);
 static scm_obj_t read_list(void)
 {
 	scm_obj_t obj, head, last;
@@ -221,7 +220,7 @@ static scm_obj_t read_quote(void)
 	return scm_cons(scm_quote, args);
 }
 
-static scm_obj_t read(_Bool dot_ok, _Bool rparen_ok, _Bool eof_ok)
+static scm_obj_t read(bool dot_ok, bool rparen_ok, bool eof_ok)
 {
 	int c;
 

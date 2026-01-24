@@ -19,11 +19,6 @@ static void write_list(scm_obj_t obj)
 	putchar(')');
 }
 
-static void write_string(scm_obj_t string)
-{
-	fwrite(scm_string_value(string), 1, scm_string_length(string), stdout);
-}
-
 extern scm_obj_t scm_write(scm_obj_t obj)
 {
 	if (scm_is_null(obj)) {
@@ -54,11 +49,11 @@ extern scm_obj_t scm_write(scm_obj_t obj)
 		fputs("#!closure", stdout);
 	}
 	else if (scm_is_symbol(obj)) {
-		write_string(scm_symbol_to_string(obj));
+		fputs(scm_string_value(scm_symbol_to_string(obj)), stdout);
 	}
 	else if (scm_is_string(obj)) {
 		putchar('\"');
-	       	write_string(obj);
+		fputs(scm_string_value(obj), stdout);
 	       	putchar('\"');
 	}
 	else if (scm_is_pair(obj)) {

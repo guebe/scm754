@@ -4,6 +4,7 @@
 #define __SCM754_H__
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -33,9 +34,6 @@ typedef uint64_t scm_obj_t;
  * to cell with a pair ((variables) . (body)) stored in the environment */
 #define SCM_CLOSURE      0xffff000000000000
 
-#define SCM_SIZE_MASK  0xFFFF
-#define SCM_SIZE_SHIFT 32U
-
 /* primitives - special forms which control evaluation and thus are kept
  * separate from procedures. Each primitive itself (callee) evaluates its
  * arguments according to special rules defined by the specification. Those
@@ -46,8 +44,11 @@ extern scm_obj_t scm_quote;
 extern scm_obj_t scm_lambda;
 extern scm_obj_t scm_define;
 
+extern scm_obj_t scm_interaction_environment;
+extern scm_obj_t scm_symbols;
+
 typedef enum {
-	/* sort enum tags by arity - this helps the compiler optimize the eval function */
+	/* sort enum tags by arity - this helps compiler-optimizing the eval function */
 
 	/* arity: 1 */
 	SCM_PROCEDURE_CAR = 1,
@@ -81,20 +82,20 @@ typedef enum {
 } scm_procedure_t;
 
 /* type predicates */
-static inline _Bool scm_is_null(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_NIL; }
-static inline _Bool scm_is_boolean(scm_obj_t obj)      { return ((obj & SCM_MASK) == SCM_TRUE) || ((obj & SCM_MASK) == SCM_FALSE); }
-static inline _Bool scm_is_eof_object(scm_obj_t obj)   { return (obj & SCM_MASK) == SCM_EOF; }
-static inline _Bool scm_is_dot(scm_obj_t obj)          { return (obj & SCM_MASK) == SCM_DOT; }
-static inline _Bool scm_is_rparen(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_RPAREN; }
-static inline _Bool scm_is_unspecified(scm_obj_t obj)  { return (obj & SCM_MASK) == SCM_UNSPECIFIED; }
-static inline _Bool scm_is_error(scm_obj_t obj)        { return (obj & SCM_MASK) == SCM_ERROR; }
-static inline _Bool scm_is_symbol(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_SYMBOL; }
-static inline _Bool scm_is_string(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_STRING; }
-static inline _Bool scm_is_pair(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_PAIR; }
-static inline _Bool scm_is_char(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_CHAR; }
-static inline _Bool scm_is_procedure(scm_obj_t obj)    { return (obj & SCM_MASK) == SCM_PROCEDURE; }
-static inline _Bool scm_is_closure(scm_obj_t obj)      { return (obj & SCM_MASK) == SCM_CLOSURE; }
-static inline _Bool scm_is_number(scm_obj_t obj)
+static inline bool scm_is_null(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_NIL; }
+static inline bool scm_is_boolean(scm_obj_t obj)      { return ((obj & SCM_MASK) == SCM_TRUE) || ((obj & SCM_MASK) == SCM_FALSE); }
+static inline bool scm_is_eof_object(scm_obj_t obj)   { return (obj & SCM_MASK) == SCM_EOF; }
+static inline bool scm_is_dot(scm_obj_t obj)          { return (obj & SCM_MASK) == SCM_DOT; }
+static inline bool scm_is_rparen(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_RPAREN; }
+static inline bool scm_is_unspecified(scm_obj_t obj)  { return (obj & SCM_MASK) == SCM_UNSPECIFIED; }
+static inline bool scm_is_error(scm_obj_t obj)        { return (obj & SCM_MASK) == SCM_ERROR; }
+static inline bool scm_is_symbol(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_SYMBOL; }
+static inline bool scm_is_string(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_STRING; }
+static inline bool scm_is_pair(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_PAIR; }
+static inline bool scm_is_char(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_CHAR; }
+static inline bool scm_is_procedure(scm_obj_t obj)    { return (obj & SCM_MASK) == SCM_PROCEDURE; }
+static inline bool scm_is_closure(scm_obj_t obj)      { return (obj & SCM_MASK) == SCM_CLOSURE; }
+static inline bool scm_is_number(scm_obj_t obj)
 {
 	scm_obj_t exp = (obj >> 52) & 0x7FF;
 	scm_obj_t tag = (obj >> 48) & 0xF;
@@ -102,8 +103,7 @@ static inline _Bool scm_is_number(scm_obj_t obj)
 }
 
 /* accessors */
-static inline _Bool scm_boolean_value(scm_obj_t obj)         { return obj != SCM_FALSE; }
-static inline size_t scm_string_length(scm_obj_t string)     { assert(scm_is_string(string)); return (string >> SCM_SIZE_SHIFT) & SCM_SIZE_MASK; }
+static inline bool scm_boolean_value(scm_obj_t obj)         { return obj != SCM_FALSE; }
 static inline double scm_number_value(scm_obj_t number)      { double d; memcpy(&d, &number, sizeof d); return d; }
 static inline char scm_char_value(scm_obj_t c)               { return (char)c; }
 static inline uint32_t scm_procedure_id(scm_obj_t procedure) { return (uint32_t)procedure; }
@@ -111,6 +111,7 @@ static inline uint32_t scm_closure_idx(scm_obj_t closure)    { return (uint32_t)
 extern scm_obj_t scm_car(scm_obj_t pair);
 extern scm_obj_t scm_cdr(scm_obj_t pair);
 extern const char *scm_string_value(scm_obj_t string);
+static inline size_t scm_string_length(scm_obj_t string)     { assert(scm_is_string(string)); return strlen(scm_string_value(string)); }
 extern const char *scm_error_value(void);
 
 /* mutators */
@@ -119,7 +120,7 @@ extern scm_obj_t scm_set_cdr(scm_obj_t pair, scm_obj_t obj);
 
 /* constructors */
 static inline scm_obj_t scm_nil(void)              { return SCM_NIL; }
-static inline scm_obj_t scm_boolean(_Bool x)       { return x?SCM_TRUE:SCM_FALSE; }
+static inline scm_obj_t scm_boolean(bool x)        { return x?SCM_TRUE:SCM_FALSE; }
 static inline scm_obj_t scm_true(void)             { return SCM_TRUE; }
 static inline scm_obj_t scm_false(void)            { return SCM_FALSE; }
 static inline scm_obj_t scm_eof_object(void)       { return SCM_EOF; }
@@ -131,7 +132,7 @@ static inline scm_obj_t scm_char(char c)           { return SCM_CHAR | (scm_obj_
 static inline scm_obj_t scm_procedure(uint32_t id) { return SCM_PROCEDURE | id; }
 static inline scm_obj_t scm_closure(uint32_t idx)  { return SCM_CLOSURE | idx; }
 extern scm_obj_t scm_string_to_number(const char *string, int radix);
-extern scm_obj_t scm_string(const char *string, size_t k);
+extern scm_obj_t scm_string(const char *string);
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2);
 
 /* primitives */
@@ -167,5 +168,10 @@ extern size_t scm_length(scm_obj_t list);
 extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b);
 extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b);
 extern scm_obj_t scm_numeric_equal(scm_obj_t args);
+
+extern void scm_gc_init(void);
+extern void scm_gc_collect(void);
+extern void scm_gc_free(scm_obj_t obj);
+extern bool scm_gc_contains_env(scm_obj_t obj, scm_obj_t target_env, scm_obj_t stop_at);
 
 #endif
