@@ -88,6 +88,91 @@ static scm_obj_t eval_quote(size_t argc, scm_obj_t args)
 	return argc == 1 ? scm_car(args) : scm_error("quote: bad form, should be (quote list)");
 }
 
+static bool get_let_binding(scm_obj_t first, scm_obj_t *param, scm_obj_t *value)
+{
+	if (!scm_is_pair(first)) return false;
+	scm_obj_t second = scm_cdr(first);
+	if (!scm_is_pair(second) || !scm_is_null(scm_cdr(second))) return false;
+	*param = scm_car(first);
+	*value = scm_car(second);
+	return true;
+}
+
+/* desugar (let ((x y)...)) body...) -> (lambda (xs...) body...) ys... */
+static scm_obj_t eval_let(size_t argc, scm_obj_t args)
+{
+	scm_obj_t param_list = scm_nil(), value_list = scm_nil();
+	scm_obj_t param_tail, value_tail, param, value;
+
+	if (argc < 2) return scm_error("let: bad form, need bindings and body");
+
+	scm_obj_t bindings = scm_car(args);
+	scm_obj_t body = scm_cdr(args);
+
+	while (scm_is_pair(bindings)) {
+		if (!get_let_binding(scm_car(bindings), &param, &value))
+			return scm_error("let: bad form in binding");
+
+		scm_obj_t param_pair = scm_cons(param, scm_nil());
+		scm_obj_t value_pair = scm_cons(value, scm_nil());
+
+		if (scm_is_null(param_list)) {
+			param_list = param_tail = param_pair;
+			value_list = value_tail = value_pair;
+		}
+		else {
+			scm_set_cdr(param_tail, param_pair);
+			scm_set_cdr(value_tail, value_pair);
+			param_tail = param_pair;
+			value_tail = value_pair;
+		}
+
+		bindings = scm_cdr(bindings);
+	}
+	if (!scm_is_null(bindings)) return scm_error("let: improper binding list");
+
+	return scm_cons(scm_cons(scm_lambda, scm_cons(param_list, body)), value_list);
+}
+
+/* desugar (let* ((x y)...) body...) -> (lambda (x) (lambda... body...)) y */
+static scm_obj_t eval_let_star(size_t argc, scm_obj_t args)
+{
+	if (argc < 2) return scm_error("let*: bad form, need bindings and body");
+
+	scm_obj_t bindings = scm_car(args);
+	scm_obj_t body = scm_cdr(args);
+
+	/* no binding ((lambda () body...)) */
+	if (scm_is_null(bindings)) return scm_cons(scm_cons(scm_lambda, scm_cons(scm_nil(), body)), scm_nil());
+
+	if (!scm_is_pair(bindings)) return scm_error("let*: bindings must be a list");
+
+	/* first binding ((lambda (param) body...) value) */
+	scm_obj_t param, value, prev, inner;
+	if (!get_let_binding(scm_car(bindings), &param, &value))
+		return scm_error("let*: bad form in binding");
+
+	prev = inner = scm_cons(scm_cons(param, scm_nil()), body);
+	scm_obj_t root = scm_cons(scm_cons(scm_lambda, inner), scm_cons(value, scm_nil()));
+
+	/* other bindings ((lambda (param1) ((lambda (param2) body...) value2)) value1) */
+	bindings = scm_cdr(bindings);
+	while (scm_is_pair(bindings)) {
+		if (!get_let_binding(scm_car(bindings), &param, &value))
+			return scm_error("let*: bad form in binding");
+
+		inner = scm_cons(scm_cons(param, scm_nil()), body);
+		scm_obj_t outer = scm_cons(scm_cons(scm_lambda, inner), scm_cons(value, scm_nil()));
+		scm_set_cdr(prev, scm_cons(outer, scm_nil()));
+		prev = inner;
+
+		bindings = scm_cdr(bindings);
+	}
+	if (!scm_is_null(bindings)) return scm_error("let*: improper binding list");
+
+	return root;
+}
+
 extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 {
 	while (1) {
@@ -111,6 +196,16 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 			else if (op == scm_if) {
 				expr = eval_if(argc, args, env);
 				if (scm_is_unspecified(expr) || scm_is_error(expr)) return expr;
+				continue; /* tail call */
+			}
+			else if (op == scm_let) {
+				expr = eval_let(argc, args);
+				if (scm_is_error(expr)) return expr;
+				continue; /* tail call */
+			}
+			else if (op == scm_let_star) {
+				expr = eval_let_star(argc, args);
+				if (scm_is_error(expr)) return expr;
 				continue; /* tail call */
 			}
 		}

@@ -45,6 +45,8 @@ extern scm_obj_t scm_if;
 extern scm_obj_t scm_quote;
 extern scm_obj_t scm_lambda;
 extern scm_obj_t scm_define;
+extern scm_obj_t scm_let;
+extern scm_obj_t scm_let_star;
 
 extern scm_obj_t scm_interaction_environment;
 extern scm_obj_t scm_symbols;
