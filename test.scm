@@ -1279,9 +1279,9 @@
 ;(test (remainder -12345  12345) 0)
 ;(test (remainder -12345 -12345) 0)
 
-;(test (zero? -1) #f)
-;(test (zero?  0) #t)
-;(test (zero?  1) #f)
+(zero? -1) ; #f
+(zero?  0) ; #t
+(zero?  1) ; #f
 
 ;;; Equivalence
 

@@ -1,7 +1,5 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
-
 #include "scm754.h"
-#include <stdio.h>
 
 #define SCM_TOKEN_SIZE  128
 #define SCM_STRING_SIZE 512
@@ -114,13 +112,14 @@ static scm_obj_t read_number(char c)
 static scm_obj_t read_symbol(char c)
 {
 	char buf[SCM_TOKEN_SIZE];
+	ssize_t len;
 	scm_obj_t obj;
 
 	buf[0] = c;
-	if (scan_token(buf + 1, sizeof buf - 1) < 0)
+	if ((len = scan_token(buf + 1, sizeof buf - 1)) < 0)
 		return scm_error("read_symbol: scan error");
 
-	obj = scm_string(buf);
+	obj = scm_string(buf, (size_t)len+1);
 	if (scm_is_error(obj)) return obj;
 
 	return scm_string_to_symbol(obj);
@@ -145,7 +144,7 @@ static scm_obj_t read_symbol_or_number_or_dot(char c, bool dot_ok)
 	if (scm_boolean_value(obj)) return obj;
 
 make_symbol:
-	obj = scm_string(buf);
+	obj = scm_string(buf, (size_t)len+1);
 	if (scm_is_error(obj)) return obj;
 
 	return scm_string_to_symbol(obj);
@@ -164,7 +163,7 @@ static scm_obj_t read_string(void)
 
 	buf[n] = 0;
 
-	return scm_string(buf);
+	return scm_string(buf, n);
 }
 
 static scm_obj_t read(bool dot_ok, bool rparen_ok, bool eof_ok);
@@ -261,4 +260,25 @@ extern scm_obj_t scm_read(void)
 {
 	read_depth = 0;
 	return read(0, 0, 1);
+}
+
+extern scm_obj_t scm_load(scm_obj_t filename)
+{
+	if (!scm_is_string(filename)) return scm_error("load: argument not a string");
+
+	const char *str = scm_string_value(filename);
+	FILE *f = fopen(str, "r");
+	if (f == NULL) return scm_error("cant open file %s", str);
+	FILE *saved = scm_current_input_port;
+	scm_current_input_port = f;
+	while (1) {
+		scm_obj_t obj = scm_read();
+		if (scm_is_eof_object(obj)) { break; }
+		else if (scm_is_error(obj)) { puts(scm_error_value()); break; }
+		obj = scm_eval(obj, scm_interaction_environment);
+		if (scm_is_error(obj)) { puts(scm_error_value()); break; }
+	}
+	scm_current_input_port = saved;
+	fclose(f);
+	return scm_unspecified();
 }

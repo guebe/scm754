@@ -1,9 +1,7 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
-
 #include "scm754.h"
-#include <stdio.h>
 
-static void write_list(scm_obj_t obj)
+static void print_list(scm_obj_t obj)
 {
 	putchar('(');
 	while (1) {
@@ -19,13 +17,13 @@ static void write_list(scm_obj_t obj)
 	putchar(')');
 }
 
-extern scm_obj_t scm_write(scm_obj_t obj)
+extern void print(scm_obj_t obj, bool readable)
 {
 	if (scm_is_null(obj)) {
-       		fputs("()", stdout);
+		fputs("()", stdout);
 	}
 	else if (scm_is_boolean(obj)) {
-	       	fputs(scm_boolean_value(obj) ? "#t" : "#f", stdout);
+		fputs(scm_boolean_value(obj) ? "#t" : "#f", stdout);
 	}
 	else if (scm_is_eof_object(obj)) {
 		fputs("#!eof", stdout);
@@ -52,19 +50,36 @@ extern scm_obj_t scm_write(scm_obj_t obj)
 		fputs(scm_string_value(scm_symbol_to_string(obj)), stdout);
 	}
 	else if (scm_is_string(obj)) {
-		putchar('\"');
+		if (readable) putchar('\"');
 		fputs(scm_string_value(obj), stdout);
-	       	putchar('\"');
+		if (readable) putchar('\"');
 	}
 	else if (scm_is_pair(obj)) {
-	       	write_list(obj);
+		print_list(obj);
 	}
-       	else if (scm_is_char(obj)) {
+	else if (scm_is_char(obj)) {
 		fputs("#\\", stdout);
 		putchar(scm_char_value(obj));
 	}
 	else {
 		printf("%.16g", scm_number_value(obj));
 	}
+}
+
+extern scm_obj_t scm_write(scm_obj_t obj)
+{
+	print(obj, true);
+	return scm_unspecified();
+}
+
+extern scm_obj_t scm_display(scm_obj_t obj)
+{
+	print(obj, false);
+	return scm_unspecified();
+}
+
+extern scm_obj_t scm_newline(void)
+{
+	putchar('\n');
 	return scm_unspecified();
 }

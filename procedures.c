@@ -91,6 +91,12 @@ extern scm_obj_t scm_numeric_equal(scm_obj_t args)
 	return scm_true();
 }
 
+extern scm_obj_t scm_is_zero(scm_obj_t z)
+{
+	double x = scm_number_value(z);
+	return scm_boolean(x == 0.0);
+}
+
 extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b)
 {
 	double x, y;

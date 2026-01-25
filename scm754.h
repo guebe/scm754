@@ -5,7 +5,9 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef uint64_t scm_obj_t;
@@ -46,12 +48,16 @@ extern scm_obj_t scm_define;
 
 extern scm_obj_t scm_interaction_environment;
 extern scm_obj_t scm_symbols;
+extern FILE *scm_current_input_port;
 
 typedef enum {
 	/* sort enum tags by arity - this helps compiler-optimizing the eval function */
 
+	/* arity: 0 */
+	SCM_PROCEDURE_NEWLINE = 1,
+
 	/* arity: 1 */
-	SCM_PROCEDURE_CAR = 1,
+	SCM_PROCEDURE_CAR,
 	SCM_PROCEDURE_CDR,
 	SCM_PROCEDURE_IS_PROCEDURE,
 	SCM_PROCEDURE_IS_NULL,
@@ -63,6 +69,9 @@ typedef enum {
 	SCM_PROCEDURE_IS_CHAR,
 	SCM_PROCEDURE_IS_NUMBER,
 	SCM_PROCEDURE_LENGTH,
+	SCM_PROCEDURE_DISPLAY,
+	SCM_PROCEDURE_LOAD,
+	SCM_PROCEDURE_IS_ZERO,
 
 	/* arity: 2 */
 	SCM_PROCEDURE_IS_EQ,
@@ -132,14 +141,17 @@ static inline scm_obj_t scm_char(char c)           { return SCM_CHAR | (scm_obj_
 static inline scm_obj_t scm_procedure(uint32_t id) { return SCM_PROCEDURE | id; }
 static inline scm_obj_t scm_closure(uint32_t idx)  { return SCM_CLOSURE | idx; }
 extern scm_obj_t scm_string_to_number(const char *string, int radix);
-extern scm_obj_t scm_string(const char *string);
+extern scm_obj_t scm_string(const char *string, size_t k);
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2);
 
 /* primitives */
 __attribute__((warn_unused_result))
 extern scm_obj_t scm_error(const char *message, ...);
 extern scm_obj_t scm_write(scm_obj_t obj);
+extern scm_obj_t scm_display(scm_obj_t obj);
+extern scm_obj_t scm_newline(void);
 extern scm_obj_t scm_read(void);
+extern scm_obj_t scm_load(scm_obj_t filename);
 extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env);
 extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc);
 extern int scm_read_char(void);
@@ -168,10 +180,12 @@ extern size_t scm_length(scm_obj_t list);
 extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b);
 extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b);
 extern scm_obj_t scm_numeric_equal(scm_obj_t args);
+extern scm_obj_t scm_is_zero(scm_obj_t z);
 
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);
 extern void scm_gc_free(scm_obj_t obj);
 extern bool scm_gc_contains_env(scm_obj_t obj, scm_obj_t target_env, scm_obj_t stop_at);
-
+extern void scm_init_strings(void);
+extern void scm_string_free(scm_obj_t string);
 #endif

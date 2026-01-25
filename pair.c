@@ -1,12 +1,8 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
-
 #include "scm754.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define SCM_CELL_MASK 0xFFFFFFFF
-#define SCM_CELL_NUM 1000U
+#define SCM_CELL_NUM 80000U
 
 typedef struct
 {
@@ -21,6 +17,8 @@ static uint32_t head = 0;
 
 extern void scm_gc_init(void)
 {
+	scm_init_strings();
+
 	for (uint32_t i = 0; i < SCM_CELL_NUM; i++) {
 		scm_pair_t *c = &cell[i];
 		c->next = (i != (SCM_CELL_NUM - 1)) ? i + 1 : SCM_CELL_MASK;
@@ -41,8 +39,6 @@ static void mark(scm_obj_t pair)
 	mark(c->cdr);
 }
 
-static inline char *to_string(scm_obj_t string) { return (char *)(string & (~SCM_MASK)); }
-
 static uint32_t sweep(void)
 {
 	uint32_t f = SCM_CELL_MASK;
@@ -53,12 +49,10 @@ static uint32_t sweep(void)
 			c->car = SCM_ERROR;
 			c->cdr = SCM_ERROR;
 			f = i;
-#if 0
-			if (scm_is_string(c->car)) free(to_string(c->car));
-			else if (scm_is_symbol(c->car)) free(to_string(scm_symbol_to_string(c->car)));
-			if (scm_is_string(c->cdr)) free(to_string(c->cdr));
-			else if (scm_is_symbol(c->cdr)) free(to_string(scm_symbol_to_string(c->cdr)));
-#endif
+			if (scm_is_string(c->car)) scm_string_free(c->car);
+			else if (scm_is_symbol(c->car)) scm_string_free(scm_symbol_to_string(c->car));
+			if (scm_is_string(c->cdr)) scm_string_free(c->cdr);
+			else if (scm_is_symbol(c->cdr)) scm_string_free(scm_symbol_to_string(c->cdr));
 		}
 		else {
 			c->mark = 0;
@@ -100,24 +94,9 @@ extern bool scm_gc_contains_env(scm_obj_t obj, scm_obj_t target_env, scm_obj_t s
 	else return false;
 }
 
-extern const char *scm_string_value(scm_obj_t string)
-{
-	if (!scm_is_string(string)) {
-		puts("error: scm_string_value: not a string");
-		return "<not a string>";
-	}
-	return to_string(string);
-}
-
-extern scm_obj_t scm_string(const char *string)
-{
-	return SCM_STRING | ((uintptr_t)strdup(string) & (~SCM_MASK));
-}
-
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
 {
 	if (head == SCM_CELL_MASK) return scm_error("out of memory");
-
 	size_t i = head;
 	scm_pair_t *c = &cell[i];
 	c->car = obj1;

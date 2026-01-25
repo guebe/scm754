@@ -52,37 +52,41 @@ extern scm_obj_t scm_environment_create(void)
 
 	scm_gc_init();
 
-	scm_if     = scm_string_to_symbol(scm_string("if"));
-	scm_quote  = scm_string_to_symbol(scm_string("quote"));
-	scm_lambda = scm_string_to_symbol(scm_string("lambda"));
-	scm_define = scm_string_to_symbol(scm_string("define"));
+	scm_if     = scm_string_to_symbol(scm_string("if", 2));
+	scm_quote  = scm_string_to_symbol(scm_string("quote", 5));
+	scm_lambda = scm_string_to_symbol(scm_string("lambda", 6));
+	scm_define = scm_string_to_symbol(scm_string("define", 6));
 
 	environment = scm_cons(scm_nil(), scm_nil());
 
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("+")), scm_procedure(SCM_PROCEDURE_ADD));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("-")), scm_procedure(SCM_PROCEDURE_SUB));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("*")), scm_procedure(SCM_PROCEDURE_MUL));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("/")), scm_procedure(SCM_PROCEDURE_DIV));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("=")), scm_procedure(SCM_PROCEDURE_NUMERIC_EQUAL));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("car")), scm_procedure(SCM_PROCEDURE_CAR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("cdr")), scm_procedure(SCM_PROCEDURE_CDR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("eq?")), scm_procedure(SCM_PROCEDURE_IS_EQ));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("cons")), scm_procedure(SCM_PROCEDURE_CONS));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("write")), scm_procedure(SCM_PROCEDURE_WRITE));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("null?")), scm_procedure(SCM_PROCEDURE_IS_NULL));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("pair?")), scm_procedure(SCM_PROCEDURE_IS_PAIR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("char?")), scm_procedure(SCM_PROCEDURE_IS_CHAR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("modulo")), scm_procedure(SCM_PROCEDURE_MODULO));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("length")), scm_procedure(SCM_PROCEDURE_LENGTH));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("symbol?")), scm_procedure(SCM_PROCEDURE_IS_SYMBOL));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("string?")), scm_procedure(SCM_PROCEDURE_IS_STRING));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("number?")), scm_procedure(SCM_PROCEDURE_IS_NUMBER));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("boolean?")), scm_procedure(SCM_PROCEDURE_IS_BOOLEAN));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-car!")), scm_procedure(SCM_PROCEDURE_SET_CAR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-cdr!")), scm_procedure(SCM_PROCEDURE_SET_CDR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("quotient")), scm_procedure(SCM_PROCEDURE_QUOTIENT));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("procedure?")), scm_procedure(SCM_PROCEDURE_IS_PROCEDURE));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("eof-object?")), scm_procedure(SCM_PROCEDURE_IS_EOF_OBJECT));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("+", 1)), scm_procedure(SCM_PROCEDURE_ADD));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("-", 1)), scm_procedure(SCM_PROCEDURE_SUB));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("*", 1)), scm_procedure(SCM_PROCEDURE_MUL));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("/", 1)), scm_procedure(SCM_PROCEDURE_DIV));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("=", 1)), scm_procedure(SCM_PROCEDURE_NUMERIC_EQUAL));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("car", 3)), scm_procedure(SCM_PROCEDURE_CAR));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("cdr", 3)), scm_procedure(SCM_PROCEDURE_CDR));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("eq?", 3)), scm_procedure(SCM_PROCEDURE_IS_EQ));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("cons", 4)), scm_procedure(SCM_PROCEDURE_CONS));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("load", 4)), scm_procedure(SCM_PROCEDURE_LOAD));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("write", 5)), scm_procedure(SCM_PROCEDURE_WRITE));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("null?", 5)), scm_procedure(SCM_PROCEDURE_IS_NULL));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("pair?", 5)), scm_procedure(SCM_PROCEDURE_IS_PAIR));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("char?", 5)), scm_procedure(SCM_PROCEDURE_IS_CHAR));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("zero?", 5)), scm_procedure(SCM_PROCEDURE_IS_ZERO));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("modulo", 6)), scm_procedure(SCM_PROCEDURE_MODULO));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("length", 6)), scm_procedure(SCM_PROCEDURE_LENGTH));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("symbol?", 7)), scm_procedure(SCM_PROCEDURE_IS_SYMBOL));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("display", 7)), scm_procedure(SCM_PROCEDURE_DISPLAY));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("newline", 7)), scm_procedure(SCM_PROCEDURE_NEWLINE));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("string?", 7)), scm_procedure(SCM_PROCEDURE_IS_STRING));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("number?", 7)), scm_procedure(SCM_PROCEDURE_IS_NUMBER));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("boolean?", 8)), scm_procedure(SCM_PROCEDURE_IS_BOOLEAN));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-car!", 8)), scm_procedure(SCM_PROCEDURE_SET_CAR));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-cdr!", 8)), scm_procedure(SCM_PROCEDURE_SET_CDR));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("quotient", 8)), scm_procedure(SCM_PROCEDURE_QUOTIENT));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("procedure?", 10)), scm_procedure(SCM_PROCEDURE_IS_PROCEDURE));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("eof-object?", 11)), scm_procedure(SCM_PROCEDURE_IS_EOF_OBJECT));
 	return environment;
 }
 
