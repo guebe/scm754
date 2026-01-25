@@ -1,12 +1,41 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
 
 #include "scm754.h"
+#include <libgen.h>
+#include <unistd.h>
+
+static int load_library(void)
+{
+	char exe[4096];
+	char path[4096];
+
+	ssize_t n = readlink("/proc/self/exe", exe, sizeof(exe));
+	if (n < 0 || (size_t)n >= sizeof(exe)) goto errout;
+
+	exe[n] = 0;
+	char *dir = dirname(exe);
+
+	int ret = snprintf(path, sizeof(path), "%s/scm754.scm", dir);
+	if (ret < 0 || (size_t)ret >= sizeof(path)) goto errout;
+
+	scm_obj_t load_result = scm_load(path);
+	if (scm_is_error(load_result)) {
+		puts(scm_error_value());
+		return -1;
+	}
+	return 0;
+errout:
+	puts("cant load library");
+	return -1;
+}
 
 int main(int argc, char *argv[])
 {
 	FILE *f;
 	bool repl;
 	scm_interaction_environment = scm_environment_create();
+
+	if (load_library() < 0) return 1;
 
 	if (argc != 2) {
 		repl = true;

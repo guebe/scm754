@@ -155,7 +155,7 @@ extern scm_obj_t scm_write(scm_obj_t obj);
 extern scm_obj_t scm_display(scm_obj_t obj);
 extern scm_obj_t scm_newline(void);
 extern scm_obj_t scm_read(void);
-extern scm_obj_t scm_load(scm_obj_t filename);
+extern scm_obj_t scm_load(const char *filename);
 extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env);
 extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc);
 extern int scm_read_char(void);

@@ -262,23 +262,21 @@ extern scm_obj_t scm_read(void)
 	return read(0, 0, 1);
 }
 
-extern scm_obj_t scm_load(scm_obj_t filename)
+extern scm_obj_t scm_load(const char *filename)
 {
-	if (!scm_is_string(filename)) return scm_error("load: argument not a string");
-
-	const char *str = scm_string_value(filename);
-	FILE *f = fopen(str, "r");
-	if (f == NULL) return scm_error("cant open file %s", str);
+	scm_obj_t obj = scm_unspecified();
+	FILE *f = fopen(filename, "r");
+	if (f == NULL) return scm_error("cant open file %s", filename);
 	FILE *saved = scm_current_input_port;
 	scm_current_input_port = f;
 	while (1) {
-		scm_obj_t obj = scm_read();
-		if (scm_is_eof_object(obj)) { break; }
-		else if (scm_is_error(obj)) { puts(scm_error_value()); break; }
+		obj = scm_read();
+		if (scm_is_eof_object(obj)) break;
+		else if (scm_is_error(obj)) break;
 		obj = scm_eval(obj, scm_interaction_environment);
-		if (scm_is_error(obj)) { puts(scm_error_value()); break; }
+		if (scm_is_error(obj)) break;
 	}
 	scm_current_input_port = saved;
 	fclose(f);
-	return scm_unspecified();
+	return obj;
 }

@@ -182,7 +182,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 		else if (procedure == SCM_PROCEDURE_LENGTH) return argc == 1 ? scm_number((double)scm_length(arg1)) : scm_error("length: takes one parameter");
 		else if (procedure == SCM_PROCEDURE_DISPLAY) return argc == 1 ? scm_display(arg1) : scm_error("display: takes one parameter");
 		else if (procedure == SCM_PROCEDURE_WRITE) return argc == 1 ? scm_write(arg1) : scm_error("write: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_LOAD) return argc == 1 ? scm_load(arg1) : scm_error("load: takes one parameter");
+		else if (procedure == SCM_PROCEDURE_LOAD) { scm_obj_t tmp; return argc == 1 && scm_is_string(arg1) ? ((scm_is_error(tmp = scm_load(scm_string_value(arg1)))) ? tmp : scm_unspecified()) : scm_error("load: takes one string parameter"); }
 		else if (procedure == SCM_PROCEDURE_IS_ZERO) return argc == 1 ? scm_is_zero(arg1) : scm_error("zero?: takes one parameter");
 		else if (procedure == SCM_PROCEDURE_IS_EQ) return argc == 2 ? scm_is_eq(arg1, arg2) : scm_error("eq?: takes two parameter");
 		else if (procedure == SCM_PROCEDURE_CONS) return argc == 2 ? scm_cons(arg1, arg2) : scm_error("cons: takes two parameter");
