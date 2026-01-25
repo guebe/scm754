@@ -88,6 +88,10 @@ typedef enum {
 	SCM_PROCEDURE_DIV,
 	SCM_PROCEDURE_WRITE,
 	SCM_PROCEDURE_NUMERIC_EQUAL,
+	SCM_PROCEDURE_LT,
+	SCM_PROCEDURE_GT,
+	SCM_PROCEDURE_LE,
+	SCM_PROCEDURE_GE,
 } scm_procedure_t;
 
 /* type predicates */
@@ -181,6 +185,10 @@ extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b);
 extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b);
 extern scm_obj_t scm_numeric_equal(scm_obj_t args);
 extern scm_obj_t scm_is_zero(scm_obj_t z);
+extern scm_obj_t scm_lt(scm_obj_t args);
+extern scm_obj_t scm_gt(scm_obj_t args);
+extern scm_obj_t scm_le(scm_obj_t args);
+extern scm_obj_t scm_ge(scm_obj_t args);
 
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);

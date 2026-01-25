@@ -73,24 +73,6 @@ extern scm_obj_t scm_div(scm_obj_t args)
 	return scm_number(x);
 }
 
-extern scm_obj_t scm_numeric_equal(scm_obj_t args)
-{
-	if (!scm_is_pair(args)) return scm_error("=: needs an argument");
-	scm_obj_t a = scm_car(args);
-	if (!scm_is_number(a)) return scm_error("=: needs a number");
-	double x = scm_number_value(a);
-	args = scm_cdr(args);
-	if (scm_is_null(args)) return scm_true();
-
-	while (scm_is_pair(args)) {
-		a = scm_car(args);
-		if (!scm_is_number(a)) return scm_error("=: needs a number");
-		if (x != scm_number_value(a)) return scm_false();
-		args = scm_cdr(args);
-	}
-	return scm_true();
-}
-
 extern scm_obj_t scm_is_zero(scm_obj_t z)
 {
 	double x = scm_number_value(z);
@@ -116,4 +98,38 @@ extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b)
 	if (y == 0.0) return scm_error("modulo: division by zero");
 	return scm_number(x - y * floor(x / y));
 }
+
+typedef bool (*cmp_func_t)(double, double);
+static bool lt(double a, double b) { return a < b; }
+static bool gt(double a, double b) { return a > b; }
+static bool le(double a, double b) { return a <= b; }
+static bool ge(double a, double b) { return a >= b; }
+static bool eq(double a, double b) { return a == b; }
+
+static scm_obj_t numeric_compare(scm_obj_t args, cmp_func_t cmp, const char *name)
+{
+	if (!scm_is_pair(args)) return scm_error("%s: needs an argument", name);
+
+	scm_obj_t a = scm_car(args);
+	if (!scm_is_number(a)) return scm_error("%s: needs a number", name);
+	double x = scm_number_value(a);
+
+	args = scm_cdr(args);
+	while (scm_is_pair(args)) {
+		a = scm_car(args);
+		if (!scm_is_number(a)) return scm_error("%s: needs a number", name);
+		double y = scm_number_value(a);
+		if (!cmp(x, y)) return scm_false();
+		x = y;
+		args = scm_cdr(args);
+	}
+
+	return scm_true();
+}
+
+extern scm_obj_t scm_lt(scm_obj_t args) { return numeric_compare(args, lt, "<"); }
+extern scm_obj_t scm_gt(scm_obj_t args) { return numeric_compare(args, gt, ">"); }
+extern scm_obj_t scm_le(scm_obj_t args) { return numeric_compare(args, le, "<="); }
+extern scm_obj_t scm_ge(scm_obj_t args) { return numeric_compare(args, ge, ">="); }
+extern scm_obj_t scm_numeric_equal(scm_obj_t args) { return numeric_compare(args, eq, "="); }
 

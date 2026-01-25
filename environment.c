@@ -64,6 +64,10 @@ extern scm_obj_t scm_environment_create(void)
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("*", 1)), scm_procedure(SCM_PROCEDURE_MUL));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("/", 1)), scm_procedure(SCM_PROCEDURE_DIV));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("=", 1)), scm_procedure(SCM_PROCEDURE_NUMERIC_EQUAL));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("<", 1)), scm_procedure(SCM_PROCEDURE_LT));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string(">", 1)), scm_procedure(SCM_PROCEDURE_GT));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("<=", 2)), scm_procedure(SCM_PROCEDURE_LE));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string(">=", 2)), scm_procedure(SCM_PROCEDURE_GE));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("car", 3)), scm_procedure(SCM_PROCEDURE_CAR));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("cdr", 3)), scm_procedure(SCM_PROCEDURE_CDR));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("eq?", 3)), scm_procedure(SCM_PROCEDURE_IS_EQ));

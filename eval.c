@@ -195,6 +195,10 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 		else if (procedure == SCM_PROCEDURE_MUL) return scm_mul(args);
 		else if (procedure == SCM_PROCEDURE_DIV) return scm_div(args);
 		else if (procedure == SCM_PROCEDURE_NUMERIC_EQUAL) return scm_numeric_equal(args);
+		else if (procedure == SCM_PROCEDURE_LT) return scm_lt(args);
+		else if (procedure == SCM_PROCEDURE_GT) return scm_gt(args);
+		else if (procedure == SCM_PROCEDURE_LE) return scm_le(args);
+		else if (procedure == SCM_PROCEDURE_GE) return scm_ge(args);
 		else return scm_error("unknown procedure");
 	}
 	else {
