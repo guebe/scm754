@@ -193,7 +193,6 @@ extern scm_obj_t scm_ge(scm_obj_t args);
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);
 extern void scm_gc_free(scm_obj_t obj);
-extern bool scm_gc_contains_env(scm_obj_t obj, scm_obj_t target_env, scm_obj_t stop_at);
 extern void scm_init_strings(void);
 extern void scm_string_free(scm_obj_t string);
 #endif

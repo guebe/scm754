@@ -80,20 +80,6 @@ extern void scm_gc_free(scm_obj_t obj)
 	head = i;
 }
 
-extern bool scm_gc_contains_env(scm_obj_t obj, scm_obj_t target_env, scm_obj_t stop_at)
-{
-	if (obj == stop_at) return false;
-	else if (scm_is_closure(obj)) {
-		scm_obj_t closure_env = scm_car((obj & ~SCM_MASK) | SCM_PAIR);
-		return closure_env == target_env;
-	}
-	else if (scm_is_pair(obj)) {
-		return scm_gc_contains_env(scm_car(obj), target_env, stop_at) ||
-			scm_gc_contains_env(scm_cdr(obj), target_env, stop_at);
-	}
-	else return false;
-}
-
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
 {
 	if (head == SCM_CELL_MASK) return scm_error("out of memory");
