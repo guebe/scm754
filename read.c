@@ -264,7 +264,7 @@ extern scm_obj_t scm_read(void)
 
 extern scm_obj_t scm_load(const char *filename)
 {
-	scm_obj_t obj = scm_unspecified();
+	scm_obj_t obj;
 	FILE *f = fopen(filename, "r");
 	if (f == NULL) return scm_error("cant open file %s", filename);
 	FILE *saved = scm_current_input_port;
