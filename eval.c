@@ -138,7 +138,7 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 			scm_obj_t body = scm_cdr(scm_cdr((op)));
 			while (scm_is_pair(scm_cdr(body))) {
 #ifdef DEBUG
-printf("; apply: calling (eval "); scm_write(scm_car(body)); printf(" "); scm_write(new_env); printf(")\n");
+printf("; apply: calling (eval "); scm_write(scm_car(body)); printf(" "); scm_write(new); printf(")\n");
 #endif
 				op = scm_eval(scm_car(body), env);
 				if (scm_is_error(op)) return op;
