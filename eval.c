@@ -153,45 +153,49 @@ printf("; apply: calling (eval "); scm_write(scm_car(body)); printf(" "); scm_wr
 
 extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 {
-	if (scm_is_procedure(proc)) {
-		uint32_t procedure = scm_procedure_id(proc);
-		scm_obj_t arg1 = scm_car(args);
-		scm_obj_t arg2 = scm_car(scm_cdr(args));
-		if (procedure == SCM_PROCEDURE_NEWLINE) return argc == 0 ? scm_newline() : scm_error("newline: takes no parameter");
-		if (procedure == SCM_PROCEDURE_CAR) return argc == 1 ? scm_car(arg1) : scm_error("car: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_CDR) return argc == 1 ? scm_cdr(arg1) : scm_error("cdr: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_IS_PROCEDURE) return argc == 1 ? scm_boolean(scm_is_procedure(arg1) || scm_is_closure(arg1)) : scm_error("procedure?: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_IS_NULL) return argc == 1 ? scm_boolean(scm_is_null(arg1)) : scm_error("null?: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_IS_BOOLEAN) return argc == 1 ? scm_boolean(scm_is_boolean(arg1)) : scm_error("boolean?: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_IS_EOF_OBJECT) return argc == 1 ? scm_boolean(scm_is_eof_object(arg1)) : scm_error("eof-object?: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_IS_SYMBOL) return argc == 1 ? scm_boolean(scm_is_symbol(arg1)) : scm_error("symbol?: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_IS_STRING) return argc == 1 ? scm_boolean(scm_is_string(arg1)) : scm_error("string?: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_IS_PAIR) return argc == 1 ? scm_boolean(scm_is_pair(arg1)) : scm_error("pair?: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_IS_CHAR) return argc == 1 ? scm_boolean(scm_is_char(arg1)) : scm_error("char?: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_IS_NUMBER) return argc == 1 ? scm_boolean(scm_is_number(arg1)) : scm_error("number?: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_LENGTH) return argc == 1 ? scm_number((double)scm_length(arg1)) : scm_error("length: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_DISPLAY) return argc == 1 ? scm_display(arg1) : scm_error("display: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_WRITE) return argc == 1 ? scm_write(arg1) : scm_error("write: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_LOAD) { scm_obj_t tmp; return argc == 1 && scm_is_string(arg1) ? ((scm_is_error(tmp = scm_load(scm_string_value(arg1)))) ? tmp : scm_unspecified()) : scm_error("load: takes one string parameter"); }
-		else if (procedure == SCM_PROCEDURE_IS_ZERO) return argc == 1 ? scm_is_zero(arg1) : scm_error("zero?: takes one parameter");
-		else if (procedure == SCM_PROCEDURE_IS_EQ) return argc == 2 ? scm_is_eq(arg1, arg2) : scm_error("eq?: takes two parameter");
-		else if (procedure == SCM_PROCEDURE_CONS) return argc == 2 ? scm_cons(arg1, arg2) : scm_error("cons: takes two parameter");
-		else if (procedure == SCM_PROCEDURE_SET_CAR) return argc == 2 ? scm_set_car(arg1, arg2) : scm_error("set-car!: takes two parameter");
-		else if (procedure == SCM_PROCEDURE_SET_CDR) return argc == 2 ? scm_set_cdr(arg1, arg2) : scm_error("set-cdr!: takes two parameter");
-		else if (procedure == SCM_PROCEDURE_MODULO) return argc == 2 ? scm_modulo(arg1, arg2) : scm_error("modulo: takes two parameter");
-		else if (procedure == SCM_PROCEDURE_QUOTIENT) return argc == 2 ? scm_quotient(arg1, arg2) : scm_error("quotient: takes two parameter");
-		else if (procedure == SCM_PROCEDURE_ADD) return scm_add(args);
-		else if (procedure == SCM_PROCEDURE_SUB) return scm_sub(args);
-		else if (procedure == SCM_PROCEDURE_MUL) return scm_mul(args);
-		else if (procedure == SCM_PROCEDURE_DIV) return scm_div(args);
-		else if (procedure == SCM_PROCEDURE_NUMERIC_EQUAL) return scm_numeric_equal(args);
-		else if (procedure == SCM_PROCEDURE_LT) return scm_lt(args);
-		else if (procedure == SCM_PROCEDURE_GT) return scm_gt(args);
-		else if (procedure == SCM_PROCEDURE_LE) return scm_le(args);
-		else if (procedure == SCM_PROCEDURE_GE) return scm_ge(args);
-		else return scm_error("unknown procedure");
+	if (!scm_is_procedure(proc)) return scm_error("apply: attempt to apply non-procedure");
+
+	uint32_t procedure = scm_procedure_id(proc);
+	scm_obj_t arg1 = scm_car(args);
+	scm_obj_t arg2 = scm_car(scm_cdr(args));
+
+	switch (procedure) {
+	case SCM_PROCEDURE_NEWLINE: return argc == 0 ? scm_newline() : scm_error("newline: takes no parameter");
+	case SCM_PROCEDURE_CAR: return argc == 1 ? scm_car(arg1) : scm_error("car: takes one parameter");
+	case SCM_PROCEDURE_CDR: return argc == 1 ? scm_cdr(arg1) : scm_error("cdr: takes one parameter");
+	case SCM_PROCEDURE_IS_PROCEDURE: return argc == 1 ? scm_boolean(scm_is_procedure(arg1) || scm_is_closure(arg1)) : scm_error("procedure?: takes one parameter");
+	case SCM_PROCEDURE_IS_NULL: return argc == 1 ? scm_boolean(scm_is_null(arg1)) : scm_error("null?: takes one parameter");
+	case SCM_PROCEDURE_IS_BOOLEAN: return argc == 1 ? scm_boolean(scm_is_boolean(arg1)) : scm_error("boolean?: takes one parameter");
+	case SCM_PROCEDURE_IS_EOF_OBJECT: return argc == 1 ? scm_boolean(scm_is_eof_object(arg1)) : scm_error("eof-object?: takes one parameter");
+	case SCM_PROCEDURE_IS_SYMBOL: return argc == 1 ? scm_boolean(scm_is_symbol(arg1)) : scm_error("symbol?: takes one parameter");
+	case SCM_PROCEDURE_IS_STRING: return argc == 1 ? scm_boolean(scm_is_string(arg1)) : scm_error("string?: takes one parameter");
+	case SCM_PROCEDURE_IS_PAIR: return argc == 1 ? scm_boolean(scm_is_pair(arg1)) : scm_error("pair?: takes one parameter");
+	case SCM_PROCEDURE_IS_CHAR: return argc == 1 ? scm_boolean(scm_is_char(arg1)) : scm_error("char?: takes one parameter");
+	case SCM_PROCEDURE_IS_NUMBER: return argc == 1 ? scm_boolean(scm_is_number(arg1)) : scm_error("number?: takes one parameter");
+	case SCM_PROCEDURE_LENGTH: return argc == 1 ? scm_number((double)scm_length(arg1)) : scm_error("length: takes one parameter");
+	case SCM_PROCEDURE_DISPLAY: return argc == 1 ? scm_display(arg1) : scm_error("display: takes one parameter");
+	case SCM_PROCEDURE_WRITE: return argc == 1 ? scm_write(arg1) : scm_error("write: takes one parameter");
+	case SCM_PROCEDURE_LOAD: {
+		if ((argc != 1) || !scm_is_string(arg1)) return scm_error("load: takes one string parameter");
+		scm_obj_t tmp = scm_load(scm_string_value(arg1));
+		return scm_is_error(tmp) ? tmp : scm_unspecified();
 	}
-	else {
-		return scm_error("apply: attempt to apply non-procedure");
+	case SCM_PROCEDURE_IS_ZERO: return argc == 1 ? scm_is_zero(arg1) : scm_error("zero?: takes one parameter");
+	case SCM_PROCEDURE_IS_EQ: return argc == 2 ? scm_is_eq(arg1, arg2) : scm_error("eq?: takes two parameter");
+	case SCM_PROCEDURE_CONS: return argc == 2 ? scm_cons(arg1, arg2) : scm_error("cons: takes two parameter");
+	case SCM_PROCEDURE_SET_CAR: return argc == 2 ? scm_set_car(arg1, arg2) : scm_error("set-car!: takes two parameter");
+	case SCM_PROCEDURE_SET_CDR: return argc == 2 ? scm_set_cdr(arg1, arg2) : scm_error("set-cdr!: takes two parameter");
+	case SCM_PROCEDURE_MODULO: return argc == 2 ? scm_modulo(arg1, arg2) : scm_error("modulo: takes two parameter");
+	case SCM_PROCEDURE_QUOTIENT: return argc == 2 ? scm_quotient(arg1, arg2) : scm_error("quotient: takes two parameter");
+	case SCM_PROCEDURE_ADD: return scm_add(args);
+	case SCM_PROCEDURE_SUB: return scm_sub(args);
+	case SCM_PROCEDURE_MUL: return scm_mul(args);
+	case SCM_PROCEDURE_DIV: return scm_div(args);
+	case SCM_PROCEDURE_NUMERIC_EQUAL: return scm_numeric_equal(args);
+	case SCM_PROCEDURE_LT: return scm_lt(args);
+	case SCM_PROCEDURE_GT: return scm_gt(args);
+	case SCM_PROCEDURE_LE: return scm_le(args);
+	case SCM_PROCEDURE_GE: return scm_ge(args);
+	default: return scm_error("unknown procedure");
 	}
 }
