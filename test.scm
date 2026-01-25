@@ -480,26 +480,26 @@
 
 ; let*
 
-;(test (let* () 1) 1)
-;(test (let* () 1 2 3) 3)
-;(test (let* ((x 'first)) x) 'first)
-;(test (let* ((x 'first) (y 'second) (z 'third)) (list x y z))
-;      '(first second third))
-;(test (let* ((x 0))
-;         (let* ((x 1)
-;                (y (* x 5)))
-;           y))
-;       5)
-;(test (let* ((x 3)
-;             (y (cons 2 x))
-;             (z (cons 1 y)))
-;         z)
-;      '(1 2 . 3))
-;(test (let* ((x 3)
-;             (x (cons 2 x))
-;             (x (cons 1 x)))
-;         x)
-;      '(1 2 . 3))
+(let* () 1) ; 1
+(let* () 1 2 3) ; 3
+(let* ((x 'first)) x) ; 'first
+;(let* ((x 'first) (y 'second) (z 'third)) (list x y z))
+;'(first second third))
+(let* ((x 0))
+   (let* ((x 1)
+          (y (* x 5)))
+     y))
+; 5
+(let* ((x 3)
+       (y (cons 2 x))
+       (z (cons 1 y)))
+   z)
+; '(1 2 . 3)
+(let* ((x 3)
+       (x (cons 2 x))
+       (x (cons 1 x)))
+   x)
+; '(1 2 . 3)
 
 ; or
 
