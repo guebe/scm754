@@ -306,29 +306,29 @@
 ; define
 
 (define x 'foo)
-;(test (let () (define x 1) x) 1)
+(let () (define x 1) x) ; 1
 ((lambda () (define x 0) x)) ; 0
 ;(test (begin ((lambda () (define x 0) x)) x) 'foo)
 ;(test (begin (let () (define x 0) x) x) 'foo)
 ;(test (begin (let () (define x 0) x)) 0)
 ;(test (let () (letrec () (define x 0) x) x) 'foo)
 ;(test (let () (letrec () (define x 0) x)) 0)
-;(test (let () (define (f) 1) (f)) 1)
-;(test (let () (define (f x) x) (f 1)) 1)
-;(test (let () (define (f x y) x) (f 1 2)) 1)
-;(test (let () (define (f x y) y) (f 1 2)) 2)
-;(test (let () (define (f . x) x) (f)) '())
-;(test (let () (define (f . x) x) (f 1)) '(1))
-;(test (let () (define (f . x) x) (f 1 2)) '(1 2))
-;(test (let () (define (f x . y) y) (f 1 2)) '(2))
-;(test (let () (define f (lambda () 1)) (f)) 1)
-;(test (let () (define f (lambda (x) x)) (f 1)) 1)
-;(test (let () (define f (lambda (x y) x)) (f 1 2)) 1)
-;(test (let () (define f (lambda (x y) y)) (f 1 2)) 2)
-;(test (let () (define f (lambda x x)) (f)) '())
-;(test (let () (define f (lambda x x)) (f 1)) '(1))
-;(test (let () (define f (lambda x x)) (f 1 2)) '(1 2))
-;(test (let () (define f (lambda (x . y) y)) (f 1 2)) '(2))
+(let () (define (f) 1) (f)) ; 1
+(let () (define (f x) x) (f 1)) ; 1
+(let () (define (f x y) x) (f 1 2)) ; 1
+(let () (define (f x y) y) (f 1 2)) ; 2
+;(let () (define (f . x) x) (f)) ; '()
+;(let () (define (f . x) x) (f 1)) ; '(1)
+;(let () (define (f . x) x) (f 1 2)) ; '(1 2)
+;(let () (define (f x . y) y) (f 1 2)) ; '(2)
+(let () (define f (lambda () 1)) (f)) ; 1
+(let () (define f (lambda (x) x)) (f 1)) ; 1
+(let () (define f (lambda (x y) x)) (f 1 2)) ; 1
+(let () (define f (lambda (x y) y)) (f 1 2)) ; 2
+;(let () (define f (lambda x x)) (f)) ; '()
+;(let () (define f (lambda x x)) (f 1)) ; '(1)
+;(let () (define f (lambda x x)) (f 1 2)) ; '(1 2)
+;(let () (define f (lambda (x . y) y)) (f 1 2)) ; '(2)
 ;(test ((lambda ()
 ;          (define (e x) (or (zero? x) (o (- x 1))))
 ;          (define (o x) (if (zero? x) #f (e (- x 1))))
@@ -438,27 +438,27 @@
 
 ; let
 
-;(test (let () 1) 1)
-;(test (let () 1 2 3) 3)
-;(test (let ((x 1)) x) 1)
-;(test (let ((x 1) (y 2) (z 3)) (list x y z)) '(1 2 3))
+(let () 1) ; 1
+(let () 1 2 3) ; 3
+(let ((x 1)) x) ; 1
+;(let ((x 1) (y 2) (z 3)) (list x y z)) ; '(1 2 3)
 
-;(test (let ((x 0))
-;         (let ((x 1)
-;               (y (* x 1)))
-;           y))
-;       0)
-;(test (let ((x 0))
-;         (let ((x 1))
-;           (let ((y (* x 1)))
-;             y)))
-;       1)
+(let ((x 0))
+   (let ((x 1)
+         (y (* x 1)))
+     y))
+; 0
+(let ((x 0))
+   (let ((x 1))
+     (let ((y (* x 1)))
+       y)))
+; 1
 
-;(test (let ((x 'lexical))
-;        (let ((f (lambda () x)))
-;          (let ((x 'dynamic))
-;            (f))))
-;      'lexical)
+(let ((x 'lexical))
+  (let ((f (lambda () x)))
+    (let ((x 'dynamic))
+      (f))))
+; 'lexical
 
 ; letrec
 
