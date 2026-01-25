@@ -13,7 +13,7 @@ CFLAGS_EXTRA_FUZZ = -O1 -g -fsanitize=fuzzer,address,undefined
 
 all: scm754
 
-test: scm754 scm754-debug test-read test-read.test test.test test-extra.test fuzz-whitebox fuzz-blackbox analyze tidy
+test: scm754 scm754-debug test-read test-read.test test.test test-extra.test fuzz-whitebox fuzz-all analyze tidy
 
 clean:
 	rm -f scm754 scm754-debug fuzz-whitebox test-read *.out *.plist
@@ -24,8 +24,9 @@ analyze:
 tidy:
 	clang-tidy $(SRC_SCHEME) -checks=misc-unused-functions,misc-unused-parameters,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling -- -I.
 
-fuzz-blackbox:
+fuzz-all:
 	./fuzz-blackbox
+	./fuzz-whitebox -max_total_time=3 -verbosity=0
 
 scm754: $(SRC_SCHEME) scm754.h
 	$(CC) $(CFLAGS) -o $@ $(SRC_SCHEME) -lm
