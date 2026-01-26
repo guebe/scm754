@@ -98,15 +98,17 @@ static bool get_let_binding(scm_obj_t first, scm_obj_t *param, scm_obj_t *value)
 }
 
 /* desugar (let ((x y)...)) body...) -> (lambda (xs...) body...) ys... */
-static scm_obj_t eval_let(size_t argc, scm_obj_t args)
+static scm_obj_t eval_let(scm_obj_t args)
 {
 	scm_obj_t param_list = scm_nil(), value_list = scm_nil();
 	scm_obj_t param_tail, value_tail, param, value;
 
-	if (argc < 2) return scm_error("let: bad form, need bindings and body");
+	if (!scm_is_pair(args)) return scm_error("let*: bad form, need bindings");
 
 	scm_obj_t bindings = scm_car(args);
 	scm_obj_t body = scm_cdr(args);
+
+	if (scm_is_null(body)) return scm_error("let*: bad form, need body");
 
 	while (scm_is_pair(bindings)) {
 		if (!get_let_binding(scm_car(bindings), &param, &value))
@@ -134,12 +136,14 @@ static scm_obj_t eval_let(size_t argc, scm_obj_t args)
 }
 
 /* desugar (let* ((x y)...) body...) -> (lambda (x) (lambda... body...)) y */
-static scm_obj_t eval_let_star(size_t argc, scm_obj_t args)
+static scm_obj_t eval_let_star(scm_obj_t args)
 {
-	if (argc < 2) return scm_error("let*: bad form, need bindings and body");
+	if (!scm_is_pair(args)) return scm_error("let*: bad form, need bindings");
 
 	scm_obj_t bindings = scm_car(args);
 	scm_obj_t body = scm_cdr(args);
+
+	if (scm_is_null(body)) return scm_error("let*: bad form, need body");
 
 	/* no binding ((lambda () body...)) */
 	if (scm_is_null(bindings)) return scm_cons(scm_cons(scm_lambda, scm_cons(scm_nil(), body)), scm_nil());
@@ -198,12 +202,12 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 				continue; /* tail call */
 			}
 			else if (op == scm_let) {
-				expr = eval_let(argc, args);
+				expr = eval_let(args);
 				if (scm_is_error(expr)) return expr;
 				continue; /* tail call */
 			}
 			else if (op == scm_let_star) {
-				expr = eval_let_star(argc, args);
+				expr = eval_let_star(args);
 				if (scm_is_error(expr)) return expr;
 				continue; /* tail call */
 			}
