@@ -67,7 +67,7 @@ extern scm_obj_t scm_environment_create(void)
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("-", 1)), scm_procedure(SCM_PROCEDURE_SUB));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("*", 1)), scm_procedure(SCM_PROCEDURE_MUL));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("/", 1)), scm_procedure(SCM_PROCEDURE_DIV));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("=", 1)), scm_procedure(SCM_PROCEDURE_NUMERIC_EQUAL));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("=", 1)), scm_procedure(SCM_PROCEDURE_NUMBER_EQ));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("<", 1)), scm_procedure(SCM_PROCEDURE_LT));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string(">", 1)), scm_procedure(SCM_PROCEDURE_GT));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("<=", 2)), scm_procedure(SCM_PROCEDURE_LE));
@@ -93,8 +93,11 @@ extern scm_obj_t scm_environment_create(void)
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-car!", 8)), scm_procedure(SCM_PROCEDURE_SET_CAR));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-cdr!", 8)), scm_procedure(SCM_PROCEDURE_SET_CDR));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("quotient", 8)), scm_procedure(SCM_PROCEDURE_QUOTIENT));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("string=?", 8)), scm_procedure(SCM_PROCEDURE_STRING_EQ));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("procedure?", 10)), scm_procedure(SCM_PROCEDURE_IS_PROCEDURE));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("eof-object?", 11)), scm_procedure(SCM_PROCEDURE_IS_EOF_OBJECT));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("string-copy", 11)), scm_procedure(SCM_PROCEDURE_STRING_COPY));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("string-length", 13)), scm_procedure(SCM_PROCEDURE_STRING_LENGTH));
 	return environment;
 }
 

@@ -106,7 +106,7 @@ static bool le(double a, double b) { return a <= b; }
 static bool ge(double a, double b) { return a >= b; }
 static bool eq(double a, double b) { return a == b; }
 
-static scm_obj_t numeric_compare(scm_obj_t args, cmp_func_t cmp, const char *name)
+static scm_obj_t number_compare(scm_obj_t args, cmp_func_t cmp, const char *name)
 {
 	if (!scm_is_pair(args)) return scm_error("%s: needs an argument", name);
 
@@ -127,9 +127,29 @@ static scm_obj_t numeric_compare(scm_obj_t args, cmp_func_t cmp, const char *nam
 	return scm_true();
 }
 
-extern scm_obj_t scm_lt(scm_obj_t args) { return numeric_compare(args, lt, "<"); }
-extern scm_obj_t scm_gt(scm_obj_t args) { return numeric_compare(args, gt, ">"); }
-extern scm_obj_t scm_le(scm_obj_t args) { return numeric_compare(args, le, "<="); }
-extern scm_obj_t scm_ge(scm_obj_t args) { return numeric_compare(args, ge, ">="); }
-extern scm_obj_t scm_numeric_equal(scm_obj_t args) { return numeric_compare(args, eq, "="); }
+extern scm_obj_t scm_lt(scm_obj_t args) { return number_compare(args, lt, "<"); }
+extern scm_obj_t scm_gt(scm_obj_t args) { return number_compare(args, gt, ">"); }
+extern scm_obj_t scm_le(scm_obj_t args) { return number_compare(args, le, "<="); }
+extern scm_obj_t scm_ge(scm_obj_t args) { return number_compare(args, ge, ">="); }
+extern scm_obj_t scm_number_eq(scm_obj_t args) { return number_compare(args, eq, "="); }
 
+extern scm_obj_t scm_string_eq(scm_obj_t args)
+{
+	if (!scm_is_pair(args)) return scm_error("string=?: needs an argument");
+
+	scm_obj_t a = scm_car(args);
+	if (!scm_is_string(a)) return scm_error("string=?: needs a number");
+	const char *x = scm_string_value(a);
+
+	args = scm_cdr(args);
+	while (scm_is_pair(args)) {
+		a = scm_car(args);
+		if (!scm_is_string(a)) return scm_error("string=?: needs a number");
+		const char *y = scm_string_value(a);
+		if (strcmp(x, y) != 0) return scm_false();
+		x = y;
+		args = scm_cdr(args);
+	}
+
+	return scm_true();
+}

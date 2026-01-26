@@ -74,6 +74,7 @@ typedef enum {
 	SCM_PROCEDURE_DISPLAY,
 	SCM_PROCEDURE_LOAD,
 	SCM_PROCEDURE_IS_ZERO,
+	SCM_PROCEDURE_STRING_LENGTH,
 
 	/* arity: 2 */
 	SCM_PROCEDURE_IS_EQ,
@@ -89,11 +90,15 @@ typedef enum {
 	SCM_PROCEDURE_MUL,
 	SCM_PROCEDURE_DIV,
 	SCM_PROCEDURE_WRITE,
-	SCM_PROCEDURE_NUMERIC_EQUAL,
+	SCM_PROCEDURE_NUMBER_EQ,
 	SCM_PROCEDURE_LT,
 	SCM_PROCEDURE_GT,
 	SCM_PROCEDURE_LE,
 	SCM_PROCEDURE_GE,
+	SCM_PROCEDURE_STRING_EQ,
+
+	/* arity: 1-3 */
+	SCM_PROCEDURE_STRING_COPY,
 } scm_procedure_t;
 
 /* type predicates */
@@ -185,12 +190,13 @@ static inline scm_obj_t scm_is_eq(scm_obj_t obj1, scm_obj_t obj2) { return scm_b
 extern size_t scm_length(scm_obj_t list);
 extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b);
 extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b);
-extern scm_obj_t scm_numeric_equal(scm_obj_t args);
+extern scm_obj_t scm_number_eq(scm_obj_t args);
 extern scm_obj_t scm_is_zero(scm_obj_t z);
 extern scm_obj_t scm_lt(scm_obj_t args);
 extern scm_obj_t scm_gt(scm_obj_t args);
 extern scm_obj_t scm_le(scm_obj_t args);
 extern scm_obj_t scm_ge(scm_obj_t args);
+extern scm_obj_t scm_string_eq(scm_obj_t args);
 
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);

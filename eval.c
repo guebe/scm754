@@ -284,6 +284,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 		return scm_is_error(tmp) ? tmp : scm_unspecified();
 	}
 	case SCM_PROCEDURE_IS_ZERO: return argc == 1 ? scm_is_zero(arg1) : scm_error("zero?: takes one parameter");
+	case SCM_PROCEDURE_STRING_LENGTH: return argc == 1 ? scm_number((double)scm_string_length(arg1)) : scm_error("string-length: takes one parameter");
 	case SCM_PROCEDURE_IS_EQ: return argc == 2 ? scm_is_eq(arg1, arg2) : scm_error("eq?: takes two parameter");
 	case SCM_PROCEDURE_CONS: return argc == 2 ? scm_cons(arg1, arg2) : scm_error("cons: takes two parameter");
 	case SCM_PROCEDURE_SET_CAR: return argc == 2 ? scm_set_car(arg1, arg2) : scm_error("set-car!: takes two parameter");
@@ -294,11 +295,12 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 	case SCM_PROCEDURE_SUB: return scm_sub(args);
 	case SCM_PROCEDURE_MUL: return scm_mul(args);
 	case SCM_PROCEDURE_DIV: return scm_div(args);
-	case SCM_PROCEDURE_NUMERIC_EQUAL: return scm_numeric_equal(args);
+	case SCM_PROCEDURE_NUMBER_EQ: return scm_number_eq(args);
 	case SCM_PROCEDURE_LT: return scm_lt(args);
 	case SCM_PROCEDURE_GT: return scm_gt(args);
 	case SCM_PROCEDURE_LE: return scm_le(args);
 	case SCM_PROCEDURE_GE: return scm_ge(args);
+	case SCM_PROCEDURE_STRING_EQ: return scm_string_eq(args);
 	default: return scm_error("unknown procedure");
 	}
 }
