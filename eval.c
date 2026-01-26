@@ -47,9 +47,8 @@ static scm_obj_t eval_if(size_t argc, scm_obj_t args, scm_obj_t env)
 	scm_obj_t cond = scm_eval(scm_car(args), env);
 	if (scm_is_error(cond)) return cond;
 	args = scm_cdr(args);
-	if (scm_boolean_value(cond)) return scm_car(args);
-	else if (argc == 3) return scm_car(scm_cdr(args));
-	else return scm_unspecified();
+	return scm_boolean_value(cond) ? scm_car(args)
+		                       : ((argc == 3) ? scm_car(scm_cdr(args)) : scm_unspecified());
 }
 
 static scm_obj_t eval_define(size_t argc, scm_obj_t args, scm_obj_t env)
