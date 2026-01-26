@@ -129,6 +129,9 @@ extern scm_obj_t scm_environment_extend(scm_obj_t env, scm_obj_t params, scm_obj
 	if (scm_is_null(params) && scm_is_null(args))
 		return env;
 
+	if (!scm_is_pair(params) || !scm_is_pair(args))
+		return scm_error("environment: params or args missing");
+
 	scm_obj_t frame = scm_nil();
 	while (scm_is_pair(params) && scm_is_pair(args)) {
 		frame = scm_cons(scm_cons(scm_car(params), scm_car(args)), frame);

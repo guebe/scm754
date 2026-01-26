@@ -41,28 +41,39 @@ static void free_list(scm_obj_t evaled_args)
 	}
 }
 
-static scm_obj_t eval_if(size_t argc, scm_obj_t args, scm_obj_t env)
+static scm_obj_t eval_if(scm_obj_t args, scm_obj_t env)
 {
-	if (argc != 2 && argc != 3) return scm_error("if: bad form, should be (if expr then [else])");
-	scm_obj_t cond = scm_eval(scm_car(args), env);
-	if (scm_is_error(cond)) return cond;
+	scm_obj_t cond = scm_car(args);
 	args = scm_cdr(args);
-	return scm_boolean_value(cond) ? scm_car(args)
-		                       : ((argc == 3) ? scm_car(scm_cdr(args)) : scm_unspecified());
+
+	scm_obj_t then = scm_car(args);
+	args = scm_cdr(args);
+
+	scm_obj_t else_ = scm_nil();
+	if (!scm_is_null(args)) {
+		else_ = scm_car(args);
+		if (!scm_is_null(scm_cdr(args))) return scm_error("if: bad form, should be (if expr then [else])");
+	}
+	cond = scm_eval(cond, env);
+	if (scm_is_error(cond)) return cond;
+
+	return scm_boolean_value(cond) ? then
+				       : (!scm_is_null(else_) ? else_ : scm_unspecified());
 }
 
-static scm_obj_t eval_define(size_t argc, scm_obj_t args, scm_obj_t env)
+static scm_obj_t eval_define(scm_obj_t args, scm_obj_t env)
 {
 	scm_obj_t value;
 	scm_obj_t var = scm_car(args);
+	args = scm_cdr(args);
 	if (scm_is_symbol(var)) { /* variable define */
-		if (argc != 2) return scm_error("define: bad form, should be (define x expr)");
-		value = scm_eval(scm_car(scm_cdr(args)), env);
+		if (!scm_is_null(scm_cdr(args))) return scm_error("define: bad form, should be (define x expr)");
+		value = scm_eval(scm_car(args), env);
 		goto out;
 	}
 	else if (scm_is_pair(var) && scm_is_symbol(scm_car(var))) { /* function define - de-sugar to lambda */
-		if (argc < 2) return scm_error("define: bad form, should be (define (f x y) body...)");
-		value = scm_eval(scm_cons(scm_lambda, scm_cons(scm_cdr(var), scm_cdr(args))), env);
+		if (scm_is_null(args)) return scm_error("define: bad form, should be (define (f x y) body...)");
+		value = scm_eval(scm_cons(scm_lambda, scm_cons(scm_cdr(var), args)), env);
 		var = scm_car(var);
 		goto out;
 	}
@@ -73,13 +84,10 @@ out:
 	return scm_unspecified();
 }
 
-/* convert the lambda to a closure for later application: capture the environment at lamda definition time */
-static scm_obj_t eval_lambda(size_t argc, scm_obj_t args, scm_obj_t env)
+/* convert the lambda to a closure and capture the environment */
+static scm_obj_t eval_lambda(scm_obj_t args, scm_obj_t env)
 {
-	if (argc < 2) return scm_error("lambda: bad form, should be (lambda (params...) body...");
-	scm_obj_t param = scm_car(args);
-	if (!scm_is_pair(param) && !scm_is_null(param) && !scm_is_symbol(param)) return scm_error("lambda: param must be a list, null or a symbol");
-	return scm_closure((uint32_t)scm_cons(env, args));
+	return scm_closure(scm_cons(env, args));
 }
 
 static scm_obj_t eval_quote(scm_obj_t args)
@@ -186,15 +194,14 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 
 		scm_obj_t op = scm_car(expr);
 		scm_obj_t args = scm_cdr(expr);
-		size_t argc = scm_length(args);
 
 		/* special forms */
 		if (scm_is_symbol(op)) {
 			if (op == scm_quote) return eval_quote(args);
-			else if (op == scm_define) return eval_define(argc, args, env);
-			else if (op == scm_lambda) return eval_lambda(argc, args, env);
+			else if (op == scm_define) return eval_define(args, env);
+			else if (op == scm_lambda) return eval_lambda(args, env);
 			else if (op == scm_if) {
-				expr = eval_if(argc, args, env);
+				expr = eval_if(args, env);
 				if (scm_is_unspecified(expr) || scm_is_error(expr)) return expr;
 				continue; /* tail call */
 			}
@@ -213,6 +220,7 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 		/* application */
 		op = scm_eval(op, env);
 		if (scm_is_error(op)) return op;
+		size_t argc = scm_length(args);
 		args = eval_list(args, env);
 		if (scm_is_error(args)) return args;
 #ifdef DEBUG
@@ -224,7 +232,7 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 			return op;
 		}
 		else if (scm_is_closure(op)) {
-			op = (op & ~SCM_MASK) | SCM_PAIR;
+			op = scm_closure_value(op);
 			env = scm_environment_extend(scm_car(op), scm_car(scm_cdr(op)), args);
 			if (scm_is_error(env)) return env;
 			free_list(args);

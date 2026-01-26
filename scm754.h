@@ -122,7 +122,7 @@ static inline bool scm_boolean_value(scm_obj_t obj)          { return obj != SCM
 static inline double scm_number_value(scm_obj_t number)      { double d; memcpy(&d, &number, sizeof d); return d; }
 static inline char scm_char_value(scm_obj_t c)               { return (char)c; }
 static inline uint32_t scm_procedure_id(scm_obj_t procedure) { return (uint32_t)procedure; }
-static inline uint32_t scm_closure_idx(scm_obj_t closure)    { return (uint32_t)closure; }
+static inline scm_obj_t scm_closure_value(scm_obj_t closure) { return (closure & ~SCM_MASK) | SCM_PAIR; }
 extern scm_obj_t scm_car(scm_obj_t pair);
 extern scm_obj_t scm_cdr(scm_obj_t pair);
 extern const char *scm_string_value(scm_obj_t string);
@@ -145,7 +145,7 @@ static inline scm_obj_t scm_unspecified(void)      { return SCM_UNSPECIFIED; }
 static inline scm_obj_t scm_number(double number)  { scm_obj_t d; memcpy(&d, &number, sizeof d); return d; }
 static inline scm_obj_t scm_char(char c)           { return SCM_CHAR | (scm_obj_t)c; }
 static inline scm_obj_t scm_procedure(uint32_t id) { return SCM_PROCEDURE | id; }
-static inline scm_obj_t scm_closure(uint32_t idx)  { return SCM_CLOSURE | idx; }
+static inline scm_obj_t scm_closure(scm_obj_t pair){ return SCM_CLOSURE | (uint32_t)pair; }
 extern scm_obj_t scm_string_to_number(const char *string, int radix);
 extern scm_obj_t scm_string(const char *string, size_t k);
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2);
