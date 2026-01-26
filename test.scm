@@ -1853,8 +1853,8 @@
 ;(test (string-ci>=? "cd" "cd" "ab") #t)
 ;(test (string-ci>=? "ef" "cd" "ab") #t)
 
-;(test (string-copy "") "")
-;(test (string-copy "abcdef") "abcdef")
+(string-copy "") ; ""
+(string-copy "abcdef") ; "abcdef"
 ;(test (begin (let ((s "abc"))
 ;                (let ((s2 (string-copy s)))
 ;                  (string-set! s2 1 #\x)
