@@ -1864,11 +1864,11 @@
 ;(test (let ((s (make-string 1))) (string-fill! s #\x) s) "x")
 ;(test (let ((s (make-string 3))) (string-fill! s #\z) s) "zzz")
 
-;(test (string-length "") 0)
-;(test (string-length "a") 1)
-;(test (string-length "ab") 2)
-;(test (string-length "abc") 3)
-;(test (string-length "Hello, World!") 13)
+(string-length "") ; 0
+(string-length "a") ; 1
+(string-length "ab") ; 2
+(string-length "abc") ; 3
+(string-length "Hello, World!") ; 13
 
 ;(test (string-ref "abc" 0) #\a)
 ;(test (string-ref "abc" 1) #\b)
@@ -1913,13 +1913,13 @@
 ;(test (string<=? "cd" "cd" "ab") #f)
 ;(test (string<=? "ef" "cd" "ab") #f)
 
-;(test (string=? "abc" "abc") #t)
-;(test (string=? "aBc" "abc") #f)
-;(test (string=? "abc" "abd") #f)
-;(test (string=? "abc" "abcd") #f)
-;(test (string=? "abcd" "abc") #f)
-;(test (string=? "abc" "abc" "abc") #t)
-;(test (string=? "abc" "abc" "cba") #f)
+(string=? "abc" "abc") ; #t
+(string=? "aBc" "abc") ; #f
+(string=? "abc" "abd") ; #f
+(string=? "abc" "abcd") ; #f
+(string=? "abcd" "abc") ; #f
+(string=? "abc" "abc" "abc") ; #t
+(string=? "abc" "abc" "cba") ; #f
 
 ;(test (string>? "test" "test") #f)
 ;(test (string>? "test" "tesa") #t)
