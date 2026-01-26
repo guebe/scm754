@@ -82,9 +82,10 @@ static scm_obj_t eval_lambda(size_t argc, scm_obj_t args, scm_obj_t env)
 	return scm_closure((uint32_t)scm_cons(env, args));
 }
 
-static scm_obj_t eval_quote(size_t argc, scm_obj_t args)
+static scm_obj_t eval_quote(scm_obj_t args)
 {
-	return argc == 1 ? scm_car(args) : scm_error("quote: bad form, should be (quote list)");
+	if (!scm_is_null(scm_cdr(args))) return scm_error("quote: bad form, should be (quote datum)");
+	return scm_car(args);
 }
 
 static bool get_let_binding(scm_obj_t first, scm_obj_t *param, scm_obj_t *value)
@@ -103,12 +104,10 @@ static scm_obj_t eval_let(scm_obj_t args)
 	scm_obj_t param_list = scm_nil(), value_list = scm_nil();
 	scm_obj_t param_tail, value_tail, param, value;
 
-	if (!scm_is_pair(args)) return scm_error("let*: bad form, need bindings");
-
 	scm_obj_t bindings = scm_car(args);
 	scm_obj_t body = scm_cdr(args);
 
-	if (scm_is_null(body)) return scm_error("let*: bad form, need body");
+	if (scm_is_null(body)) return scm_error("let: bad form, body missing");
 
 	while (scm_is_pair(bindings)) {
 		if (!get_let_binding(scm_car(bindings), &param, &value))
@@ -138,12 +137,10 @@ static scm_obj_t eval_let(scm_obj_t args)
 /* desugar (let* ((x y)...) body...) -> (lambda (x) (lambda... body...)) y */
 static scm_obj_t eval_let_star(scm_obj_t args)
 {
-	if (!scm_is_pair(args)) return scm_error("let*: bad form, need bindings");
-
 	scm_obj_t bindings = scm_car(args);
 	scm_obj_t body = scm_cdr(args);
 
-	if (scm_is_null(body)) return scm_error("let*: bad form, need body");
+	if (scm_is_null(body)) return scm_error("let*: bad form, body missing");
 
 	/* no binding ((lambda () body...)) */
 	if (scm_is_null(bindings)) return scm_cons(scm_cons(scm_lambda, scm_cons(scm_nil(), body)), scm_nil());
@@ -193,7 +190,7 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 
 		/* special forms */
 		if (scm_is_symbol(op)) {
-			if (op == scm_quote) return eval_quote(argc, args);
+			if (op == scm_quote) return eval_quote(args);
 			else if (op == scm_define) return eval_define(argc, args, env);
 			else if (op == scm_lambda) return eval_lambda(argc, args, env);
 			else if (op == scm_if) {
