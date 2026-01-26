@@ -301,6 +301,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 	case SCM_PROCEDURE_LE: return scm_le(args);
 	case SCM_PROCEDURE_GE: return scm_ge(args);
 	case SCM_PROCEDURE_STRING_EQ: return scm_string_eq(args);
+	case SCM_PROCEDURE_STRING_COPY: return scm_string_copy(args);
 	default: return scm_error("unknown procedure");
 	}
 }

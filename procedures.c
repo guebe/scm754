@@ -138,13 +138,13 @@ extern scm_obj_t scm_string_eq(scm_obj_t args)
 	if (!scm_is_pair(args)) return scm_error("string=?: needs an argument");
 
 	scm_obj_t a = scm_car(args);
-	if (!scm_is_string(a)) return scm_error("string=?: needs a number");
+	if (!scm_is_string(a)) return scm_error("string=?: needs a string");
 	const char *x = scm_string_value(a);
 
 	args = scm_cdr(args);
 	while (scm_is_pair(args)) {
 		a = scm_car(args);
-		if (!scm_is_string(a)) return scm_error("string=?: needs a number");
+		if (!scm_is_string(a)) return scm_error("string=?: needs a string");
 		const char *y = scm_string_value(a);
 		if (strcmp(x, y) != 0) return scm_false();
 		x = y;
@@ -152,4 +152,41 @@ extern scm_obj_t scm_string_eq(scm_obj_t args)
 	}
 
 	return scm_true();
+}
+
+extern scm_obj_t scm_string_copy(scm_obj_t args)
+{
+	if (!scm_is_pair(args)) return scm_error("string-copy: needs an argument");
+
+	scm_obj_t a = scm_car(args);
+	if (!scm_is_string(a)) return scm_error("string-copy: needs a string");
+	const char *x = scm_string_value(a);
+
+	size_t start = 0;
+	size_t max = scm_string_length(a);
+	size_t end;
+	bool end_avail = false;
+
+	args = scm_cdr(args);
+	if (!scm_is_null(args)) {
+		scm_obj_t b = scm_car(args);
+		if (!scm_is_number(b)) return scm_error("string-copy: needs a number");
+		start = (size_t)scm_number_value(b);
+
+		args = scm_cdr(args);
+		if (!scm_is_null(args)) {
+			scm_obj_t c = scm_car(args);
+			if (!scm_is_number(c)) return scm_error("string-copy: needs a number");
+			end = (size_t)scm_number_value(c);
+
+			if (!scm_is_null(scm_cdr(args))) return scm_error("string-copy: too many arguments");
+			end_avail = true;
+		}
+	}
+
+	if (!end_avail) end = max;
+
+	if (start > end || end > max) return scm_error("string-copy: invalid arguements");
+
+	return scm_string(x + start, end - start);
 }

@@ -197,6 +197,7 @@ extern scm_obj_t scm_gt(scm_obj_t args);
 extern scm_obj_t scm_le(scm_obj_t args);
 extern scm_obj_t scm_ge(scm_obj_t args);
 extern scm_obj_t scm_string_eq(scm_obj_t args);
+extern scm_obj_t scm_string_copy(scm_obj_t args);
 
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);
