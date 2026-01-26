@@ -53,7 +53,7 @@ extern scm_obj_t scm_symbols;
 extern FILE *scm_current_input_port;
 
 typedef enum {
-	/* sort enum tags by arity - this helps compiler-optimizing the eval function */
+	/* sort enum tags by arity - this helps compiler-optimizing the apply function */
 
 	/* arity: 0 */
 	SCM_PROCEDURE_NEWLINE = 1,
@@ -118,7 +118,7 @@ static inline bool scm_is_number(scm_obj_t obj)
 }
 
 /* accessors */
-static inline bool scm_boolean_value(scm_obj_t obj)         { return obj != SCM_FALSE; }
+static inline bool scm_boolean_value(scm_obj_t obj)          { return obj != SCM_FALSE; }
 static inline double scm_number_value(scm_obj_t number)      { double d; memcpy(&d, &number, sizeof d); return d; }
 static inline char scm_char_value(scm_obj_t c)               { return (char)c; }
 static inline uint32_t scm_procedure_id(scm_obj_t procedure) { return (uint32_t)procedure; }

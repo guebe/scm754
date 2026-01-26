@@ -101,7 +101,7 @@ extern scm_obj_t scm_car(scm_obj_t pair)
 
 extern scm_obj_t scm_cdr(scm_obj_t pair)
 {
-	if (scm_is_error(pair)) return scm_error("cdr: memory error");
+	if (!scm_is_pair(pair)) return scm_error("cdr: not a pair");
 	scm_obj_t cdr = cell[pair & SCM_CELL_MASK].cdr;
 	assert(cdr != SCM_ERROR);
 	return cdr;
@@ -109,7 +109,7 @@ extern scm_obj_t scm_cdr(scm_obj_t pair)
 
 extern scm_obj_t scm_set_car(scm_obj_t pair, scm_obj_t obj)
 {
-	if (scm_is_error(pair)) return scm_error("set-car!: memory error");
+	if (!scm_is_pair(pair)) return scm_error("set-car!: not a pair");
 	size_t i = pair & SCM_CELL_MASK;
 	assert(cell[i].car != SCM_ERROR);
 	cell[i].car = obj;
@@ -118,7 +118,7 @@ extern scm_obj_t scm_set_car(scm_obj_t pair, scm_obj_t obj)
 
 extern scm_obj_t scm_set_cdr(scm_obj_t pair, scm_obj_t obj)
 {
-	if (scm_is_error(pair)) return scm_error("set-cdr!: memory error");
+	if (!scm_is_pair(pair)) return scm_error("set-cdr!: not a pair");
 	size_t i = pair & SCM_CELL_MASK;
 	assert(cell[i].cdr != SCM_ERROR);
 	cell[i].cdr = obj;
