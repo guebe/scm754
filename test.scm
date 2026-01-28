@@ -1639,8 +1639,8 @@
 ;(test (make-string 1) " ")
 ;(test (make-string 3 #\x) "xxx")
 
-;(test (number->string 0) "0")
-;(test (number->string 123) "123")
+(number->string 0) ; "0"
+(number->string 123) ; "123"
 ;(test (number->string 165 2) "10100101")
 ;(test (number->string 375 8) "567")
 ;(test (number->string 789 10) "789")

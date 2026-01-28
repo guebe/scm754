@@ -190,3 +190,11 @@ extern scm_obj_t scm_string_copy(scm_obj_t args)
 
 	return scm_string(x + start, end - start);
 }
+
+extern scm_obj_t scm_number_to_string(scm_obj_t number)
+{
+	char buffer[64];
+	int ret = snprintf(buffer, sizeof(buffer), "%.16g", scm_number_value(number));
+	if (ret < 0 || (size_t)ret >= sizeof(buffer)) return scm_error("number->string: number too big");
+	return scm_string(buffer, (size_t)ret);
+}

@@ -77,6 +77,7 @@ typedef enum {
 	SCM_PROCEDURE_LOAD,
 	SCM_PROCEDURE_IS_ZERO,
 	SCM_PROCEDURE_STRING_LENGTH,
+	SCM_PROCEDURE_NUMBER_TO_STRING,
 
 	/* arity: 2 */
 	SCM_PROCEDURE_IS_EQ,
@@ -154,6 +155,7 @@ static inline scm_obj_t scm_char(char c)           { return SCM_CHAR | (scm_obj_
 static inline scm_obj_t scm_procedure(uint32_t id) { return SCM_PROCEDURE | id; }
 static inline scm_obj_t scm_closure(scm_obj_t pair){ return SCM_CLOSURE | (uint32_t)pair; }
 extern scm_obj_t scm_string_to_number(const char *string, int radix);
+extern scm_obj_t scm_number_to_string(scm_obj_t number);
 extern scm_obj_t scm_string(const char *string, size_t k);
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2);
 

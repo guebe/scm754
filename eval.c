@@ -323,6 +323,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 	}
 	case SCM_PROCEDURE_IS_ZERO: return argc == 1 ? scm_is_zero(arg1) : scm_error("zero?: takes one parameter");
 	case SCM_PROCEDURE_STRING_LENGTH: return argc == 1 ? scm_number((double)scm_string_length(arg1)) : scm_error("string-length: takes one parameter");
+	case SCM_PROCEDURE_NUMBER_TO_STRING: return argc == 1 ? scm_number_to_string(arg1) : scm_error("number->string: takes one parameter");
 	case SCM_PROCEDURE_IS_EQ: return argc == 2 ? scm_is_eq(arg1, arg2) : scm_error("eq?: takes two parameter");
 	case SCM_PROCEDURE_CONS: return argc == 2 ? scm_cons(arg1, arg2) : scm_error("cons: takes two parameter");
 	case SCM_PROCEDURE_SET_CAR: return argc == 2 ? scm_set_car(arg1, arg2) : scm_error("set-car!: takes two parameter");
