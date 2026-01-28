@@ -195,21 +195,18 @@ static scm_obj_t eval_and(scm_obj_t args, scm_obj_t env)
 	return scm_car(args);
 }
 
-static scm_obj_t eval_or(scm_obj_t args)
+static scm_obj_t eval_or(scm_obj_t args, scm_obj_t env)
 {
 	if (scm_is_null(args)) return scm_false();
 
-	scm_obj_t test = scm_car(args);
-	args = scm_cdr(args);
-
-	while (scm_is_pair(args)) {
+	scm_obj_t test;
+	while (scm_is_pair(scm_cdr(args))) {
+		test = scm_eval(scm_car(args), env);
 		if (scm_boolean_value(test)) return test;
-
-		test = scm_car(args);
 		args = scm_cdr(args);
 	}
 
-	return test;
+	return scm_car(args);
 }
 
 extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
@@ -252,7 +249,7 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 				continue; /* tail call */
 			}
 			else if (op == scm_or) {
-				expr = eval_or(args);
+				expr = eval_or(args, env);
 				if (scm_is_error(expr)) return expr;
 				continue; /* tail call */
 			}

@@ -503,24 +503,24 @@
 
 ; or
 
-;(test (or) #f)
-;(test (or #f) #f)
-;(test (or #f #f) #f)
-;(test (or #f #t) #t)
-;(test (or #t #f) #t)
-;(test (or #t #t) #t)
-;(test (or 1 2 3) 1)
-;(test (or #f 2 3) 2)
-;(test (or 1 #f 3) 1)
-;(test (or #f #f 3) 3)
-;(test (or 'foo) 'foo)
-;(test (or #t) #t)
-;(test (or 1) 1)
-;(test (or #\x) #\x)
-;(test (or "x") "x")
-;(test (or '(x)) '(x))
-;(test (or '()) '())
-;(test (or '#(x)) '#(x))
+(or) ; #f
+(or #f) ; #f
+(or #f #f) ; #f
+(or #f #t) ; #t
+(or #t #f) ; #t
+(or #t #t) ; #t
+(or 1 2 3) ; 1
+(or #f 2 3) ; 2
+(or 1 #f 3) ; 1
+(or #f #f 3) ; 3
+(or 'foo) ; 'foo
+(or #t) ; #t
+(or 1) ; 1
+(or #\x) ; #\x
+(or "x") ; "x"
+(or '(x)) ; '(x)
+(or '()) ; '()
+;(or '#(x)) ; '#(x)
 
 ; quote
 
