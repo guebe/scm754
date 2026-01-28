@@ -98,9 +98,9 @@ extern scm_obj_t scm_environment_create(void)
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-cdr!", 8)), scm_procedure(SCM_PROCEDURE_SET_CDR));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("quotient", 8)), scm_procedure(SCM_PROCEDURE_QUOTIENT));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("string=?", 8)), scm_procedure(SCM_PROCEDURE_STRING_EQ));
+	scm_environment_define(environment, scm_string_to_symbol(scm_string("substring", 9)), scm_procedure(SCM_PROCEDURE_SUBSTRING));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("procedure?", 10)), scm_procedure(SCM_PROCEDURE_IS_PROCEDURE));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("eof-object?", 11)), scm_procedure(SCM_PROCEDURE_IS_EOF_OBJECT));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("string-copy", 11)), scm_procedure(SCM_PROCEDURE_STRING_COPY));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("string-length", 13)), scm_procedure(SCM_PROCEDURE_STRING_LENGTH));
 	scm_environment_define(environment, scm_string_to_symbol(scm_string("number->string", 14)), scm_procedure(SCM_PROCEDURE_NUMBER_TO_STRING));
 	return environment;

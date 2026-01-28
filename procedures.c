@@ -154,7 +154,7 @@ extern scm_obj_t scm_string_eq(scm_obj_t args)
 	return scm_true();
 }
 
-extern scm_obj_t scm_string_copy(scm_obj_t args)
+extern scm_obj_t scm_substring(scm_obj_t args)
 {
 	if (!scm_is_pair(args)) return scm_error("string-copy: needs an argument");
 

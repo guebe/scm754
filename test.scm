@@ -1853,8 +1853,8 @@
 ;(test (string-ci>=? "cd" "cd" "ab") #t)
 ;(test (string-ci>=? "ef" "cd" "ab") #t)
 
-(string-copy "") ; ""
-(string-copy "abcdef") ; "abcdef"
+;(string-copy "") ; ""
+;(string-copy "abcdef") ; "abcdef"
 ;(test (begin (let ((s "abc"))
 ;                (let ((s2 (string-copy s)))
 ;                  (string-set! s2 1 #\x)
@@ -1955,17 +1955,17 @@
 ;(test (string>=? "cd" "cd" "ab") #t)
 ;(test (string>=? "ef" "cd" "ab") #t)
 
-;(test (substring "" 0 0) "")
-;(test (substring "abc" 0 0) "")
-;(test (substring "abc" 0 1) "a")
-;(test (substring "abc" 0 2) "ab")
-;(test (substring "abc" 0 3) "abc")
-;(test (substring "abc" 1 1) "")
-;(test (substring "abc" 1 2) "b")
-;(test (substring "abc" 1 3) "bc")
-;(test (substring "abc" 2 2) "")
-;(test (substring "abc" 2 3) "c")
-;(test (substring "abc" 3 3) "")
+(substring "" 0 0) ; ""
+(substring "abc" 0 0) ; ""
+(substring "abc" 0 1) ; "a"
+(substring "abc" 0 2) ; "ab"
+(substring "abc" 0 3) ; "abc"
+(substring "abc" 1 1) ; ""
+(substring "abc" 1 2) ; "b"
+(substring "abc" 1 3) ; "bc"
+(substring "abc" 2 2) ; ""
+(substring "abc" 2 3) ; "c"
+(substring "abc" 3 3) ; ""
 
 ;;; Vectors
 

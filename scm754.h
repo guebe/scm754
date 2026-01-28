@@ -101,7 +101,7 @@ typedef enum {
 	SCM_PROCEDURE_STRING_EQ,
 
 	/* arity: 1-3 */
-	SCM_PROCEDURE_STRING_COPY,
+	SCM_PROCEDURE_SUBSTRING,
 } scm_procedure_t;
 
 /* type predicates */
@@ -201,7 +201,7 @@ extern scm_obj_t scm_gt(scm_obj_t args);
 extern scm_obj_t scm_le(scm_obj_t args);
 extern scm_obj_t scm_ge(scm_obj_t args);
 extern scm_obj_t scm_string_eq(scm_obj_t args);
-extern scm_obj_t scm_string_copy(scm_obj_t args);
+extern scm_obj_t scm_substring(scm_obj_t args);
 
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);
