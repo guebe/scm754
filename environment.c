@@ -9,6 +9,8 @@ scm_obj_t scm_lambda;
 scm_obj_t scm_define;
 scm_obj_t scm_let;
 scm_obj_t scm_let_star;
+scm_obj_t scm_and;
+scm_obj_t scm_or;
 
 /* Environment which is a list of frames,
  * whereas each frame is a list of pairs (symbol-index . <value|procedure>).
@@ -55,7 +57,9 @@ extern scm_obj_t scm_environment_create(void)
 	scm_gc_init();
 
 	scm_if       = scm_string_to_symbol(scm_string("if", 2));
+	scm_or       = scm_string_to_symbol(scm_string("or", 2));
 	scm_let      = scm_string_to_symbol(scm_string("let", 3));
+	scm_and      = scm_string_to_symbol(scm_string("and", 3));
 	scm_let_star = scm_string_to_symbol(scm_string("let*", 4));
 	scm_quote    = scm_string_to_symbol(scm_string("quote", 5));
 	scm_lambda   = scm_string_to_symbol(scm_string("lambda", 6));

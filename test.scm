@@ -223,25 +223,25 @@
 
 ; and
 
-;(test (and) #t)
-;(test (and #f) #f)
-;(test (and #f #f) #f)
-;(test (and #f #t) #f)
-;(test (and #t #f) #f)
-;(test (and #t #t) #t)
-;(test (and 1 2 3) 3)
-;(test (and #f 2 3) #f)
-;(test (and 1 #f 3) #f)
-;(test (and 1 2 #f) #f)
-;(test (and 'foo) 'foo)
-;(test (and #t) #t)
-;(test (and 1) 1)
-;(test (and #\x) #\x)
-;(test (and "x") "x")
-;(test (and '(x)) '(x))
-;(test (and '()) '())
-;(test (and '#(x)) '#(x))
-;(test (and (lambda (x) x) #t) #t)
+(and) ; #t
+(and #f) ; #f
+(and #f #f) ; #f
+(and #f #t) ; #f
+(and #t #f) ; #f
+(and #t #t) ; #t
+(and 1 2 3) ; 3
+(and #f 2 3) ; #f
+(and 1 #f 3) ; #f
+(and 1 2 #f) ; #f
+(and 'foo) ; 'foo
+(and #t) ; #t
+(and 1) ; 1
+(and #\x) ; #\x
+(and "x") ; "x"
+(and '(x)) ; '(x)
+(and '()) ; '()
+;(and '#(x)) ; '#(x)
+(and (lambda (x) x) #t) ; #t
 
 ; begin
 
