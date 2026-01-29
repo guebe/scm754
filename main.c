@@ -37,15 +37,24 @@ int main(int argc, char *argv[])
 
 	if (load_library() < 0) return 1;
 
-	if (argc != 2) {
+	if (argc < 2) {
 		repl = true;
 		scm_current_input_port = stdin;
 	}
 	else {
+		const char *file;
 		repl = false;
-		f = fopen(argv[1], "r");
+		if (argc == 2) {
+			file = argv[1];
+		}
+		else {
+			scm_enable_debug();
+			file = argv[2];
+		}
+
+		f = fopen(file, "r");
 		if (f == NULL) {
-			printf("cant open file %s\n", argv[1]);
+			printf("cant open file %s\n", file);
 			return 1;
 		}
 		scm_current_input_port = f;

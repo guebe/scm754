@@ -208,4 +208,5 @@ extern void scm_gc_collect(void);
 extern void scm_gc_free(scm_obj_t obj);
 extern void scm_init_strings(void);
 extern void scm_string_free(scm_obj_t string);
+extern void scm_enable_debug(void);
 #endif

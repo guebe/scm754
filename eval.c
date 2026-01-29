@@ -1,6 +1,7 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
-#undef DEBUG
 #include "scm754.h"
+
+static bool debug = false;
 
 static scm_obj_t eval_list(scm_obj_t list, scm_obj_t environment_specifier)
 {
@@ -209,6 +210,21 @@ static scm_obj_t eval_or(scm_obj_t args, scm_obj_t env)
 	return scm_car(args);
 }
 
+extern void scm_enable_debug(void)
+{
+	debug = true;
+}
+
+static void debug_print(bool is_closure, scm_obj_t op, scm_obj_t args)
+{
+	if (is_closure) fputs("; lambda ", stdout);
+	else fputs("; ", stdout);
+	scm_write(op);
+	putchar(' ');
+	scm_write(args);
+	putchar('\n');
+}
+
 extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 {
 	while (1) {
@@ -261,10 +277,8 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 		size_t argc = scm_length(args);
 		args = eval_list(args, env);
 		if (scm_is_error(args)) return args;
-#ifdef DEBUG
-		printf("; eval: calling (apply "); scm_write(op); printf(" "); scm_write(args); printf(")\n");
-#endif
 		if (scm_is_procedure(op)) {
+			if (debug) debug_print(false, op, args);
 			op = scm_apply(op, args, argc);
 			free_list(args);
 			return op;
@@ -273,14 +287,12 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 			op = scm_closure_value(op);
 			env = scm_environment_extend(scm_car(op), scm_car(scm_cdr(op)), args);
 			if (scm_is_error(env)) return env;
+			if (debug) debug_print(true, scm_cdr(op), args);
 			free_list(args);
 
 			/* eval body expressions in order */
 			scm_obj_t body = scm_cdr(scm_cdr((op)));
 			while (scm_is_pair(scm_cdr(body))) {
-#ifdef DEBUG
-printf("; apply: calling (eval "); scm_write(scm_car(body)); printf(" "); scm_write(new); printf(")\n");
-#endif
 				op = scm_eval(scm_car(body), env);
 				if (scm_is_error(op)) return op;
 				body = scm_cdr(body);
