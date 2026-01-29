@@ -135,7 +135,6 @@ extern scm_obj_t scm_car(scm_obj_t pair);
 extern scm_obj_t scm_cdr(scm_obj_t pair);
 extern const char *scm_string_value(scm_obj_t string);
 static inline size_t scm_string_length(scm_obj_t string)     { assert(scm_is_string(string)); return strlen(scm_string_value(string)); }
-extern const char *scm_error_value(void);
 
 /* mutators */
 extern scm_obj_t scm_set_car(scm_obj_t pair, scm_obj_t obj);
@@ -160,6 +159,7 @@ extern scm_obj_t scm_string(const char *string, size_t k);
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2);
 
 /* primitives */
+__attribute__((format(printf, 1, 2)))
 __attribute__((warn_unused_result))
 extern scm_obj_t scm_error(const char *message, ...);
 extern scm_obj_t scm_write(scm_obj_t obj);
@@ -209,4 +209,5 @@ extern void scm_gc_free(scm_obj_t obj);
 extern void scm_init_strings(void);
 extern void scm_string_free(scm_obj_t string);
 extern void scm_enable_debug(void);
+extern void scm_enable_error(void);
 #endif

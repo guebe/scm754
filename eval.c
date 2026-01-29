@@ -309,8 +309,8 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 	if (!scm_is_procedure(proc)) return scm_error("apply: attempt to apply non-procedure");
 
 	uint32_t procedure = scm_procedure_id(proc);
-	scm_obj_t arg1 = scm_car(args);
-	scm_obj_t arg2 = scm_car(scm_cdr(args));
+	scm_obj_t arg1 = (argc >= 1) ? scm_car(args) : scm_nil();
+	scm_obj_t arg2 = (argc >= 2) ? scm_car(scm_cdr(args)): scm_nil();
 
 	switch (procedure) {
 	case SCM_PROCEDURE_NEWLINE: return argc == 0 ? scm_newline() : scm_error("newline: takes no parameter");

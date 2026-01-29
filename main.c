@@ -20,7 +20,6 @@ static int load_library(void)
 
 	scm_obj_t load_result = scm_load(path);
 	if (scm_is_error(load_result)) {
-		puts(scm_error_value());
 		return -1;
 	}
 	return 0;
@@ -33,6 +32,9 @@ int main(int argc, char *argv[])
 {
 	FILE *f;
 	bool repl;
+
+	scm_enable_error();
+
 	scm_interaction_environment = scm_environment_create();
 
 	if (load_library() < 0) return 1;
@@ -68,11 +70,11 @@ int main(int argc, char *argv[])
 		scm_gc_collect();
 		scm_obj_t obj = scm_read();
 		if (scm_is_eof_object(obj)) { break; }
-		else if (scm_is_error(obj)) { puts(scm_error_value()); if (repl) continue; else break; }
+		else if (scm_is_error(obj)) { if (repl) continue; else break; }
 
 #ifndef SCM_NO_EVAL
 		obj = scm_eval(obj, scm_interaction_environment);
-		if (scm_is_error(obj)) { puts(scm_error_value()); if (repl) continue; else break; }
+		if (scm_is_error(obj)) { if (repl) continue; else break; }
 #endif
 
 		/* unspecified is returned by e.g. define as per specification. we do _not_ want to print the unspecified value in a REPL */
