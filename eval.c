@@ -227,91 +227,93 @@ static void debug_print(bool is_closure, scm_obj_t op, scm_obj_t args)
 
 extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 {
-	while (1) {
-		if (scm_is_null(expr)) return scm_error("eval: can not eval empty list object ()");
+	scm_obj_t result;
 
-		/* symbols are bound to values or procedures in the environment */
-		else if (scm_is_symbol(expr)) return scm_environment_lookup(env, scm_intern(expr));
-
-		/* self-evaluating */
-		else if (!scm_is_pair(expr)) return expr;
-
+tail_call:
+	if (scm_is_null(expr)) {
+		result = scm_error("eval: can not eval empty list object ()");
+	}
+	else if (scm_is_symbol(expr)) {
+		result = scm_environment_lookup(env, scm_intern(expr));
+	}
+	else if (!scm_is_pair(expr)) {
+		result = expr; /* self-evaluating */
+	}
+	else {
 		scm_obj_t op = scm_car(expr);
 		scm_obj_t args = scm_cdr(expr);
 
 		/* special forms */
 		if (scm_is_symbol(op)) {
 			switch (op) {
-			case SCM_QUOTE:  return eval_quote(args);
-			case SCM_DEFINE: return eval_define(args, env);
-			case SCM_LAMBDA: return eval_lambda(args, env);
-			case SCM_IF: {
-				expr = eval_if(args, env);
-				if (scm_is_unspecified(expr) || scm_is_error(expr)) return expr;
-				continue;
-			}
-			case SCM_LET: {
-				expr = eval_let(args);
-				if (scm_is_error(expr)) return expr;
-				continue;
-			}
-			case SCM_LET_STAR: {
-				expr = eval_let_star(args);
-				if (scm_is_error(expr)) return expr;
-				continue;
-			}
-			case SCM_AND: {
-				expr = eval_and(args, env);
-				if (scm_is_error(expr)) return expr;
-				continue;
-			}
-			case SCM_OR: {
-				expr = eval_or(args, env);
-				if (scm_is_error(expr)) return expr;
-				continue;
-			}
+			case SCM_QUOTE:
+				result = eval_quote(args);
+				goto out;
+			case SCM_DEFINE:
+				result = eval_define(args, env);
+				goto out;
+			case SCM_LAMBDA:
+				result = eval_lambda(args, env);
+				goto out;
+			case SCM_IF:
+				expr = result = eval_if(args, env);
+				if (scm_is_unspecified(result) || scm_is_error(result)) goto out; else goto tail_call;
+			case SCM_LET:
+				expr = result = eval_let(args);
+				if (scm_is_error(result)) goto out; else goto tail_call;
+			case SCM_LET_STAR:
+				expr = result = eval_let_star(args);
+				if (scm_is_error(result)) goto out; else goto tail_call;
+			case SCM_AND:
+				expr = result = eval_and(args, env);
+				if (scm_is_error(result)) goto out; else goto tail_call;
+			case SCM_OR:
+				expr = result = eval_or(args, env);
+				if (scm_is_error(result)) goto out; else goto tail_call;
 			default: break;
 			}
 		}
 
 		/* application */
-		op = scm_eval(op, env);
-		if (scm_is_error(op)) return op;
-		size_t argc = scm_length(args);
-		args = eval_list(args, env);
-		if (scm_is_error(args)) return args;
+		op = result = scm_eval(op, env);
+		if (scm_is_error(result)) goto out;
+		args = result = eval_list(args, env);
+		if (scm_is_error(result)) goto out;
+
 		if (scm_is_procedure(op)) {
 			if (debug) debug_print(false, op, args);
-			op = scm_apply(op, args, argc);
+			result = scm_apply(op, args);
 			free_list(args);
-			return op;
 		}
 		else if (scm_is_closure(op)) {
 			op = scm_closure_value(op);
-			env = scm_environment_extend(scm_car(op), scm_car(scm_cdr(op)), args);
-			if (scm_is_error(env)) return env;
+			env = result = scm_environment_extend(scm_car(op), scm_car(scm_cdr(op)), args);
+			if (scm_is_error(result)) goto out;
 			if (debug) debug_print(true, scm_cdr(op), args);
 			free_list(args);
 
-			/* eval body expressions in order */
-			scm_obj_t body = scm_cdr(scm_cdr((op)));
-			while (scm_is_pair(scm_cdr(body))) {
-				op = scm_eval(scm_car(body), env);
-				if (scm_is_error(op)) return op;
-				body = scm_cdr(body);
+			scm_obj_t body;
+			for (body = scm_cdr(scm_cdr(op)); scm_is_pair(scm_cdr(body)); body = scm_cdr(body)) {
+			    result = scm_eval(scm_car(body), env);
+			    if (scm_is_error(result)) goto out;
 			}
 			expr = scm_car(body);
-			continue; /* tail call */
+			goto tail_call;
 		}
-		else return scm_error("eval: not callable");
+		else {
+			result = scm_error("eval: not callable");
+		}
 	}
+out:
+	return result;
 }
 
-extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
+extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 {
 	if (!scm_is_procedure(proc)) return scm_error("apply: attempt to apply non-procedure");
 
 	uint32_t procedure = scm_procedure_id(proc);
+	size_t argc = scm_length(args);
 	scm_obj_t arg1 = (argc >= 1) ? scm_car(args) : scm_nil();
 	scm_obj_t arg2 = (argc >= 2) ? scm_car(scm_cdr(args)): scm_nil();
 
