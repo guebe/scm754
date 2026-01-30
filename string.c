@@ -3,15 +3,22 @@
 
 #define SCM_STRING_NUM 1024U
 
-static char *strings[SCM_STRING_NUM];
-static uint32_t free_list[SCM_STRING_NUM];
-static uint32_t free_count = SCM_STRING_NUM;
-
-extern void scm_init_strings(void)
+typedef struct
 {
-	for (uint32_t i = 0; i < SCM_STRING_NUM; i++)
-		free_list[i] = i;
-	free_count = SCM_STRING_NUM;
+	char *string;
+	uint32_t next;
+} scm_string_t;
+
+static scm_string_t strings[SCM_STRING_NUM];
+static uint32_t head = 0;
+
+extern void scm_string_init(void)
+{
+	for (uint32_t i = 0; i < SCM_STRING_NUM; i++) {
+		strings[i].string = NULL;
+		strings[i].next = ((i + 1) < SCM_STRING_NUM) ? i + 1 : UINT32_MAX;
+	}
+	head = 0;
 }
 
 extern const char *scm_string_value(scm_obj_t string)
@@ -20,30 +27,44 @@ extern const char *scm_string_value(scm_obj_t string)
 		puts("error: scm_string_value: not a string");
 		return "<not a string>";
 	}
+
 	uint32_t i = (uint32_t)string;
+
 	assert(i < SCM_STRING_NUM);
-	assert(strings[i] != NULL);
-	return strings[i];
+	assert(strings[i].string != NULL);
+
+	return strings[i].string;
 }
 
 extern scm_obj_t scm_string(const char *string, size_t k)
 {
-	if (free_count == 0) return scm_error("out of string memory");
-	char *s = strndup(string, k);
-	if (s == NULL) return scm_error("string allocation failed");
-	uint32_t i = free_list[--free_count];
-	strings[i] = s;
+	if (head == UINT32_MAX) return scm_error("out of string memory");
+
+	char *cstr = strndup(string, k);
+	if (cstr == NULL) return scm_error("string allocation failed");
+
+	uint32_t i = head;
+
+	assert(i < SCM_STRING_NUM);
+	assert(strings[i].string == NULL);
+
+	strings[i].string = cstr;
+	head = strings[i].next;
+
 	return SCM_STRING | i;
 }
 
 extern void scm_string_free(scm_obj_t string)
 {
 	assert(scm_is_string(string));
+
 	uint32_t i = (uint32_t)string;
+
 	assert(i < SCM_STRING_NUM);
-	assert(strings[i] != NULL);
-	free(strings[i]);
-	strings[i] = NULL;
-	assert(free_count < SCM_STRING_NUM);
-	free_list[free_count++] = i;
+	assert(strings[i].string != NULL);
+
+	free(strings[i].string);
+	strings[i].string = NULL;
+	strings[i].next = head;
+	head = i;
 }

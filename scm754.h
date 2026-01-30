@@ -39,16 +39,16 @@ typedef uint64_t scm_obj_t;
 /* primitives - special forms which control evaluation and thus are kept
  * separate from procedures. Each primitive itself (callee) evaluates its
  * arguments according to special rules defined by the specification. Those
- * primitives are interned to speed-up evaluation but _not_ stored in any
- * environment. */
-extern scm_obj_t scm_if;
-extern scm_obj_t scm_quote;
-extern scm_obj_t scm_lambda;
-extern scm_obj_t scm_define;
-extern scm_obj_t scm_let;
-extern scm_obj_t scm_let_star;
-extern scm_obj_t scm_and;
-extern scm_obj_t scm_or;
+ * primitives are interned constants to speed-up evaluation but _not_ stored in
+ * any environment. */
+#define SCM_IF       (SCM_SYMBOL | 0)
+#define SCM_OR       (SCM_SYMBOL | 1)
+#define SCM_LET      (SCM_SYMBOL | 2)
+#define SCM_AND      (SCM_SYMBOL | 3)
+#define SCM_LET_STAR (SCM_SYMBOL | 4)
+#define SCM_QUOTE    (SCM_SYMBOL | 5)
+#define SCM_LAMBDA   (SCM_SYMBOL | 6)
+#define SCM_DEFINE   (SCM_SYMBOL | 7)
 
 extern scm_obj_t scm_interaction_environment;
 extern scm_obj_t scm_symbols;
@@ -206,7 +206,7 @@ extern scm_obj_t scm_substring(scm_obj_t args);
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);
 extern void scm_gc_free(scm_obj_t obj);
-extern void scm_init_strings(void);
+extern void scm_string_init(void);
 extern void scm_string_free(scm_obj_t string);
 extern void scm_enable_debug(void);
 extern void scm_enable_error(void);

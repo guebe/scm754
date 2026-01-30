@@ -74,7 +74,7 @@ static scm_obj_t eval_define(scm_obj_t args, scm_obj_t env)
 	}
 	else if (scm_is_pair(var) && scm_is_symbol(scm_car(var))) { /* function define - de-sugar to lambda */
 		if (scm_is_null(args)) return scm_error("define: bad form, should be (define (f x y) body...)");
-		value = scm_eval(scm_cons(scm_lambda, scm_cons(scm_cdr(var), args)), env);
+		value = scm_eval(scm_cons(SCM_LAMBDA, scm_cons(scm_cdr(var), args)), env);
 		var = scm_car(var);
 		goto out;
 	}
@@ -140,7 +140,7 @@ static scm_obj_t eval_let(scm_obj_t args)
 	}
 	if (!scm_is_null(bindings)) return scm_error("let: improper binding list");
 
-	return scm_cons(scm_cons(scm_lambda, scm_cons(param_list, body)), value_list);
+	return scm_cons(scm_cons(SCM_LAMBDA, scm_cons(param_list, body)), value_list);
 }
 
 /* desugar (let* ((x y)...) body...) -> (lambda (x) (lambda... body...)) y */
@@ -152,7 +152,7 @@ static scm_obj_t eval_let_star(scm_obj_t args)
 	if (scm_is_null(body)) return scm_error("let*: bad form, body missing");
 
 	/* no binding ((lambda () body...)) */
-	if (scm_is_null(bindings)) return scm_cons(scm_cons(scm_lambda, scm_cons(scm_nil(), body)), scm_nil());
+	if (scm_is_null(bindings)) return scm_cons(scm_cons(SCM_LAMBDA, scm_cons(scm_nil(), body)), scm_nil());
 
 	if (!scm_is_pair(bindings)) return scm_error("let*: bindings must be a list");
 
@@ -162,7 +162,7 @@ static scm_obj_t eval_let_star(scm_obj_t args)
 		return scm_error("let*: bad form in binding");
 
 	prev = inner = scm_cons(scm_cons(param, scm_nil()), body);
-	scm_obj_t root = scm_cons(scm_cons(scm_lambda, inner), scm_cons(value, scm_nil()));
+	scm_obj_t root = scm_cons(scm_cons(SCM_LAMBDA, inner), scm_cons(value, scm_nil()));
 
 	/* other bindings ((lambda (param1) ((lambda (param2) body...) value2)) value1) */
 	bindings = scm_cdr(bindings);
@@ -171,7 +171,7 @@ static scm_obj_t eval_let_star(scm_obj_t args)
 			return scm_error("let*: bad form in binding");
 
 		inner = scm_cons(scm_cons(param, scm_nil()), body);
-		scm_obj_t outer = scm_cons(scm_cons(scm_lambda, inner), scm_cons(value, scm_nil()));
+		scm_obj_t outer = scm_cons(scm_cons(SCM_LAMBDA, inner), scm_cons(value, scm_nil()));
 		scm_set_cdr(prev, scm_cons(outer, scm_nil()));
 		prev = inner;
 
@@ -228,7 +228,7 @@ static void debug_print(bool is_closure, scm_obj_t op, scm_obj_t args)
 extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 {
 	while (1) {
-		if (scm_is_null(expr)) return scm_error("eval: can not apply empty list object ()");
+		if (scm_is_null(expr)) return scm_error("eval: can not eval empty list object ()");
 
 		/* symbols are bound to values or procedures in the environment */
 		else if (scm_is_symbol(expr)) return scm_environment_lookup(env, scm_intern(expr));
@@ -241,33 +241,36 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 
 		/* special forms */
 		if (scm_is_symbol(op)) {
-			if (op == scm_quote) return eval_quote(args);
-			else if (op == scm_define) return eval_define(args, env);
-			else if (op == scm_lambda) return eval_lambda(args, env);
-			else if (op == scm_if) {
+			switch (op) {
+			case SCM_QUOTE:  return eval_quote(args);
+			case SCM_DEFINE: return eval_define(args, env);
+			case SCM_LAMBDA: return eval_lambda(args, env);
+			case SCM_IF: {
 				expr = eval_if(args, env);
 				if (scm_is_unspecified(expr) || scm_is_error(expr)) return expr;
-				continue; /* tail call */
+				continue;
 			}
-			else if (op == scm_let) {
+			case SCM_LET: {
 				expr = eval_let(args);
 				if (scm_is_error(expr)) return expr;
-				continue; /* tail call */
+				continue;
 			}
-			else if (op == scm_let_star) {
+			case SCM_LET_STAR: {
 				expr = eval_let_star(args);
 				if (scm_is_error(expr)) return expr;
-				continue; /* tail call */
+				continue;
 			}
-			else if (op == scm_and) {
+			case SCM_AND: {
 				expr = eval_and(args, env);
 				if (scm_is_error(expr)) return expr;
-				continue; /* tail call */
+				continue;
 			}
-			else if (op == scm_or) {
+			case SCM_OR: {
 				expr = eval_or(args, env);
 				if (scm_is_error(expr)) return expr;
-				continue; /* tail call */
+				continue;
+			}
+			default: break;
 			}
 		}
 
@@ -334,7 +337,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args, size_t argc)
 		return scm_is_error(tmp) ? tmp : scm_unspecified();
 	}
 	case SCM_PROCEDURE_IS_ZERO: return argc == 1 ? scm_is_zero(arg1) : scm_error("zero?: takes one parameter");
-	case SCM_PROCEDURE_STRING_LENGTH: return argc == 1 ? scm_number((double)scm_string_length(arg1)) : scm_error("string-length: takes one parameter");
+	case SCM_PROCEDURE_STRING_LENGTH: return (argc == 1 && scm_is_string(arg1)) ? scm_number((double)scm_string_length(arg1)) : scm_error("string-length: takes one parameter with value string");
 	case SCM_PROCEDURE_NUMBER_TO_STRING: return argc == 1 ? scm_number_to_string(arg1) : scm_error("number->string: takes one parameter");
 	case SCM_PROCEDURE_IS_EQ: return argc == 2 ? scm_is_eq(arg1, arg2) : scm_error("eq?: takes two parameter");
 	case SCM_PROCEDURE_CONS: return argc == 2 ? scm_cons(arg1, arg2) : scm_error("cons: takes two parameter");

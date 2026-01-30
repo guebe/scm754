@@ -3,15 +3,6 @@
 #include "scm754.h"
 #include <assert.h>
 
-scm_obj_t scm_if;
-scm_obj_t scm_quote;
-scm_obj_t scm_lambda;
-scm_obj_t scm_define;
-scm_obj_t scm_let;
-scm_obj_t scm_let_star;
-scm_obj_t scm_and;
-scm_obj_t scm_or;
-
 /* Environment which is a list of frames,
  * whereas each frame is a list of pairs (symbol-index . <value|procedure>).
  * This is needed to support nested environments and rebinding of variables.
@@ -56,14 +47,23 @@ extern scm_obj_t scm_environment_create(void)
 
 	scm_gc_init();
 
-	scm_if       = scm_string_to_symbol(scm_string("if", 2));
-	scm_or       = scm_string_to_symbol(scm_string("or", 2));
-	scm_let      = scm_string_to_symbol(scm_string("let", 3));
-	scm_and      = scm_string_to_symbol(scm_string("and", 3));
-	scm_let_star = scm_string_to_symbol(scm_string("let*", 4));
-	scm_quote    = scm_string_to_symbol(scm_string("quote", 5));
-	scm_lambda   = scm_string_to_symbol(scm_string("lambda", 6));
-	scm_define   = scm_string_to_symbol(scm_string("define", 6));
+	scm_obj_t scm_if       = scm_string_to_symbol(scm_string("if", 2));
+	scm_obj_t scm_or       = scm_string_to_symbol(scm_string("or", 2));
+	scm_obj_t scm_let      = scm_string_to_symbol(scm_string("let", 3));
+	scm_obj_t scm_and      = scm_string_to_symbol(scm_string("and", 3));
+	scm_obj_t scm_let_star = scm_string_to_symbol(scm_string("let*", 4));
+	scm_obj_t scm_quote    = scm_string_to_symbol(scm_string("quote", 5));
+	scm_obj_t scm_lambda   = scm_string_to_symbol(scm_string("lambda", 6));
+	scm_obj_t scm_define   = scm_string_to_symbol(scm_string("define", 6));
+
+	assert(scm_if == SCM_IF);
+	assert(scm_or == SCM_OR);
+	assert(scm_let == SCM_LET);
+	assert(scm_and == SCM_AND);
+	assert(scm_let_star == SCM_LET_STAR);
+	assert(scm_quote == SCM_QUOTE);
+	assert(scm_lambda == SCM_LAMBDA);
+	assert(scm_define == SCM_DEFINE);
 
 	environment = scm_cons(scm_nil(), scm_nil());
 
