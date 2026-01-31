@@ -77,7 +77,7 @@ static scm_obj_t eval_define(scm_obj_t args, scm_obj_t env)
 	else return scm_error("define: bad form, should be (define var value) or (define (f x y) body)");
 out:
 	if (scm_is_error(value)) return value;
-	scm_environment_define(env, scm_intern(var), value);
+	scm_environment_define(env, var, value);
 	return scm_unspecified();
 }
 
@@ -236,7 +236,7 @@ tail_call:
 		result = scm_error("eval: can not eval empty list object ()");
 	}
 	else if (scm_is_symbol(expr)) {
-		result = scm_environment_lookup(env, scm_intern(expr));
+		result = scm_environment_lookup(env, expr);
 	}
 	else if (!scm_is_pair(expr)) {
 		result = expr; /* self-evaluating */
