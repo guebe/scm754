@@ -1,7 +1,6 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
 
 #include "scm754.h"
-#include <assert.h>
 
 /* Environment which is a list of frames,
  * whereas each frame is a list of pairs (symbol-index . <value|procedure>).
@@ -56,14 +55,14 @@ extern scm_obj_t scm_environment_create(void)
 	scm_obj_t scm_lambda   = scm_string_to_symbol(scm_string("lambda", 6));
 	scm_obj_t scm_define   = scm_string_to_symbol(scm_string("define", 6));
 
-	assert(scm_if == SCM_IF);
-	assert(scm_or == SCM_OR);
-	assert(scm_let == SCM_LET);
-	assert(scm_and == SCM_AND);
-	assert(scm_let_star == SCM_LET_STAR);
-	assert(scm_quote == SCM_QUOTE);
-	assert(scm_lambda == SCM_LAMBDA);
-	assert(scm_define == SCM_DEFINE);
+	if (scm_if != SCM_IF) abort();
+	if (scm_or != SCM_OR) abort();
+	if (scm_let != SCM_LET) abort();
+	if (scm_and != SCM_AND) abort();
+	if (scm_let_star != SCM_LET_STAR) abort();
+	if (scm_quote != SCM_QUOTE) abort();
+	if (scm_lambda != SCM_LAMBDA) abort();
+	if (scm_define != SCM_DEFINE) abort();
 
 	environment = scm_cons(scm_nil(), scm_nil());
 
