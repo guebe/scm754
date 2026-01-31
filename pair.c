@@ -29,7 +29,10 @@ extern bool scm_gc_push(const scm_obj_t *obj)
 extern void scm_gc_pop(void)
 {
 	assert(stack_index > 0);
-	stack[--stack_index] = NULL;
+	stack_index--;
+#ifndef NDEBUG
+	stack[stack_index] = NULL;
+#endif
 }
 
 extern void scm_gc_init(void)
