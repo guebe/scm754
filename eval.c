@@ -276,31 +276,32 @@ tail_call:
 			}
 		}
 
+		if (!scm_gc_push(&op) || !scm_gc_push(&args)) {
+			return scm_error("eval: stack overflow");
+		}
+
 		/* application */
 		op = result = scm_eval(op, env);
-		if (scm_is_error(result)) goto out;
-		if (!scm_gc_push(&op)) { result = scm_error("eval: stack overflow"); goto out; }
+		if (scm_is_error(result)) goto out2;
 
 		args = result = eval_list(args, env);
-		if (scm_is_error(result)) { goto out3; }
-		if (!scm_gc_push(&args)) { result = scm_error("eval: stack overflow"); goto out3; }
+		if (scm_is_error(result)) { goto out2; }
 
 		if (scm_is_procedure(op)) {
 			if (debug) debug_print(false, op, args);
 			result = scm_apply(op, args);
-			scm_gc_pop();
-			scm_gc_pop();
+			goto out2;
 		}
 		else if (scm_is_closure(op)) {
 			op = scm_closure_value(op);
 			env = result = scm_environment_extend(scm_car(op), scm_car(scm_cdr(op)), args);
-			if (scm_is_error(result)) goto out4;
+			if (scm_is_error(result)) goto out2;
 			if (debug) debug_print(true, scm_cdr(op), args);
 
 			scm_obj_t body;
 			for (body = scm_cdr(scm_cdr(op)); scm_is_pair(scm_cdr(body)); body = scm_cdr(body)) {
 			    result = scm_eval(scm_car(body), env);
-			    if (scm_is_error(result)) goto out4;
+			    if (scm_is_error(result)) goto out2;
 			}
 			scm_gc_pop();
 			scm_gc_pop();
@@ -312,9 +313,8 @@ tail_call:
 		}
 	}
 	goto out;
-out4:
+out2:
 	scm_gc_pop();
-out3:
 	scm_gc_pop();
 out:
 	scm_gc_pop();

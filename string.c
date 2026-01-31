@@ -43,8 +43,8 @@ extern void scm_sweep_string(void)
 extern void scm_string_init(void)
 {
 	for (uint32_t i = 0; i < SCM_STRING_NUM; i++) {
-		strings[i].string = NULL;
 		strings[i].next = ((i + 1) < SCM_STRING_NUM) ? i + 1 : UINT32_MAX;
+		strings[i].string = NULL;
 	}
 	head = 0;
 }
@@ -81,4 +81,3 @@ extern scm_obj_t scm_string(const char *string, size_t k)
 
 	return SCM_STRING | i;
 }
-

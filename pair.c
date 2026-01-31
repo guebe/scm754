@@ -41,8 +41,10 @@ extern void scm_gc_init(void)
 
 	for (uint32_t i = 0; i < SCM_CELL_NUM; i++) {
 		cell[i].next = ((i + 1) < SCM_CELL_NUM) ? i + 1 : UINT32_MAX;
+#ifndef NDEBUG
 		cell[i].car = SCM_ERROR;
 		cell[i].cdr = SCM_ERROR;
+#endif
 		cell[i].mark = 0;
 	}
 	head = 0;
@@ -75,8 +77,10 @@ static void sweep(void)
 	for (uint32_t i = 0; i < SCM_CELL_NUM; i++) {
 		scm_pair_t *x = &cell[i];
 		if (!x->mark) {
+#ifndef NDEBUG
 			x->car = SCM_ERROR;
 			x->cdr = SCM_ERROR;
+#endif
 			x->next = tail;
 			tail = i;
 		}
