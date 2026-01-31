@@ -67,7 +67,6 @@ int main(int argc, char *argv[])
 			fputs("> ", stdout);
 			fflush(stdout);
 		}
-		scm_gc_collect();
 		scm_obj_t obj = scm_read();
 		if (scm_is_eof_object(obj)) { break; }
 		else if (scm_is_error(obj)) { if (repl) continue; else break; }

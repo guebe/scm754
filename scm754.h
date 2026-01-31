@@ -205,9 +205,12 @@ extern scm_obj_t scm_substring(scm_obj_t args);
 
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);
-extern void scm_gc_free(scm_obj_t obj);
+__attribute__((warn_unused_result))
+extern bool scm_gc_push(const scm_obj_t *obj);
+extern void scm_gc_pop(void);
 extern void scm_string_init(void);
-extern void scm_string_free(scm_obj_t string);
+extern void scm_mark_string(scm_obj_t string);
+extern void scm_sweep_string(void);
 extern void scm_enable_debug(void);
 extern void scm_enable_error(void);
 #endif

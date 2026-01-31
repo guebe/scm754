@@ -7,39 +7,35 @@ static scm_obj_t eval_list(scm_obj_t list, scm_obj_t environment_specifier)
 {
 	scm_obj_t head = scm_nil();
 	scm_obj_t tail = scm_nil();
+	scm_obj_t result;
+
+	if (!scm_gc_push(&head)) return scm_error("eval: stack overflow");
 
 	while (scm_is_pair(list)) {
-		scm_obj_t val = scm_eval(scm_car(list), environment_specifier);
-		if (scm_is_error(val)) return val;
+		result = scm_eval(scm_car(list), environment_specifier);
+		if (scm_is_error(result)) goto out;
 
-		scm_obj_t cell = scm_cons(val, scm_nil());
-		if (scm_is_error(cell)) return cell;
+		result = scm_cons(result, scm_nil());
+		if (scm_is_error(result)) goto out;
 
 		if (scm_is_null(head)) {
-			head = cell;
-			tail = cell;
+			head = tail = result;
 		} else {
-			scm_set_cdr(tail, cell);
-			tail = cell;
+			scm_set_cdr(tail, result);
+			tail = result;
 		}
 
 		list = scm_cdr(list);
 	}
 
+	result = head;
+
 	if (!scm_is_null(list))
-		return scm_error("eval_list: improper list");
+		result = scm_error("eval_list: improper list");
 
-	return head;
-}
-
-/* free value list: the values got copied into environment bindings by apply */
-static void free_list(scm_obj_t evaled_args)
-{
-	while (scm_is_pair(evaled_args)) {
-		scm_obj_t next = scm_cdr(evaled_args);
-		scm_gc_free(evaled_args);
-		evaled_args = next;
-	}
+out:
+	scm_gc_pop();
+	return result;
 }
 
 static scm_obj_t eval_if(scm_obj_t args, scm_obj_t env)
@@ -229,7 +225,13 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 {
 	scm_obj_t result;
 
+	if (!scm_gc_push(&expr) || !scm_gc_push(&env)) {
+		return scm_error("eval: stack overflow");
+	}
+
 tail_call:
+	scm_gc_collect();
+
 	if (scm_is_null(expr)) {
 		result = scm_error("eval: can not eval empty list object ()");
 	}
@@ -277,26 +279,31 @@ tail_call:
 		/* application */
 		op = result = scm_eval(op, env);
 		if (scm_is_error(result)) goto out;
+		if (!scm_gc_push(&op)) { result = scm_error("eval: stack overflow"); goto out; }
+
 		args = result = eval_list(args, env);
-		if (scm_is_error(result)) goto out;
+		if (scm_is_error(result)) { goto out3; }
+		if (!scm_gc_push(&args)) { result = scm_error("eval: stack overflow"); goto out3; }
 
 		if (scm_is_procedure(op)) {
 			if (debug) debug_print(false, op, args);
 			result = scm_apply(op, args);
-			free_list(args);
+			scm_gc_pop();
+			scm_gc_pop();
 		}
 		else if (scm_is_closure(op)) {
 			op = scm_closure_value(op);
 			env = result = scm_environment_extend(scm_car(op), scm_car(scm_cdr(op)), args);
-			if (scm_is_error(result)) goto out;
+			if (scm_is_error(result)) goto out4;
 			if (debug) debug_print(true, scm_cdr(op), args);
-			free_list(args);
 
 			scm_obj_t body;
 			for (body = scm_cdr(scm_cdr(op)); scm_is_pair(scm_cdr(body)); body = scm_cdr(body)) {
 			    result = scm_eval(scm_car(body), env);
-			    if (scm_is_error(result)) goto out;
+			    if (scm_is_error(result)) goto out4;
 			}
+			scm_gc_pop();
+			scm_gc_pop();
 			expr = scm_car(body);
 			goto tail_call;
 		}
@@ -304,7 +311,14 @@ tail_call:
 			result = scm_error("eval: not callable");
 		}
 	}
+	goto out;
+out4:
+	scm_gc_pop();
+out3:
+	scm_gc_pop();
 out:
+	scm_gc_pop();
+	scm_gc_pop();
 	return result;
 }
 

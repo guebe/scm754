@@ -1,7 +1,8 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
 #include "scm754.h"
 
-#define SCM_CELL_NUM 80000U
+#define SCM_CELL_NUM  20000U
+#define SCM_STACK_NUM 10000U
 
 typedef struct
 {
@@ -13,6 +14,23 @@ typedef struct
 
 static scm_pair_t cell[SCM_CELL_NUM];
 static uint32_t head = 0;
+
+static const scm_obj_t *stack[SCM_STACK_NUM];
+static uint32_t stack_index = 0;
+
+extern bool scm_gc_push(const scm_obj_t *obj)
+{
+	if (stack_index >= SCM_STACK_NUM) return false;
+	assert(stack[stack_index] == NULL);
+	stack[stack_index++] = obj;
+	return true;
+}
+
+extern void scm_gc_pop(void)
+{
+	assert(stack_index > 0);
+	stack[--stack_index] = NULL;
+}
 
 extern void scm_gc_init(void)
 {
@@ -27,54 +45,53 @@ extern void scm_gc_init(void)
 	head = 0;
 }
 
-static void mark(scm_obj_t pair)
+static void mark(scm_obj_t obj)
 {
-	if (!scm_is_pair(pair) && !scm_is_closure(pair)) return;
-	scm_obj_t i = (uint32_t)pair;
-	if (cell[i].mark) return;
-	cell[i].mark = 1;
-	mark(cell[i].car);
-	mark(cell[i].cdr);
+	if (scm_is_pair(obj) || scm_is_closure(obj)) {
+		scm_obj_t i = (uint32_t)obj;
+		if (cell[i].mark) return;
+		cell[i].mark = 1;
+		mark(cell[i].car);
+		mark(cell[i].cdr);
+	}
+	else if (scm_is_string(obj) || scm_is_symbol(obj)) {
+		scm_mark_string(obj);
+	}
 }
 
-static uint32_t sweep(void)
+static void mark_stack(void)
 {
-	uint32_t f = UINT32_MAX;
-	for (uint32_t i = 0; i < SCM_CELL_NUM; i++) {
-		scm_pair_t *c = &cell[i];
-		if (!c->mark) {
-			c->next = f;
-			c->car = SCM_ERROR;
-			c->cdr = SCM_ERROR;
-			f = i;
-			if (scm_is_string(c->car)) scm_string_free(c->car);
-			else if (scm_is_symbol(c->car)) scm_string_free(scm_symbol_to_string(c->car));
-			if (scm_is_string(c->cdr)) scm_string_free(c->cdr);
-			else if (scm_is_symbol(c->cdr)) scm_string_free(scm_symbol_to_string(c->cdr));
-		}
-		else {
-			c->mark = 0;
-		}
+	for (uint32_t i = 0; i < stack_index; i++) {
+		mark(*stack[i]);
 	}
-	return f;
+}
+
+static void sweep(void)
+{
+	uint32_t tail = UINT32_MAX;
+	for (uint32_t i = 0; i < SCM_CELL_NUM; i++) {
+		scm_pair_t *x = &cell[i];
+		if (!x->mark) {
+			x->car = SCM_ERROR;
+			x->cdr = SCM_ERROR;
+			x->next = tail;
+			tail = i;
+		}
+		x->mark = 0;
+	}
+	head = tail;
 }
 
 extern void scm_gc_collect(void)
 {
+	static int i = 0;
+	if (i++ % 1000 == 0) {
 	mark(scm_interaction_environment);
 	mark(scm_symbols);
-	head = sweep();
-}
-
-extern void scm_gc_free(scm_obj_t obj)
-{
-	assert(scm_is_pair(obj));
-	uint32_t i = (uint32_t)obj;
-	cell[i].car = SCM_ERROR;
-	cell[i].cdr = SCM_ERROR;
-	cell[i].next = head;
-	cell[i].mark = 0;
-	head = i;
+	mark_stack();
+	sweep();
+	scm_sweep_string();
+	}
 }
 
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)

@@ -7,10 +7,38 @@ typedef struct
 {
 	char *string;
 	uint32_t next;
+	uint8_t mark;
 } scm_string_t;
 
 static scm_string_t strings[SCM_STRING_NUM];
 static uint32_t head = 0;
+
+extern void scm_mark_string(scm_obj_t obj)
+{
+	assert(scm_is_string(obj) || scm_is_symbol(obj));
+	uint32_t i = (uint32_t)obj;
+
+	assert(i < SCM_STRING_NUM);
+	assert(strings[i].string != NULL);
+
+	strings[i].mark = 1;
+}
+
+extern void scm_sweep_string(void)
+{
+	uint32_t tail = UINT32_MAX;
+	for (uint32_t i = 0; i < SCM_STRING_NUM; i++) {
+		scm_string_t *x = &strings[i];
+		if (!x->mark) {
+			free(x->string);
+			x->string = NULL;
+			x->next = tail;
+			tail = i;
+		}
+		x->mark = 0;
+	}
+	head = tail;
+}
 
 extern void scm_string_init(void)
 {
@@ -24,7 +52,7 @@ extern void scm_string_init(void)
 extern const char *scm_string_value(scm_obj_t string)
 {
 	if (!scm_is_string(string)) {
-		puts("error: scm_string_value: not a string");
+		(void)scm_error("error: scm_string_value: not a string");
 		return "<not a string>";
 	}
 
@@ -54,17 +82,3 @@ extern scm_obj_t scm_string(const char *string, size_t k)
 	return SCM_STRING | i;
 }
 
-extern void scm_string_free(scm_obj_t string)
-{
-	assert(scm_is_string(string));
-
-	uint32_t i = (uint32_t)string;
-
-	assert(i < SCM_STRING_NUM);
-	assert(strings[i].string != NULL);
-
-	free(strings[i].string);
-	strings[i].string = NULL;
-	strings[i].next = head;
-	head = i;
-}
