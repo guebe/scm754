@@ -113,7 +113,7 @@ static void sweep(void)
 extern void scm_gc_collect(void)
 {
 	static int i = 0;
-	if (i++ % 7000 == 0) {
+	if (i++ % 3000 == 0) {
 		mark(scm_interaction_environment);
 		mark(scm_symbols);
 		mark_stack();

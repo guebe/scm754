@@ -243,7 +243,6 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 	}
 
 tail_call:
-	scm_gc_collect();
 
 	if (scm_is_null(expr)) {
 		result = scm_error("eval: can not eval empty list object ()");
@@ -288,6 +287,8 @@ tail_call:
 			default: break;
 			}
 		}
+
+		scm_gc_collect();
 
 		if (!scm_gc_push2(&op, &args)) {
 			return scm_error("eval: stack overflow");
