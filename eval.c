@@ -221,11 +221,24 @@ static void debug_print(bool is_closure, scm_obj_t op, scm_obj_t args)
 	putchar('\n');
 }
 
+static scm_obj_t apply_closure(scm_obj_t proc, scm_obj_t evlist, scm_obj_t env)
+{
+	if (debug) debug_print(true, proc, evlist);
+
+	scm_obj_t body = scm_cdr(proc);
+	while (scm_is_pair(scm_cdr(body))) {
+	    scm_obj_t result = scm_eval(scm_car(body), env);
+	    if (scm_is_error(result)) return result;
+	    body = scm_cdr(body);
+	}
+	return scm_car(body);
+}
+
 extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 {
 	scm_obj_t result;
 
-	if (!scm_gc_push(&expr) || !scm_gc_push(&env)) {
+	if (!scm_gc_push2(&expr, &env)) {
 		return scm_error("eval: stack overflow");
 	}
 
@@ -276,7 +289,7 @@ tail_call:
 			}
 		}
 
-		if (!scm_gc_push(&op) || !scm_gc_push(&args)) {
+		if (!scm_gc_push2(&op, &args)) {
 			return scm_error("eval: stack overflow");
 		}
 
@@ -285,46 +298,36 @@ tail_call:
 		if (scm_is_error(result)) goto out2;
 
 		args = result = eval_list(args, env);
-		if (scm_is_error(result)) { goto out2; }
+		if (scm_is_error(result)) goto out2;
 
 		if (scm_is_procedure(op)) {
-			if (debug) debug_print(false, op, args);
 			result = scm_apply(op, args);
-			goto out2;
 		}
 		else if (scm_is_closure(op)) {
 			op = scm_closure_value(op);
-			env = result = scm_environment_extend(scm_car(op), scm_car(scm_cdr(op)), args);
+			scm_obj_t param_body = scm_cdr(op);
+			env = result = scm_environment_extend(scm_car(op), scm_car(param_body), args);
 			if (scm_is_error(result)) goto out2;
-			if (debug) debug_print(true, scm_cdr(op), args);
-
-			scm_obj_t body;
-			for (body = scm_cdr(scm_cdr(op)); scm_is_pair(scm_cdr(body)); body = scm_cdr(body)) {
-			    result = scm_eval(scm_car(body), env);
-			    if (scm_is_error(result)) goto out2;
-			}
-			scm_gc_pop();
-			scm_gc_pop();
-			expr = scm_car(body);
+			expr = apply_closure(param_body, args, env);
+			scm_gc_pop2();
 			goto tail_call;
 		}
 		else {
-			result = scm_error("eval: not callable");
+			result = scm_error("eval: unknown expression type");
 		}
+	out2:
+		scm_gc_pop2();
 	}
-	goto out;
-out2:
-	scm_gc_pop();
-	scm_gc_pop();
 out:
-	scm_gc_pop();
-	scm_gc_pop();
+	scm_gc_pop2();
 	return result;
 }
 
 extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 {
 	if (!scm_is_procedure(proc)) return scm_error("apply: attempt to apply non-procedure");
+
+	if (debug) debug_print(false, proc, args);
 
 	uint32_t procedure = scm_procedure_id(proc);
 	size_t argc = scm_length(args);

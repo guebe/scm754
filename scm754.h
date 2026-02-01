@@ -207,6 +207,8 @@ extern void scm_gc_init(void);
 extern void scm_gc_collect(void);
 __attribute__((warn_unused_result))
 extern bool scm_gc_push(const scm_obj_t *obj);
+extern bool scm_gc_push2(const scm_obj_t *obj1, const scm_obj_t *obj2);
+extern void scm_gc_pop2(void);
 extern void scm_gc_pop(void);
 extern void scm_string_init(void);
 extern void scm_mark_string(scm_obj_t string);

@@ -35,6 +35,27 @@ extern void scm_gc_pop(void)
 #endif
 }
 
+extern bool scm_gc_push2(const scm_obj_t *obj1, const scm_obj_t *obj2)
+{
+	if ((stack_index + 1) >= SCM_STACK_NUM) return false;
+	assert(stack[stack_index] == NULL);
+	assert(stack[stack_index+1] == NULL);
+	stack[stack_index] = obj1;
+	stack[stack_index+1] = obj2;
+	stack_index += 2;
+	return true;
+}
+
+extern void scm_gc_pop2(void)
+{
+	assert(stack_index >= 2);
+#ifndef NDEBUG
+	stack[stack_index-1] = NULL;
+	stack[stack_index-2] = NULL;
+#endif
+	stack_index -= 2;
+}
+
 extern void scm_gc_init(void)
 {
 	scm_string_init();

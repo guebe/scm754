@@ -29,7 +29,7 @@ fuzz-all:
 	./fuzz-whitebox -max_total_time=3 -verbosity=0
 
 scm754: $(SRC_SCHEME) scm754.h
-	$(CC) $(CFLAGS) -o $@ $(SRC_SCHEME) -lm
+	$(CC) $(CFLAGS) -DNDEBUG -O2 -flto -g -o $@ $(SRC_SCHEME) -lm
 
 scm754-debug: $(SRC_SCHEME) scm754.h
 	$(CC) $(CFLAGS) $(CFLAGS_EXTRA_DEBUG) -o $@ $(SRC_SCHEME) -lm
