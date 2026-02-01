@@ -237,10 +237,7 @@ static scm_obj_t apply_closure(scm_obj_t proc, scm_obj_t evlist, scm_obj_t env)
 extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 {
 	scm_obj_t result;
-
-	if (!scm_gc_push2(&expr, &env)) {
-		return scm_error("eval: stack overflow");
-	}
+	bool cleanup = false;
 
 tail_call:
 	scm_gc_collect();
@@ -257,6 +254,11 @@ tail_call:
 	else {
 		scm_obj_t op = scm_car(expr);
 		scm_obj_t args = scm_cdr(expr);
+
+		if (!cleanup && !scm_gc_push2(&expr, &env)) {
+			return scm_error("eval: stack overflow");
+		}
+		cleanup = true;
 
 		/* special forms */
 		if (scm_is_symbol(op)) {
@@ -319,7 +321,7 @@ tail_call:
 		scm_gc_pop2();
 	}
 out:
-	scm_gc_pop2();
+	if (cleanup) scm_gc_pop2();
 	return result;
 }
 
