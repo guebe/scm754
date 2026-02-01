@@ -240,8 +240,6 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 	bool cleanup = false;
 
 tail_call:
-	scm_gc_collect();
-
 	if (scm_is_null(expr)) {
 		result = scm_error("eval: can not eval empty list object ()");
 	}
@@ -259,6 +257,8 @@ tail_call:
 			return scm_error("eval: stack overflow");
 		}
 		cleanup = true;
+
+		scm_gc_collect();
 
 		/* special forms */
 		if (scm_is_symbol(op)) {
