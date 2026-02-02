@@ -72,7 +72,7 @@ static const scm_ops_t ops[] =
 	[SCM_OP_IS_ZERO] = { "zero?", 1 },
 };
 
-extern scm_obj_t scm_intern(scm_obj_t symbol)
+static scm_obj_t intern(scm_obj_t symbol)
 {
 	scm_obj_t x, y, z, w;
 	const char *name, *name2;
@@ -92,6 +92,12 @@ extern scm_obj_t scm_intern(scm_obj_t symbol)
 	scm_symbols = scm_cons(symbol, scm_symbols);
 
 	return symbol;
+}
+
+extern scm_obj_t scm_string_to_symbol(scm_obj_t string)
+{
+	if (!scm_is_string(string)) return scm_error("not a string");
+	return intern(SCM_SYMBOL | (uint32_t)string);
 }
 
 extern const char *scm_procedure_string(scm_obj_t proc)

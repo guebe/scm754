@@ -48,6 +48,8 @@ extern scm_obj_t scm_interaction_environment;
 extern scm_obj_t scm_symbols;
 extern FILE *scm_current_input_port;
 
+/* primitives and procedures need a contiguous index for interning the symbols
+ * with a stable id. This eases operation dispatching in eval. */
 typedef enum {
 	/* primitives */
 	SCM_OP_IF = 0,
@@ -173,12 +175,7 @@ extern scm_obj_t scm_environment_create(void);
 extern scm_obj_t scm_environment_lookup(scm_obj_t env, scm_obj_t symbol);
 extern void scm_environment_define(scm_obj_t env, scm_obj_t symbol, scm_obj_t value);
 extern scm_obj_t scm_environment_extend(scm_obj_t env, scm_obj_t params, scm_obj_t args);
-extern scm_obj_t scm_intern(scm_obj_t symbol);
-static inline scm_obj_t scm_string_to_symbol(scm_obj_t string)
-{
-	if (!scm_is_string(string)) return scm_error("not a string");
-	return scm_intern((string & ~SCM_MASK) | SCM_SYMBOL);
-}
+extern scm_obj_t scm_string_to_symbol(scm_obj_t string);
 static inline scm_obj_t scm_symbol_to_string(scm_obj_t symbol)
 {
 	if (!scm_is_symbol(symbol)) return scm_error("not a symbol");
