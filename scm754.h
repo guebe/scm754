@@ -41,14 +41,8 @@ typedef uint64_t scm_obj_t;
  * arguments according to special rules defined by the specification. Those
  * primitives are interned constants to speed-up evaluation but _not_ stored in
  * any environment. */
-#define SCM_IF       (SCM_SYMBOL | SCM_OP_IF)
-#define SCM_OR       (SCM_SYMBOL | SCM_OP_OR)
-#define SCM_LET      (SCM_SYMBOL | SCM_OP_LET)
-#define SCM_AND      (SCM_SYMBOL | SCM_OP_AND)
-#define SCM_LET_STAR (SCM_SYMBOL | SCM_OP_LET_STAR)
 #define SCM_QUOTE    (SCM_SYMBOL | SCM_OP_QUOTE)
 #define SCM_LAMBDA   (SCM_SYMBOL | SCM_OP_LAMBDA)
-#define SCM_DEFINE   (SCM_SYMBOL | SCM_OP_DEFINE)
 
 extern scm_obj_t scm_interaction_environment;
 extern scm_obj_t scm_symbols;

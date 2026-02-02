@@ -259,29 +259,29 @@ tail_call:
 
 		/* special forms */
 		if (scm_is_symbol(op)) {
-			switch (op) {
-			case SCM_QUOTE:
+			switch (scm_procedure_id(op)) {
+			case SCM_OP_QUOTE:
 				result = eval_quote(args);
 				goto out;
-			case SCM_DEFINE:
+			case SCM_OP_DEFINE:
 				result = eval_define(args, env);
 				goto out;
-			case SCM_LAMBDA:
+			case SCM_OP_LAMBDA:
 				result = eval_lambda(args, env);
 				goto out;
-			case SCM_IF:
+			case SCM_OP_IF:
 				expr = result = eval_if(args, env);
 				if (scm_is_unspecified(result) || scm_is_error(result)) goto out; else goto tail_call;
-			case SCM_LET:
+			case SCM_OP_LET:
 				expr = result = eval_let(args);
 				if (scm_is_error(result)) goto out; else goto tail_call;
-			case SCM_LET_STAR:
+			case SCM_OP_LET_STAR:
 				expr = result = eval_let_star(args);
 				if (scm_is_error(result)) goto out; else goto tail_call;
-			case SCM_AND:
+			case SCM_OP_AND:
 				expr = result = eval_and(args, env);
 				if (scm_is_error(result)) goto out; else goto tail_call;
-			case SCM_OR:
+			case SCM_OP_OR:
 				expr = result = eval_or(args, env);
 				if (scm_is_error(result)) goto out; else goto tail_call;
 			default: break;
@@ -330,7 +330,6 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 
 	if (debug) debug_print(false, proc, args);
 
-	uint32_t op = scm_procedure_id(proc);
 	int8_t arity = scm_procedure_arity(proc);
 	size_t argc = scm_length(args);
 
@@ -341,7 +340,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 	scm_obj_t arg1 = (argc >= 1) ? scm_car(args) : scm_nil();
 	scm_obj_t arg2 = (argc >= 2) ? scm_car(scm_cdr(args)): scm_nil();
 
-	switch (op) {
+	switch (scm_procedure_id(proc)) {
 	case SCM_OP_NEWLINE: return scm_newline();
 	case SCM_OP_CAR: return scm_car(arg1);
 	case SCM_OP_CDR: return scm_cdr(arg1);
@@ -383,6 +382,6 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 	case SCM_OP_GE: return scm_ge(args);
 	case SCM_OP_STRING_EQ: return scm_string_eq(args);
 	case SCM_OP_SUBSTRING: return scm_substring(args);
-	default: return scm_error("unknown procedure");
+	default: return scm_error("apply: unknown procedure");
 	}
 }
