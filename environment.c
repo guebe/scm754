@@ -3,11 +3,11 @@
 #include "scm754.h"
 
 /* Environment which is a list of frames,
- * whereas each frame is a list of pairs (symbol-index . <value|procedure>).
+ * whereas each frame is a list of pairs (symbol . <value|procedure>).
  * This is needed to support nested environments and rebinding of variables.
  * Example: (((a . 4) (b . proc)) ((a . 5) (b . 8)))
  *
- * Note: all symbols stored in the environment are globally unique (interned in the global_symbols list).
+ * Note: all symbols stored in the environment are globally unique (interned in the global symbols list).
  * This is to avoid searching by string-compare in the environment. By using
  * interned symbols we can search in the environment using numeric equality
  * instead of string comparison. Even though symbols are globally unique, each
