@@ -2,6 +2,11 @@
 
 #include "scm754.h"
 
+typedef struct {
+	const char *name;
+	int8_t arity;
+} scm_ops_t;
+
 /* Environment which is a list of frames,
  * whereas each frame is a list of pairs (symbol . <value|procedure>).
  * This is needed to support nested environments and rebinding of variables.
@@ -89,6 +94,18 @@ extern scm_obj_t scm_intern(scm_obj_t symbol)
 	return symbol;
 }
 
+extern const char *scm_procedure_string(scm_obj_t proc)
+{
+	uint32_t id = scm_procedure_id(proc);
+	return ops[id].name;
+}
+
+extern int8_t scm_procedure_arity(scm_obj_t proc)
+{
+	uint32_t id = scm_procedure_id(proc);
+	return ops[id].arity;
+}
+
 extern scm_obj_t scm_environment_create(void)
 {
 	scm_gc_init();
@@ -120,8 +137,8 @@ extern scm_obj_t scm_environment_lookup(scm_obj_t env, scm_obj_t symbol)
 		env = scm_cdr(env);
 	}
 
-	/* check if its a pre-interned operation */
-	uint32_t id = (uint32_t)symbol;
+	/* check if its a pre-interned procedure */
+	uint32_t id = scm_procedure_id(symbol);
 	if ((id >= SCM_OP_PROCEDURE_FIRST) && (id <= SCM_OP_PROCEDURE_LAST))
 		return scm_procedure(id);
 

@@ -1,51 +1,6 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
 #include "scm754.h"
 
-static const char *procedure_string(scm_obj_t proc)
-{
-	uint32_t id = scm_procedure_id(proc);
-
-	switch(id) {
-	case SCM_OP_NEWLINE: return "newline";
-	case SCM_OP_CAR: return "car";
-	case SCM_OP_CDR: return "cdr";
-	case SCM_OP_IS_PROCEDURE: return "procedure?";
-	case SCM_OP_IS_NULL: return "null?";
-	case SCM_OP_IS_BOOLEAN: return "boolean?";
-	case SCM_OP_IS_EOF_OBJECT: return "eof-object?";
-	case SCM_OP_IS_SYMBOL: return "symbol?";
-	case SCM_OP_IS_STRING: return "string?";
-	case SCM_OP_IS_PAIR: return "pair?";
-	case SCM_OP_IS_CHAR: return "char?";
-	case SCM_OP_IS_NUMBER: return "number?";
-	case SCM_OP_LENGTH: return "length";
-	case SCM_OP_DISPLAY: return "display";
-	case SCM_OP_LOAD: return "load";
-	case SCM_OP_IS_ZERO: return "zero?";
-	case SCM_OP_STRING_LENGTH: return "string-length";
-	case SCM_OP_NUMBER_TO_STRING: return "number->string";
-	case SCM_OP_IS_EQ: return "eq?";
-	case SCM_OP_CONS: return "cons";
-	case SCM_OP_SET_CAR: return "set-car!";
-	case SCM_OP_SET_CDR: return "set-cdr!";
-	case SCM_OP_MODULO: return "modulo";
-	case SCM_OP_QUOTIENT: return "quotient";
-	case SCM_OP_ADD: return "+";
-	case SCM_OP_SUB: return "-";
-	case SCM_OP_MUL: return "*";
-	case SCM_OP_DIV: return "/";
-	case SCM_OP_WRITE: return "write";
-	case SCM_OP_NUMBER_EQ: return "=";
-	case SCM_OP_LT: return "<=";
-	case SCM_OP_GT: return ">=";
-	case SCM_OP_LE: return "<";
-	case SCM_OP_GE: return ">";
-	case SCM_OP_STRING_EQ: return "string=?";
-	case SCM_OP_SUBSTRING: return "substring";
-	default: return "<unknown>";
-	}
-}
-
 static void print_list(scm_obj_t obj)
 {
 	size_t len;
@@ -92,7 +47,7 @@ extern void print(scm_obj_t obj, bool readable)
 		fputs("#!error", stdout);
 	}
 	else if (scm_is_procedure(obj)) {
-		printf("#!%s", procedure_string(obj));
+		printf("#!%s", scm_procedure_string(obj));
 	}
 	else if (scm_is_closure(obj)) {
 		fputs("#!closure", stdout);

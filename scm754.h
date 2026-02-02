@@ -106,11 +106,6 @@ typedef enum {
 	SCM_OP_PROCEDURE_LAST = SCM_OP_SUBSTRING,
 } scm_op_t;
 
-typedef struct {
-	const char *name;
-	int8_t arity;
-} scm_ops_t;
-
 /* type predicates */
 static inline bool scm_is_null(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_NIL; }
 static inline bool scm_is_boolean(scm_obj_t obj)      { return ((obj & SCM_MASK) == SCM_TRUE) || ((obj & SCM_MASK) == SCM_FALSE); }
@@ -137,6 +132,8 @@ static inline bool scm_boolean_value(scm_obj_t obj)          { return obj != SCM
 static inline double scm_number_value(scm_obj_t number)      { double d; memcpy(&d, &number, sizeof d); return d; }
 static inline char scm_char_value(scm_obj_t c)               { return (char)c; }
 static inline uint32_t scm_procedure_id(scm_obj_t procedure) { return (uint32_t)procedure; }
+extern const char *scm_procedure_string(scm_obj_t proc);
+extern int8_t scm_procedure_arity(scm_obj_t proc);
 static inline scm_obj_t scm_closure_value(scm_obj_t closure) { return SCM_PAIR | (uint32_t)closure; }
 extern scm_obj_t scm_car(scm_obj_t pair);
 extern scm_obj_t scm_cdr(scm_obj_t pair);
