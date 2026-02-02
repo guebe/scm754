@@ -18,6 +18,55 @@ scm_obj_t scm_interaction_environment;
  * (a b c) (cons a (cons b (cons c '()))) */
 scm_obj_t scm_symbols = SCM_NIL;
 
+static const scm_ops_t ops[] =
+{
+	[SCM_OP_IF] = { "if", -1 },
+	[SCM_OP_OR] = { "or", -1 },
+	[SCM_OP_LET] = { "let", -1 },
+	[SCM_OP_AND] = { "and", -1 },
+	[SCM_OP_LET_STAR] = { "let*", -1 },
+	[SCM_OP_QUOTE] = { "quote", -1 },
+	[SCM_OP_LAMBDA] = { "lambda", -1 },
+	[SCM_OP_DEFINE] = { "define", -1 },
+
+	[SCM_PROCEDURE_MUL] = { "*", -1 },
+	[SCM_PROCEDURE_ADD] = { "+", -1 },
+	[SCM_PROCEDURE_SUB] = { "-", -1 },
+	[SCM_PROCEDURE_DIV] = { "/", -1 },
+	[SCM_PROCEDURE_LT] = { "<", -1 },
+	[SCM_PROCEDURE_LE] = { "<=", -1 },
+	[SCM_PROCEDURE_NUMBER_EQ] = { "=", -1 },
+	[SCM_PROCEDURE_GT] = { ">", -1 },
+	[SCM_PROCEDURE_GE] = { ">=", -1 },
+	[SCM_PROCEDURE_IS_BOOLEAN] = { "boolean?", 1 },
+	[SCM_PROCEDURE_CAR] = { "car", 1 },
+	[SCM_PROCEDURE_CDR] = { "cdr", 1 },
+	[SCM_PROCEDURE_IS_CHAR] = { "char?", 1 },
+	[SCM_PROCEDURE_CONS] = { "cons", 2 },
+	[SCM_PROCEDURE_DISPLAY] = { "display", 1 },
+	[SCM_PROCEDURE_IS_EOF_OBJECT] = { "eof-object?", 1 },
+	[SCM_PROCEDURE_IS_EQ] = { "eq?", 2 },
+	[SCM_PROCEDURE_LENGTH] = { "length", 1 },
+	[SCM_PROCEDURE_LOAD] = { "load", 1 },
+	[SCM_PROCEDURE_MODULO] = { "modulo", 2 },
+	[SCM_PROCEDURE_NEWLINE] = { "newline", 0 },
+	[SCM_PROCEDURE_IS_NULL] = { "null?", 1 },
+	[SCM_PROCEDURE_IS_NUMBER] = { "number?", 1 },
+	[SCM_PROCEDURE_NUMBER_TO_STRING] = { "number->string", 1 },
+	[SCM_PROCEDURE_IS_PAIR] = { "pair?", 1 },
+	[SCM_PROCEDURE_IS_PROCEDURE] = { "procedure?", 1 },
+	[SCM_PROCEDURE_QUOTIENT] = { "quotient", 2 },
+	[SCM_PROCEDURE_SET_CAR] = { "set-car!", 2 },
+	[SCM_PROCEDURE_SET_CDR] = { "set-cdr!", 2 },
+	[SCM_PROCEDURE_STRING_EQ] = { "string=?", -1 },
+	[SCM_PROCEDURE_IS_STRING] = { "string?", 1 },
+	[SCM_PROCEDURE_STRING_LENGTH] = { "string-length", 1 },
+	[SCM_PROCEDURE_SUBSTRING] = { "substring", -1 },
+	[SCM_PROCEDURE_IS_SYMBOL] = { "symbol?", 1 },
+	[SCM_PROCEDURE_WRITE] = { "write", 1 },
+	[SCM_PROCEDURE_IS_ZERO] = { "zero?", 1 },
+};
+
 extern scm_obj_t scm_intern(scm_obj_t symbol)
 {
 	scm_obj_t x, y, z, w;
@@ -42,67 +91,17 @@ extern scm_obj_t scm_intern(scm_obj_t symbol)
 
 extern scm_obj_t scm_environment_create(void)
 {
-	scm_obj_t environment;
-
 	scm_gc_init();
 
-	scm_obj_t scm_if       = scm_string_to_symbol(scm_string("if", 2));
-	scm_obj_t scm_or       = scm_string_to_symbol(scm_string("or", 2));
-	scm_obj_t scm_let      = scm_string_to_symbol(scm_string("let", 3));
-	scm_obj_t scm_and      = scm_string_to_symbol(scm_string("and", 3));
-	scm_obj_t scm_let_star = scm_string_to_symbol(scm_string("let*", 4));
-	scm_obj_t scm_quote    = scm_string_to_symbol(scm_string("quote", 5));
-	scm_obj_t scm_lambda   = scm_string_to_symbol(scm_string("lambda", 6));
-	scm_obj_t scm_define   = scm_string_to_symbol(scm_string("define", 6));
+	assert((SCM_PROCEDURE_SUBSTRING + 1) == sizeof(ops)/sizeof(ops[0]));
 
-	if (scm_if != SCM_IF) abort();
-	if (scm_or != SCM_OR) abort();
-	if (scm_let != SCM_LET) abort();
-	if (scm_and != SCM_AND) abort();
-	if (scm_let_star != SCM_LET_STAR) abort();
-	if (scm_quote != SCM_QUOTE) abort();
-	if (scm_lambda != SCM_LAMBDA) abort();
-	if (scm_define != SCM_DEFINE) abort();
+	/* pre-intern all operations (special forms and procedures) to get
+	 * stable index and O(1) lookup during eval */
+	for (size_t i = 0; i < sizeof(ops)/sizeof(ops[0]); i++)
+		(void)scm_string_to_symbol(scm_string(ops[i].name, strlen(ops[i].name)));
 
-	environment = scm_cons(scm_nil(), scm_nil());
-
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("+", 1)), scm_procedure(SCM_PROCEDURE_ADD));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("-", 1)), scm_procedure(SCM_PROCEDURE_SUB));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("*", 1)), scm_procedure(SCM_PROCEDURE_MUL));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("/", 1)), scm_procedure(SCM_PROCEDURE_DIV));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("=", 1)), scm_procedure(SCM_PROCEDURE_NUMBER_EQ));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("<", 1)), scm_procedure(SCM_PROCEDURE_LT));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string(">", 1)), scm_procedure(SCM_PROCEDURE_GT));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("<=", 2)), scm_procedure(SCM_PROCEDURE_LE));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string(">=", 2)), scm_procedure(SCM_PROCEDURE_GE));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("car", 3)), scm_procedure(SCM_PROCEDURE_CAR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("cdr", 3)), scm_procedure(SCM_PROCEDURE_CDR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("eq?", 3)), scm_procedure(SCM_PROCEDURE_IS_EQ));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("cons", 4)), scm_procedure(SCM_PROCEDURE_CONS));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("load", 4)), scm_procedure(SCM_PROCEDURE_LOAD));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("write", 5)), scm_procedure(SCM_PROCEDURE_WRITE));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("null?", 5)), scm_procedure(SCM_PROCEDURE_IS_NULL));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("pair?", 5)), scm_procedure(SCM_PROCEDURE_IS_PAIR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("char?", 5)), scm_procedure(SCM_PROCEDURE_IS_CHAR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("zero?", 5)), scm_procedure(SCM_PROCEDURE_IS_ZERO));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("modulo", 6)), scm_procedure(SCM_PROCEDURE_MODULO));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("length", 6)), scm_procedure(SCM_PROCEDURE_LENGTH));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("symbol?", 7)), scm_procedure(SCM_PROCEDURE_IS_SYMBOL));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("display", 7)), scm_procedure(SCM_PROCEDURE_DISPLAY));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("newline", 7)), scm_procedure(SCM_PROCEDURE_NEWLINE));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("string?", 7)), scm_procedure(SCM_PROCEDURE_IS_STRING));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("number?", 7)), scm_procedure(SCM_PROCEDURE_IS_NUMBER));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("boolean?", 8)), scm_procedure(SCM_PROCEDURE_IS_BOOLEAN));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-car!", 8)), scm_procedure(SCM_PROCEDURE_SET_CAR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("set-cdr!", 8)), scm_procedure(SCM_PROCEDURE_SET_CDR));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("quotient", 8)), scm_procedure(SCM_PROCEDURE_QUOTIENT));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("string=?", 8)), scm_procedure(SCM_PROCEDURE_STRING_EQ));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("substring", 9)), scm_procedure(SCM_PROCEDURE_SUBSTRING));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("procedure?", 10)), scm_procedure(SCM_PROCEDURE_IS_PROCEDURE));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("eof-object?", 11)), scm_procedure(SCM_PROCEDURE_IS_EOF_OBJECT));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("string-length", 13)), scm_procedure(SCM_PROCEDURE_STRING_LENGTH));
-	scm_environment_define(environment, scm_string_to_symbol(scm_string("number->string", 14)), scm_procedure(SCM_PROCEDURE_NUMBER_TO_STRING));
-	return environment;
+	/* initial environment is empty*/
+	return scm_cons(scm_nil(), scm_nil());
 }
 
 extern scm_obj_t scm_environment_lookup(scm_obj_t env, scm_obj_t symbol)
@@ -120,6 +119,11 @@ extern scm_obj_t scm_environment_lookup(scm_obj_t env, scm_obj_t symbol)
 		}
 		env = scm_cdr(env);
 	}
+
+	/* check if its a pre-interned operation */
+	uint32_t id = (uint32_t)symbol;
+	if ((id >= SCM_PROCEDURE_NEWLINE) && (id <= SCM_PROCEDURE_SUBSTRING))
+		return scm_procedure(id);
 
 	return scm_error("unbound variable %s", scm_string_value(scm_symbol_to_string(symbol)));
 }

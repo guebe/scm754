@@ -41,24 +41,35 @@ typedef uint64_t scm_obj_t;
  * arguments according to special rules defined by the specification. Those
  * primitives are interned constants to speed-up evaluation but _not_ stored in
  * any environment. */
-#define SCM_IF       (SCM_SYMBOL | 0)
-#define SCM_OR       (SCM_SYMBOL | 1)
-#define SCM_LET      (SCM_SYMBOL | 2)
-#define SCM_AND      (SCM_SYMBOL | 3)
-#define SCM_LET_STAR (SCM_SYMBOL | 4)
-#define SCM_QUOTE    (SCM_SYMBOL | 5)
-#define SCM_LAMBDA   (SCM_SYMBOL | 6)
-#define SCM_DEFINE   (SCM_SYMBOL | 7)
+#define SCM_IF       (SCM_SYMBOL | SCM_OP_IF)
+#define SCM_OR       (SCM_SYMBOL | SCM_OP_OR)
+#define SCM_LET      (SCM_SYMBOL | SCM_OP_LET)
+#define SCM_AND      (SCM_SYMBOL | SCM_OP_AND)
+#define SCM_LET_STAR (SCM_SYMBOL | SCM_OP_LET_STAR)
+#define SCM_QUOTE    (SCM_SYMBOL | SCM_OP_QUOTE)
+#define SCM_LAMBDA   (SCM_SYMBOL | SCM_OP_LAMBDA)
+#define SCM_DEFINE   (SCM_SYMBOL | SCM_OP_DEFINE)
 
 extern scm_obj_t scm_interaction_environment;
 extern scm_obj_t scm_symbols;
 extern FILE *scm_current_input_port;
 
 typedef enum {
+	/* primitives */
+	SCM_OP_IF = 0,
+	SCM_OP_OR,
+	SCM_OP_LET,
+	SCM_OP_AND,
+	SCM_OP_LET_STAR,
+	SCM_OP_QUOTE,
+	SCM_OP_LAMBDA,
+	SCM_OP_DEFINE,
+
+	/* procedures */
 	/* sort enum tags by arity - this helps compiler-optimizing the apply function */
 
 	/* arity: 0 */
-	SCM_PROCEDURE_NEWLINE = 1,
+	SCM_PROCEDURE_NEWLINE,
 
 	/* arity: 1 */
 	SCM_PROCEDURE_CAR,
@@ -103,6 +114,11 @@ typedef enum {
 	/* arity: 1-3 */
 	SCM_PROCEDURE_SUBSTRING,
 } scm_procedure_t;
+
+typedef struct {
+	const char *name;
+	int8_t arity;
+} scm_ops_t;
 
 /* type predicates */
 static inline bool scm_is_null(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_NIL; }
