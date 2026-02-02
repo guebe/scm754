@@ -29,42 +29,42 @@ static const scm_ops_t ops[] =
 	[SCM_OP_LAMBDA] = { "lambda", -1 },
 	[SCM_OP_DEFINE] = { "define", -1 },
 
-	[SCM_PROCEDURE_MUL] = { "*", -1 },
-	[SCM_PROCEDURE_ADD] = { "+", -1 },
-	[SCM_PROCEDURE_SUB] = { "-", -1 },
-	[SCM_PROCEDURE_DIV] = { "/", -1 },
-	[SCM_PROCEDURE_LT] = { "<", -1 },
-	[SCM_PROCEDURE_LE] = { "<=", -1 },
-	[SCM_PROCEDURE_NUMBER_EQ] = { "=", -1 },
-	[SCM_PROCEDURE_GT] = { ">", -1 },
-	[SCM_PROCEDURE_GE] = { ">=", -1 },
-	[SCM_PROCEDURE_IS_BOOLEAN] = { "boolean?", 1 },
-	[SCM_PROCEDURE_CAR] = { "car", 1 },
-	[SCM_PROCEDURE_CDR] = { "cdr", 1 },
-	[SCM_PROCEDURE_IS_CHAR] = { "char?", 1 },
-	[SCM_PROCEDURE_CONS] = { "cons", 2 },
-	[SCM_PROCEDURE_DISPLAY] = { "display", 1 },
-	[SCM_PROCEDURE_IS_EOF_OBJECT] = { "eof-object?", 1 },
-	[SCM_PROCEDURE_IS_EQ] = { "eq?", 2 },
-	[SCM_PROCEDURE_LENGTH] = { "length", 1 },
-	[SCM_PROCEDURE_LOAD] = { "load", 1 },
-	[SCM_PROCEDURE_MODULO] = { "modulo", 2 },
-	[SCM_PROCEDURE_NEWLINE] = { "newline", 0 },
-	[SCM_PROCEDURE_IS_NULL] = { "null?", 1 },
-	[SCM_PROCEDURE_IS_NUMBER] = { "number?", 1 },
-	[SCM_PROCEDURE_NUMBER_TO_STRING] = { "number->string", 1 },
-	[SCM_PROCEDURE_IS_PAIR] = { "pair?", 1 },
-	[SCM_PROCEDURE_IS_PROCEDURE] = { "procedure?", 1 },
-	[SCM_PROCEDURE_QUOTIENT] = { "quotient", 2 },
-	[SCM_PROCEDURE_SET_CAR] = { "set-car!", 2 },
-	[SCM_PROCEDURE_SET_CDR] = { "set-cdr!", 2 },
-	[SCM_PROCEDURE_STRING_EQ] = { "string=?", -1 },
-	[SCM_PROCEDURE_IS_STRING] = { "string?", 1 },
-	[SCM_PROCEDURE_STRING_LENGTH] = { "string-length", 1 },
-	[SCM_PROCEDURE_SUBSTRING] = { "substring", -1 },
-	[SCM_PROCEDURE_IS_SYMBOL] = { "symbol?", 1 },
-	[SCM_PROCEDURE_WRITE] = { "write", 1 },
-	[SCM_PROCEDURE_IS_ZERO] = { "zero?", 1 },
+	[SCM_OP_MUL] = { "*", -1 },
+	[SCM_OP_ADD] = { "+", -1 },
+	[SCM_OP_SUB] = { "-", -1 },
+	[SCM_OP_DIV] = { "/", -1 },
+	[SCM_OP_LT] = { "<", -1 },
+	[SCM_OP_LE] = { "<=", -1 },
+	[SCM_OP_NUMBER_EQ] = { "=", -1 },
+	[SCM_OP_GT] = { ">", -1 },
+	[SCM_OP_GE] = { ">=", -1 },
+	[SCM_OP_IS_BOOLEAN] = { "boolean?", 1 },
+	[SCM_OP_CAR] = { "car", 1 },
+	[SCM_OP_CDR] = { "cdr", 1 },
+	[SCM_OP_IS_CHAR] = { "char?", 1 },
+	[SCM_OP_CONS] = { "cons", 2 },
+	[SCM_OP_DISPLAY] = { "display", 1 },
+	[SCM_OP_IS_EOF_OBJECT] = { "eof-object?", 1 },
+	[SCM_OP_IS_EQ] = { "eq?", 2 },
+	[SCM_OP_LENGTH] = { "length", 1 },
+	[SCM_OP_LOAD] = { "load", 1 },
+	[SCM_OP_MODULO] = { "modulo", 2 },
+	[SCM_OP_NEWLINE] = { "newline", 0 },
+	[SCM_OP_IS_NULL] = { "null?", 1 },
+	[SCM_OP_IS_NUMBER] = { "number?", 1 },
+	[SCM_OP_NUMBER_TO_STRING] = { "number->string", 1 },
+	[SCM_OP_IS_PAIR] = { "pair?", 1 },
+	[SCM_OP_IS_PROCEDURE] = { "procedure?", 1 },
+	[SCM_OP_QUOTIENT] = { "quotient", 2 },
+	[SCM_OP_SET_CAR] = { "set-car!", 2 },
+	[SCM_OP_SET_CDR] = { "set-cdr!", 2 },
+	[SCM_OP_STRING_EQ] = { "string=?", -1 },
+	[SCM_OP_IS_STRING] = { "string?", 1 },
+	[SCM_OP_STRING_LENGTH] = { "string-length", 1 },
+	[SCM_OP_SUBSTRING] = { "substring", -1 },
+	[SCM_OP_IS_SYMBOL] = { "symbol?", 1 },
+	[SCM_OP_WRITE] = { "write", 1 },
+	[SCM_OP_IS_ZERO] = { "zero?", 1 },
 };
 
 extern scm_obj_t scm_intern(scm_obj_t symbol)
@@ -93,7 +93,7 @@ extern scm_obj_t scm_environment_create(void)
 {
 	scm_gc_init();
 
-	assert((SCM_PROCEDURE_SUBSTRING + 1) == sizeof(ops)/sizeof(ops[0]));
+	assert((SCM_OP_PROCEDURE_LAST + 1) == sizeof(ops)/sizeof(ops[0]));
 
 	/* pre-intern all operations (special forms and procedures) to get
 	 * stable index and O(1) lookup during eval */
@@ -122,7 +122,7 @@ extern scm_obj_t scm_environment_lookup(scm_obj_t env, scm_obj_t symbol)
 
 	/* check if its a pre-interned operation */
 	uint32_t id = (uint32_t)symbol;
-	if ((id >= SCM_PROCEDURE_NEWLINE) && (id <= SCM_PROCEDURE_SUBSTRING))
+	if ((id >= SCM_OP_PROCEDURE_FIRST) && (id <= SCM_OP_PROCEDURE_LAST))
 		return scm_procedure(id);
 
 	return scm_error("unbound variable %s", scm_string_value(scm_symbol_to_string(symbol)));
