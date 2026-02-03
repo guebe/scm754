@@ -2,16 +2,16 @@
 ; By Nils M Holm, 2007-2018; Modified for Scheme 754 by Guenter Ebermann, 2026
 ; In the public domain
 
-;(define *Verbose* #f)
+(define *Verbose* #f)
 
-;(define testfile "test.tmp")
+(define testfile "test.tmp")
 
 ;(if (file-exists? testfile)
 ;    (delete-file testfile))
 
-;(define Errors 0)
+(define Errors 0)
 
-;(define (void) (if #f #f))
+(define (void) (if #f #f))
 
 ;(define (seq)
 ;  (let ((n 0))
@@ -19,29 +19,30 @@
 ;      (set! n (+ 1 n))
 ;      n)))
 
-;(define (fail expr result expected)
-;  (display "test failed: ")
-;  (write expr)
-;  (newline)
-;  (display "got result:  ")
-;  (write result)
-;  (newline)
-;  (display "expected:    ")
-;  (write expected)
-;  (newline)
+(define (fail expr result expected)
+  (display "test failed: ")
+  (write expr)
+  (newline)
+  (display "got result:  ")
+  (write result)
+  (newline)
+  (display "expected:    ")
+  (write expected)
+  (newline)
 ;  (set! Errors (+ 1 Errors)))
+)
 
-;(define (test3 expr result expected)
-;  (cond (*Verbose*
-;          (write expr)
-;          (display " => ")
-;          (write result)
-;          (newline)))
-;  (if (not (equal? result expected))
-;      (fail expr result expected)))
+(define (test3 expr result expected)
+  (if *Verbose* ((lambda () ;(cond (*Verbose*
+          (write expr)
+          (display " => ")
+          (write result)
+          (newline))))
+  (if (not (equal? result expected))
+      (fail expr result expected)))
 
-;(define-syntax (test form expected)
-;  `(test3 ',form ,form ,expected))
+(define (test result expected);(define-syntax (test form expected)
+  (test3 result result expected));  `(test3 ',form ,form ,expected))
 
 ;;; Comments
 
@@ -49,63 +50,63 @@
 
 ;#| This is a block comment |#
 
-;   #| Nested #| block |# comment |#
+;#| Nested #| block |# comment |#
 
-;   #| Nested
-;      #| multi-line |#
-;         block comment |#
+;#| Nested
+;   #| multi-line |#
+;   block comment |#
 
-;	 #|#|#||#|# nonsense |#
+;#|#|#||#|# nonsense |#
 
-;	 #| #|#||#|# more nonsense #|## |||#|#
+;#| #|#||#|# more nonsense #|## |||#|#
 
 ;;; Syntax
 
 ; Objects
 
-'x ; 'x
-'mississippi ; 'mississippi
-;'MIssissiPPi ; 'mississippi
-'!$%&*+-./^_ ; '!$%&*+-./^_
+(test 'x 'x)
+(test 'mississippi 'mississippi)
+;(test 'MIssissiPPi 'mississippi)
+(test '!$%&*+-./^_ '!$%&*+-./^_)
 
 ; Booleans
 
-#t ; #t
-#f ; #f
+(test #t #t)
+(test #f #f)
 
 ; Chars
 
-#\x ; #\x
-#\C ; #\C
-#\( ; #\(
-#\) ; #\)
-#\; ; #\;
-;#\space ;#\space
-;#\newline ;#\newline
+(test #\x #\x)
+(test #\C #\C)
+(test #\( #\()
+(test #\) #\))
+(test #\; #\;)
+;(test #\space #\space)
+;(test #\newline #\newline)
 
 ; Strings
 
-"test" ;"test"
-"TeSt" ;"TeSt"
-"TEST" ;"TEST"
-"hello, world!" ;"hello, world!"
-;"\"hello, world!\"" "\"hello, world!\""
-"a\\/b" ;"a\\/b"
-"(((;)))" ;"(((;)))"
+(test "test" "test")
+(test "TeSt" "TeSt")
+(test "TEST" "TEST")
+(test "hello, world!" "hello, world!")
+;(test "\"hello, world!\"" "\"hello, world!\"")
+(test "a\\/b" "a\\/b")
+(test "(((;)))" "(((;)))")
 
 ; Pairs / Lists
 
-'() ;'()
-'(a b c) ;'(a b c)
-'(a (b) c) ;'(a (b) c)
-'(((((x))))) ;'(((((x)))))
-'((caar . cdar) . (cadr . cddr)) ;'((caar . cdar) cadr . cddr)
+(test '() '())
+(test '(a b c) '(a b c))
+(test '(a (b) c) '(a (b) c))
+(test '(((((x))))) '(((((x))))))
+(test '((caar . cdar) . (cadr . cddr)) '((caar . cdar) . (cadr . cddr)))
 ;(test '[] '())
 ;(test '[a b c] '(a b c))
 ;(test '(a [b] c) '(a (b) c))
 ;(test '[a (b) c] '(a (b) c))
 ;(test '[a [b] c] '(a (b) c))
-'(((((x))))) ;'(((((x)))))
+(test '(((((x))))) '(((((x))))))
 ;(test '([([(x)])]) '(((((x))))))
 ;(test '[([([x])])] '(((((x))))))
 ;(test '[[[[[x]]]]] '(((((x))))))
@@ -123,125 +124,125 @@
 
 ; Integers
 
-0 ; 0
-1 ; 1
-1234567 ; 1234567
--0 ; 0
--1 ; -1
--1234567 ; -1234567
-;123456789012345678901234567890 ; 123456789012345678901234567890
-;-123456789012345678901234567890 ; -123456789012345678901234567890
+(test 0 0)
+(test 1 1)
+(test 1234567 1234567)
+(test -0 0)
+(test -1 -1)
+(test -1234567 -1234567)
+(test 123456789012345678901234567890 123456789012345678901234567890)
+(test -123456789012345678901234567890 -123456789012345678901234567890)
 
-#b10101010100101010101 ; 698709
-#b+10101010100101010101 ; +698709
-#b-10101010100101010101 ; -698709
-;#d1234567890987654321 ; 1234567890987654321
-;#d+1234567890987654321 ; +1234567890987654321
-;#d-1234567890987654321 ; -1234567890987654321
-#o123456707654321 ; 5744369817809
-#o+123456707654321 ; +5744369817809
-#o-123456707654321 ; -5744369817809
-;#x123456789abcdef0fedcba98765432 ; 94522879700260683132212139638805554
-;#x+123456789abcdef0fedcba98765432 ; +94522879700260683132212139638805554
-;#x-123456789abcdef0fedcba98765432 ; -94522879700260683132212139638805554
+(test #b10101010100101010101   698709)
+(test #b+10101010100101010101 +698709)
+(test #b-10101010100101010101 -698709)
+(test #d1234567890987654321   1234567890987654321)
+(test #d+1234567890987654321 +1234567890987654321)
+(test #d-1234567890987654321 -1234567890987654321)
+(test #o123456707654321   5744369817809)
+(test #o+123456707654321 +5744369817809)
+(test #o-123456707654321 -5744369817809)
+;(test #x123456789abcdef0fedcba98765432   94522879700260683132212139638805554)
+;(test #x+123456789abcdef0fedcba98765432 +94522879700260683132212139638805554)
+;(test #x-123456789abcdef0fedcba98765432 -94522879700260683132212139638805554)
 
 ; Real Numbers
 
-0.0 ; 0.0
--0.0 ; -0.0
-1.0 ; 1.0
--1.0 ; -1.0
-12345.0 ; 12345.0
--12345.0 ; -12345.0
-1.2345 ; 1.2345
--1.2345 ; -1.2345
-0.12345 ; 0.12345
--0.12345 ; -0.12345
--0.00012345 ; -0.00012345
-0.1 ; 0.1
-0.01 ; 0.01
-0.001 ; 0.001
-0.0000000000001 ; 0.0000000000001
-1e0 ; 1.0
-1e-0 ; 1.0
-1e1 ; 10.0
-1e2 ; 100.0
-1e5 ; 100000.0
-1e10 ; 10000000000.0
-1e-1 ; 0.1
-1e-2 ; 0.01
-1e-5 ; 0.00001
-1e-10 ; 0.0000000001
-123.456e0 ; 123.456
-123.456e1 ; 1234.56
-123.456e2 ; 12345.6
-123.456e3 ; 123456.0
-123.456e4 ; 1234560.0
-123.456e5 ; 12345600.0
-123.456e10 ; 1234560000000.0
--123.456e0 ; -123.456
--123.456e1 ; -1234.56
--123.456e2 ; -12345.6
--123.456e3 ; -123456.0
--123.456e4 ; -1234560.0
--123.456e5 ; -12345600.0
--123.456e10 ; -1234560000000.0
-123.456e-1 ; 12.3456
-123.456e-2 ; 1.23456
-123.456e-3 ; 0.123456
-123.456e-4 ; 0.0123456
-123.456e-5 ; 0.00123456
-123.456e-10 ; 0.0000000123456
--123.456e-1 ; -12.3456
--123.456e-2 ; -1.23456
--123.456e-3 ; -0.123456
--123.456e-4 ; -0.0123456
--123.456e-5 ; -0.00123456
--123.456e-10 ; -0.0000000123456
-;+123.45e+678 ; 123.45e678
-;-123.45e+678 ; -123.45e678
-;+123.45e-678 ; 123.45e-678
-;-123.45e-678 ; -123.45e-678
-1. ; 1.0
-.1 ; 0.1
-1.e1 ; 10.0
-.1e1 ; 1.0
-1000e0 ; 1e3
-100e1 ; 1e3
-10e2 ; 1e3
-1e3 ; 1e3
-.1e4 ; 1e3
-.01e5 ; 1e3
-.001e6 ; 1e3
-;12345678.901D10 ; 1.2345678901e+17
-12345678.901E10 ; 1.2345678901e+17
-;12345678.901F10 ; 1.2345678901e+17
-;12345678.901L10 ; 1.2345678901e+17
-;12345678.901S10 ; 1.2345678901e+17
+(test 0.0 0.0)
+(test -0.0 -0.0)
+(test 1.0 1.0)
+(test -1.0 -1.0)
+(test 12345.0 12345.0)
+(test -12345.0 -12345.0)
+(test 1.2345 1.2345)
+(test -1.2345 -1.2345)
+(test 0.12345 0.12345)
+(test -0.12345 -0.12345)
+(test -0.00012345 -0.00012345)
+(test 0.1 0.1)
+(test 0.01 0.01)
+(test 0.001 0.001)
+(test 0.0000000000001 0.0000000000001)
+(test 1e0 1.0)
+(test 1e-0 1.0)
+(test 1e1 10.0)
+(test 1e2 100.0)
+(test 1e5 100000.0)
+(test 1e10 10000000000.0)
+(test 1e-1 0.1)
+(test 1e-2 0.01)
+(test 1e-5 0.00001)
+(test 1e-10 0.0000000001)
+(test 123.456e0 123.456)
+(test 123.456e1 1234.56)
+(test 123.456e2 12345.6)
+(test 123.456e3 123456.0)
+(test 123.456e4 1234560.0)
+(test 123.456e5 12345600.0)
+(test 123.456e10 1234560000000.0)
+(test -123.456e0 -123.456)
+(test -123.456e1 -1234.56)
+(test -123.456e2 -12345.6)
+(test -123.456e3 -123456.0)
+(test -123.456e4 -1234560.0)
+(test -123.456e5 -12345600.0)
+(test -123.456e10 -1234560000000.0)
+(test 123.456e-1 12.3456)
+(test 123.456e-2 1.23456)
+(test 123.456e-3 0.123456)
+(test 123.456e-4 0.0123456)
+(test 123.456e-5 0.00123456)
+(test 123.456e-10 0.0000000123456)
+(test -123.456e-1 -12.3456)
+(test -123.456e-2 -1.23456)
+(test -123.456e-3 -0.123456)
+(test -123.456e-4 -0.0123456)
+(test -123.456e-5 -0.00123456)
+(test -123.456e-10 -0.0000000123456)
+;(test +123.45e+678 123.45e678)
+;(test -123.45e+678 -123.45e678)
+;(test +123.45e-678 123.45e-678)
+;(test -123.45e-678 -123.45e-678)
+(test 1. 1.0)
+(test .1 0.1)
+(test 1.e1 10.0)
+(test .1e1 1.0)
+(test 1000e0 1e3)
+(test 100e1 1e3)
+(test 10e2 1e3)
+(test 1e3 1e3)
+(test .1e4 1e3)
+(test .01e5 1e3)
+(test .001e6 1e3)
+;(test 12345678.901D10 1.2345678901e+17)
+(test 12345678.901E10 1.2345678901e+17)
+;(test 12345678.901F10 1.2345678901e+17)
+;(test 12345678.901L10 1.2345678901e+17)
+;(test 12345678.901S10 1.2345678901e+17)
 
 ;;; Syntax
 
 ; and
 
-(and) ; #t
-(and #f) ; #f
-(and #f #f) ; #f
-(and #f #t) ; #f
-(and #t #f) ; #f
-(and #t #t) ; #t
-(and 1 2 3) ; 3
-(and #f 2 3) ; #f
-(and 1 #f 3) ; #f
-(and 1 2 #f) ; #f
-(and 'foo) ; 'foo
-(and #t) ; #t
-(and 1) ; 1
-(and #\x) ; #\x
-(and "x") ; "x"
-(and '(x)) ; '(x)
-(and '()) ; '()
-;(and '#(x)) ; '#(x)
-(and (lambda (x) x) #t) ; #t
+(test (and) #t)
+(test (and #f) #f)
+(test (and #f #f) #f)
+(test (and #f #t) #f)
+(test (and #t #f) #f)
+(test (and #t #t) #t)
+(test (and 1 2 3) 3)
+(test (and #f 2 3) #f)
+(test (and 1 #f 3) #f)
+(test (and 1 2 #f) #f)
+(test (and 'foo) 'foo)
+(test (and #t) #t)
+(test (and 1) 1)
+(test (and #\x) #\x)
+(test (and "x") "x")
+(test (and '(x)) '(x))
+(test (and '()) '())
+;(test (and '#(x)) '#(x))
+(test (and (lambda (x) x) #t) #t)
 
 ; begin
 
@@ -306,29 +307,29 @@
 ; define
 
 (define x 'foo)
-(let () (define x 1) x) ; 1
-((lambda () (define x 0) x)) ; 0
+(test (let () (define x 1) x) 1)
+(test ((lambda () (define x 0) x)) 0)
 ;(test (begin ((lambda () (define x 0) x)) x) 'foo)
 ;(test (begin (let () (define x 0) x) x) 'foo)
 ;(test (begin (let () (define x 0) x)) 0)
 ;(test (let () (letrec () (define x 0) x) x) 'foo)
 ;(test (let () (letrec () (define x 0) x)) 0)
-(let () (define (f) 1) (f)) ; 1
-(let () (define (f x) x) (f 1)) ; 1
-(let () (define (f x y) x) (f 1 2)) ; 1
-(let () (define (f x y) y) (f 1 2)) ; 2
-;(let () (define (f . x) x) (f)) ; '()
-;(let () (define (f . x) x) (f 1)) ; '(1)
-;(let () (define (f . x) x) (f 1 2)) ; '(1 2)
-;(let () (define (f x . y) y) (f 1 2)) ; '(2)
-(let () (define f (lambda () 1)) (f)) ; 1
-(let () (define f (lambda (x) x)) (f 1)) ; 1
-(let () (define f (lambda (x y) x)) (f 1 2)) ; 1
-(let () (define f (lambda (x y) y)) (f 1 2)) ; 2
-;(let () (define f (lambda x x)) (f)) ; '()
-;(let () (define f (lambda x x)) (f 1)) ; '(1)
-;(let () (define f (lambda x x)) (f 1 2)) ; '(1 2)
-;(let () (define f (lambda (x . y) y)) (f 1 2)) ; '(2)
+(test (let () (define (f) 1) (f)) 1)
+(test (let () (define (f x) x) (f 1)) 1)
+(test (let () (define (f x y) x) (f 1 2)) 1)
+(test (let () (define (f x y) y) (f 1 2)) 2)
+;(test (let () (define (f . x) x) (f)) '())
+;(test (let () (define (f . x) x) (f 1)) '(1))
+;(test (let () (define (f . x) x) (f 1 2)) '(1 2))
+;(test (let () (define (f x . y) y) (f 1 2)) '(2))
+(test (let () (define f (lambda () 1)) (f)) 1)
+(test (let () (define f (lambda (x) x)) (f 1)) 1)
+(test (let () (define f (lambda (x y) x)) (f 1 2)) 1)
+(test (let () (define f (lambda (x y) y)) (f 1 2)) 2)
+;(test (let () (define f (lambda x x)) (f)) '())
+;(test (let () (define f (lambda x x)) (f 1)) '(1))
+;(test (let () (define f (lambda x x)) (f 1 2)) '(1 2))
+;(test (let () (define f (lambda (x . y) y)) (f 1 2)) '(2))
 ;(test ((lambda ()
 ;          (define (e x) (or (zero? x) (o (- x 1))))
 ;          (define (o x) (if (zero? x) #f (e (- x 1))))
@@ -348,18 +349,18 @@
 
 ; if
 
-(if #f #f) ; (void)
-(if #t 1) ; 1
-(if 1 1) ; 1
-(if 'a 1) ; 1
-(if #\a 1) ; 1
-(if "a" 1) ; 1
-(if '(1 2 3) 1) ; 1
-(if '() 1) ; 1
-;(if '#(1 2 3) 1) ; 1
-(if #t 1 2) ; 1
-(if #f 1 2) ; 2
-(if #f (#f)) ; (void)
+(test (if #f #f) (void))
+(test (if #t 1) 1)
+(test (if 1 1) 1)
+(test (if 'a 1) 1)
+(test (if #\a 1) 1)
+(test (if "a" 1) 1)
+(test (if '(1 2 3) 1) 1)
+(test (if '() 1) 1)
+;(test (if '#(1 2 3) 1) 1)
+(test (if #t 1 2) 1)
+(test (if #f 1 2) 2)
+(test (if #f (#f)) (void))
 
 ; if*
 
@@ -376,38 +377,38 @@
 
 ; lambda
 
-((lambda () '())) ; '()
-((lambda (x) x) 1) ; 1
+(test ((lambda () '())) '())
+(test ((lambda (x) x) 1) 1)
 ;(test ((lambda (x y z) (list x y z)) 1 2 3) '(1 2 3))
 
-(((lambda (x) (lambda (y) (cons x y))) 1) 2) ; '(1 . 2)
+(test (((lambda (x) (lambda (y) (cons x y))) 1) 2) '(1 . 2))
 
-;((lambda (a . b) a) 'foo) ; 'foo
-;((lambda (a . b) b) 'foo) ; '()
-;((lambda (a . b) b) 'foo 'bar) ; '(bar)
-;((lambda (a . b) b) 'foo 'bar 'baz) ; '(bar baz)
+;(test ((lambda (a . b) a) 'foo) 'foo)
+;(test ((lambda (a . b) b) 'foo) '())
+;(test ((lambda (a . b) b) 'foo 'bar) '(bar))
+;(test ((lambda (a . b) b) 'foo 'bar 'baz) '(bar baz))
 
-;((lambda (a b . c) a) 'foo 'bar) ; 'foo
-;((lambda (a b . c) b) 'foo 'bar) ; 'bar
-;((lambda (a b . c) c) 'foo 'bar) ; '()
-;((lambda (a b . c) c) 'foo 'bar 'baz) ; '(baz)
+;(test ((lambda (a b . c) a) 'foo 'bar) 'foo)
+;(test ((lambda (a b . c) b) 'foo 'bar) 'bar)
+;(test ((lambda (a b . c) c) 'foo 'bar) '())
+;(test ((lambda (a b . c) c) 'foo 'bar 'baz) '(baz))
 
-;((lambda a a)) ; '()
-;((lambda a a) 'foo) ; '(foo)
-;((lambda a a) 'foo 'bar) ; '(foo bar)
-;((lambda a a) 'foo 'bar 'baz) ; '(foo bar baz)
+;(test ((lambda a a)) '())
+;(test ((lambda a a) 'foo) '(foo))
+;(test ((lambda a a) 'foo 'bar) '(foo bar))
+;(test ((lambda a a) 'foo 'bar 'baz) '(foo bar baz))
 
-((lambda (x) ((lambda () x))) 1) ; 1
+(test ((lambda (x) ((lambda () x))) 1) 1)
 
-((lambda () 1 2 3)) ; 3
+(test ((lambda () 1 2 3)) 3)
 
-;((lambda (x) ((lambda () (set! x 1))) x) 0) ; 1
+;(test ((lambda (x) ((lambda () (set! x 1))) x) 0) 1)
 
 ; regression tests
 
-;(define x 1)
+(define x 1)
 
-;(define (g) x)
+(define (g) x)
 
 ;(define (f0)
 ;  (let ((x 0))
@@ -423,42 +424,42 @@
 ;(test (f0) 1)
 ;(test (f1) 1)
 
-;(define (f2)
-;  (let ((x 2))
-;    (let ((r (g)))
-;      r)))
+(define (f2)
+  (let ((x 2))
+    (let ((r (g)))
+      r)))
 
-;(test (f2) 1)
+(test (f2) 1)
 
-((lambda (x)
+(test ((lambda (x)
          ((lambda (x) x)
           (car x)))
        (quote (0)))
-    ; 0
+      0)
 
 ; let
 
-(let () 1) ; 1
-(let () 1 2 3) ; 3
-(let ((x 1)) x) ; 1
-;(let ((x 1) (y 2) (z 3)) (list x y z)) ; '(1 2 3)
+(test (let () 1) 1)
+(test (let () 1 2 3) 3)
+(test (let ((x 1)) x) 1)
+;(test (let ((x 1) (y 2) (z 3)) (list x y z)) '(1 2 3))
 
-(let ((x 0))
-   (let ((x 1)
-         (y (* x 1)))
-     y))
-; 0
-(let ((x 0))
-   (let ((x 1))
-     (let ((y (* x 1)))
-       y)))
-; 1
+(test (let ((x 0))
+         (let ((x 1)
+               (y (* x 1)))
+           y))
+       0)
+(test (let ((x 0))
+         (let ((x 1))
+           (let ((y (* x 1)))
+             y)))
+       1)
 
-(let ((x 'lexical))
-  (let ((f (lambda () x)))
-    (let ((x 'dynamic))
-      (f))))
-; 'lexical
+(test (let ((x 'lexical))
+        (let ((f (lambda () x)))
+          (let ((x 'dynamic))
+            (f))))
+      'lexical)
 
 ; letrec
 
@@ -480,67 +481,67 @@
 
 ; let*
 
-(let* () 1) ; 1
-(let* () 1 2 3) ; 3
-(let* ((x 'first)) x) ; 'first
-;(let* ((x 'first) (y 'second) (z 'third)) (list x y z))
-;'(first second third))
-(let* ((x 0))
-   (let* ((x 1)
-          (y (* x 5)))
-     y))
-; 5
-(let* ((x 3)
-       (y (cons 2 x))
-       (z (cons 1 y)))
-   z)
-; '(1 2 . 3)
-(let* ((x 3)
-       (x (cons 2 x))
-       (x (cons 1 x)))
-   x)
-; '(1 2 . 3)
+(test (let* () 1) 1)
+(test (let* () 1 2 3) 3)
+(test (let* ((x 'first)) x) 'first)
+;(test (let* ((x 'first) (y 'second) (z 'third)) (list x y z))
+;      '(first second third))
+(test (let* ((x 0))
+         (let* ((x 1)
+                (y (* x 5)))
+           y))
+       5)
+(test (let* ((x 3)
+             (y (cons 2 x))
+             (z (cons 1 y)))
+         z)
+      '(1 2 . 3))
+(test (let* ((x 3)
+             (x (cons 2 x))
+             (x (cons 1 x)))
+         x)
+      '(1 2 . 3))
 
 ; or
 
-(or) ; #f
-(or #f) ; #f
-(or #f #f) ; #f
-(or #f #t) ; #t
-(or #t #f) ; #t
-(or #t #t) ; #t
-(or 1 2 3) ; 1
-(or #f 2 3) ; 2
-(or 1 #f 3) ; 1
-(or #f #f 3) ; 3
-(or 'foo) ; 'foo
-(or #t) ; #t
-(or 1) ; 1
-(or #\x) ; #\x
-(or "x") ; "x"
-(or '(x)) ; '(x)
-(or '()) ; '()
-;(or '#(x)) ; '#(x)
+(test (or) #f)
+(test (or #f) #f)
+(test (or #f #f) #f)
+(test (or #f #t) #t)
+(test (or #t #f) #t)
+(test (or #t #t) #t)
+(test (or 1 2 3) 1)
+(test (or #f 2 3) 2)
+(test (or 1 #f 3) 1)
+(test (or #f #f 3) 3)
+(test (or 'foo) 'foo)
+(test (or #t) #t)
+(test (or 1) 1)
+(test (or #\x) #\x)
+(test (or "x") "x")
+(test (or '(x)) '(x))
+(test (or '()) '())
+;(test (or '#(x)) '#(x))
 
 ; quote
 
-(quote foo) ; 'foo
-(quote quote) ; 'quote
-(quote #t) ; #t
-(quote 1) ; 1
-(quote #\X) ; #\X
-(quote "abc") ; "abc"
-(quote ()) ; '()
-(quote (1 2 3)) ; '(1 2 3)
-;(quote #(1 2 3)) ; '#(1 2 3)
-(quote (lambda (x) x)) ; '(lambda (x) x)
-'1 ; '1
-''1 ; ''1
-'''1 ; '''1
-'#f ; #f
-'1 ; 1
-'#\b ; #\b
-'"abc" ; "abc"
+(test (quote foo) 'foo)
+(test (quote quote) 'quote)
+(test (quote #t) #t)
+(test (quote 1) 1)
+(test (quote #\X) #\X)
+(test (quote "abc") "abc")
+(test (quote ()) '())
+(test (quote (1 2 3)) '(1 2 3))
+;(test (quote #(1 2 3)) '#(1 2 3))
+(test (quote (lambda (x) x)) '(lambda (x) x))
+(test '1 '1)
+(test ''1 ''1)
+(test '''1 '''1)
+(test '#f #f)
+(test '1 1)
+(test '#\b #\b)
+(test '"abc" "abc")
 
 ;;; Mutation
 
@@ -569,18 +570,18 @@
 
 ;;; Type Predicates
 
-(boolean? #f) ; #t
-(boolean? #\c) ; #f
-(boolean? 1) ; #f
-(boolean? 1.1) ; #f
-(boolean? '(pair)) ; #f
-(boolean? (lambda () #f)) ; #f
-;(boolean? (catch (lambda (ct) ct))) ; #f
-(boolean? "string") ; #f
-(boolean? 'symbol) ; #f
-;(boolean? '#(vector)) ; #f
-;(boolean? (current-input-port)) ; #f
-;(boolean? (current-output-port)) ; #f
+(test (boolean? #f) #t)
+(test (boolean? #\c) #f)
+(test (boolean? 1) #f)
+(test (boolean? 1.1) #f)
+(test (boolean? '(pair)) #f)
+(test (boolean? (lambda () #f)) #f)
+;(test (boolean? (catch (lambda (ct) ct))) #f)
+(test (boolean? "string") #f)
+(test (boolean? 'symbol) #f)
+;(test (boolean? '#(vector)) #f)
+;(test (boolean? (current-input-port)) #f)
+;(test (boolean? (current-output-port)) #f)
 
 ;(test (catch-tag? #f) #f)
 ;(test (catch-tag? #\c) #f)
@@ -595,18 +596,18 @@
 ;(test (catch-tag? (current-input-port)) #f)
 ;(test (catch-tag? (current-output-port)) #f)
 
-(char? #f) ; #f
-(char? #\c) ; #t
-(char? 1) ; #f
-(char? 1.1) ; #f
-(char? '(pair)) ; #f
-(char? (lambda () #f)) ; #f
-;(char? (catch (lambda (ct) ct))) ; #f
-(char? "string") ; #f
-(char? 'symbol) ; #f
-;(char? '#(vector)) ; #f
-;(char? (current-input-port)) ; #f
-;(char? (current-output-port)) ; #f
+(test (char? #f) #f)
+(test (char? #\c) #t)
+(test (char? 1) #f)
+(test (char? 1.1) #f)
+(test (char? '(pair)) #f)
+(test (char? (lambda () #f)) #f)
+;(test (char? (catch (lambda (ct) ct))) #f)
+(test (char? "string") #f)
+(test (char? 'symbol) #f)
+;(test (char? '#(vector)) #f)
+;(test (char? (current-input-port)) #f)
+;(test (char? (current-output-port)) #f)
 
 ;(test (input-port? #f) #f)
 ;(test (input-port? #\c) #f)
@@ -634,18 +635,18 @@
 ;(test (integer? (current-input-port)) #f)
 ;(test (integer? (current-output-port)) #f)
 
-(number? #f) ; #f
-(number? #\c) ; #f
-(number? 1) ; #t
-(number? 1.1) ; #t
-(number? '(pair)) ; #f
-(number? (lambda () #f)) ; #f
-;(number? (catch (lambda (ct) ct))) ; #f
-(number? "string") ; #f
-(number? 'symbol) ; #f
-;(number? '#(vector)) ; #f
-;(number? (current-input-port)) ; #f
-;(number? (current-output-port)) ; #f
+(test (number? #f) #f)
+(test (number? #\c) #f)
+(test (number? 1) #t)
+(test (number? 1.1) #t)
+(test (number? '(pair)) #f)
+(test (number? (lambda () #f)) #f)
+;(test (number? (catch (lambda (ct) ct))) #f)
+(test (number? "string") #f)
+(test (number? 'symbol) #f)
+;(test (number? '#(vector)) #f)
+;(test (number? (current-input-port)) #f)
+;(test (number? (current-output-port)) #f)
 
 ;(test (output-port? #f) #f)
 ;(test (output-port? #\c) #f)
@@ -659,31 +660,31 @@
 ;(test (output-port? '#(vector)) #f)
 ;(test (output-port? (current-output-port)) #t)
 
-(pair? #f) ; #f
-(pair? #\c) ; #f
-(pair? 1) ; #f
-(pair? 1.1) ; #f
-(pair? '(pair)) ; #t
-(pair? (lambda () #f)) ; #f
-;(pair? (catch (lambda (ct) ct))) ; #f
-(pair? "string") ; #f
-(pair? 'symbol) ; #f
-;(pair? '#(vector)) ; #f
-;(pair? (current-input-port)) ; #f
-;(pair? (current-output-port)) ; #f
+(test (pair? #f) #f)
+(test (pair? #\c) #f)
+(test (pair? 1) #f)
+(test (pair? 1.1) #f)
+(test (pair? '(pair)) #t)
+(test (pair? (lambda () #f)) #f)
+;(test (pair? (catch (lambda (ct) ct))) #f)
+(test (pair? "string") #f)
+(test (pair? 'symbol) #f)
+;(test (pair? '#(vector)) #f)
+;(test (pair? (current-input-port)) #f)
+;(test (pair? (current-output-port)) #f)
 
-(procedure? #f) ; #f
-(procedure? #\c) ; #f
-(procedure? 1) ; #f
-(procedure? 1.1) ; #f
-(procedure? '(procedure)) ; #f
-(procedure? (lambda () #f)) ; #t
-;(procedure? (catch (lambda (ct) ct))) ; #f
-(procedure? "string") ; #f
-(procedure? 'symbol) ; #f
-;(procedure? '#(vector)) ; #f
-;(procedure? (current-input-port)) ; #f
-;(procedure? (current-output-port)) ; #f
+(test (procedure? #f) #f)
+(test (procedure? #\c) #f)
+(test (procedure? 1) #f)
+(test (procedure? 1.1) #f)
+(test (procedure? '(procedure)) #f)
+(test (procedure? (lambda () #f)) #t)
+;(test (procedure? (catch (lambda (ct) ct))) #f)
+(test (procedure? "string") #f)
+(test (procedure? 'symbol) #f)
+;(test (procedure? '#(vector)) #f)
+;(test (procedure? (current-input-port)) #f)
+;(test (procedure? (current-output-port)) #f)
 
 ;(test (real? #f) #f)
 ;(test (real? #\c) #f)
@@ -698,31 +699,31 @@
 ;(test (real? (current-input-port)) #f)
 ;(test (real? (current-output-port)) #f)
 
-(string? #f) ; #f
-(string? #\c) ; #f
-(string? 1) ; #f
-(string? 1.1) ; #f
-(string? '(pair)) ; #f
-(string? (lambda () #f)) ; #f
-;(string? (catch (lambda (ct) ct))) ; #f
-(string? "string") ; #t
-(string? 'symbol) ; #f
-;(string? '#(vector)) ; #f
-;(string? (current-input-port)) ; #f
-;(string? (current-output-port)) ; #f
+(test (string? #f) #f)
+(test (string? #\c) #f)
+(test (string? 1) #f)
+(test (string? 1.1) #f)
+(test (string? '(pair)) #f)
+(test (string? (lambda () #f)) #f)
+;(test (string? (catch (lambda (ct) ct))) #f)
+(test (string? "string") #t)
+(test (string? 'symbol) #f)
+;(test (string? '#(vector)) #f)
+;(test (string? (current-input-port)) #f)
+;(test (string? (current-output-port)) #f)
 
-(symbol? #f) ; #f
-(symbol? #\c) ; #f
-(symbol? 1) ; #f
-(symbol? 1.1) ; #f
-(symbol? '(pair)) ; #f
-(symbol? (lambda () #f)) ; #f
-;(symbol? (catch (lambda (ct) ct))) ; #f
-(symbol? "string") ; #f
-(symbol? 'symbol) ; #t
-;(symbol? '#(vector)) ; #f
-;(symbol? (current-input-port)) ; #f
-;(symbol? (current-output-port)) ; #f
+(test (symbol? #f) #f)
+(test (symbol? #\c) #f)
+(test (symbol? 1) #f)
+(test (symbol? 1.1) #f)
+(test (symbol? '(pair)) #f)
+(test (symbol? (lambda () #f)) #f)
+;(test (symbol? (catch (lambda (ct) ct))) #f)
+(test (symbol? "string") #f)
+(test (symbol? 'symbol) #t)
+;(test (symbol? '#(vector)) #f)
+;(test (symbol? (current-input-port)) #f)
+;(test (symbol? (current-output-port)) #f)
 
 ;(test (vector? #f) #f)
 ;(test (vector? #\c) #f)
@@ -924,9 +925,9 @@
 ;(test (assq 'a '((a . a) (b . b))) '(a . a))
 ;(test (assq 'x '()) #f)
 
-;(define tree '((((1 . 2) . (3 . 4)) . ((5 . 6) . (7 . 8)))
-;              .
-;              (((9 . 10) . (11 . 12)) . ((13 . 14) . (15 . 16)))))
+(define tree '((((1 . 2) . (3 . 4)) . ((5 . 6) . (7 . 8)))
+              .
+              (((9 . 10) . (11 . 12)) . ((13 . 14) . (15 . 16)))))
 ;(test (caar tree) '((1 . 2) . (3 . 4)))
 ;(test (cadr tree) '((9 . 10) . (11 . 12)))
 ;(test (cdar tree) '((5 . 6) . (7 . 8)))
@@ -956,17 +957,17 @@
 ;(test (cdddar tree) 8)
 ;(test (cddddr tree) 16)
 
-(car '(1 1)) ; 1
-(car '(1 . 2)) ; 1
-(cdr '(1 2)) ; '(2)
-(cdr '(1 . 2)) ; 2
-(cons 1 2) ; '(1 . 2)
-(cons 1 '(2)) ; '(1 2)
-(cons 1 (cons 2 '())) ; '(1 2)
+(test (car '(1 1)) 1)
+(test (car '(1 . 2)) 1)
+(test (cdr '(1 2)) '(2))
+(test (cdr '(1 . 2)) 2)
+(test (cons 1 2) '(1 . 2))
+(test (cons 1 '(2)) '(1 2))
+(test (cons 1 (cons 2 '())) '(1 2))
 
-(length '()) ; 0
-(length '(1)) ; 1
-(length '(1 2 3)) ; 3
+(test (length '()) 0)
+(test (length '(1)) 1)
+(test (length '(1 2 3)) 3)
 
 ;(test (list) '())
 ;(test (list '()) '(()))
@@ -1034,155 +1035,150 @@
 ;(test (memq 'a '(a b)) '(a b))
 ;(test (memq 'x '()) #f)
 
-(null? #f) ; #f
-(null? #\c) ; #f
-(null? 1) ; #f
-(null? '(pair)) ; #f
-(null? (lambda () #f)) ; #f
-(null? "string") ; #f
-(null? 'symbol) ; #f
-;(null? '#(vector)) ; #f
-;(null? (current-input-port)) ; #f
-;(null? (current-output-port)) ; #f
-(null? '()) ; #t
+(test (null? #f) #f)
+(test (null? #\c) #f)
+(test (null? 1) #f)
+(test (null? '(pair)) #f)
+(test (null? (lambda () #f)) #f)
+(test (null? "string") #f)
+(test (null? 'symbol) #f)
+;(test (null? '#(vector)) #f)
+;(test (null? (current-input-port)) #f)
+;(test (null? (current-output-port)) #f)
+(test (null? '()) #t)
 
-;(test (reverse '(1)) '(1))
-;(test (reverse '(1 2 3)) '(3 2 1))
-;(test (reverse '()) '())
+(test (reverse '(1)) '(1))
+(test (reverse '(1 2 3)) '(3 2 1))
+(test (reverse '()) '())
 
 ; Integer Arithmetics
 
-(+  1234567890  9876543210) ;  11111111100
-(+  1234567890 -9876543210) ;  -8641975320
-(+ -1234567890  9876543210) ;   8641975320
-(+ -1234567890 -9876543210) ; -11111111100
-(+  9876543210  1234567890) ;  11111111100
-(+  9876543210 -1234567890) ;   8641975320
-(+ -9876543210  1234567890) ;  -8641975320
-(+ -9876543210 -1234567890) ; -11111111100
-(+ 1234567890 0) ; 1234567890
-(+ 0 1234567890) ; 1234567890
-(+ 1 2 3 4 5 6 7 8 9 10) ; 55
-(+ 1) ; 1
-(+) ; 0
+(test (+  1234567890  9876543210)  11111111100)
+(test (+  1234567890 -9876543210)  -8641975320)
+(test (+ -1234567890  9876543210)   8641975320)
+(test (+ -1234567890 -9876543210) -11111111100)
+(test (+  9876543210  1234567890)  11111111100)
+(test (+  9876543210 -1234567890)   8641975320)
+(test (+ -9876543210  1234567890)  -8641975320)
+(test (+ -9876543210 -1234567890) -11111111100)
+(test (+ 1234567890 0) 1234567890)
+(test (+ 0 1234567890) 1234567890)
+(test (+ 1 2 3 4 5 6 7 8 9 10) 55)
+(test (+ 1) 1)
+(test (+) 0)
 
-(-  1234567890  9876543210)  ; -8641975320
-(-  1234567890 -9876543210)  ; 11111111100
-(- -1234567890  9876543210) ; -11111111100
-(- -1234567890 -9876543210)   ; 8641975320
-(-  9876543210  1234567890)   ; 8641975320
-(-  9876543210 -1234567890)  ; 11111111100
-(- -9876543210  1234567890) ; -11111111100
-(- -9876543210 -1234567890)  ; -8641975320
-(- 1234567890 0) ; 1234567890
-(- 0 1234567890) ; -1234567890
-(- 1 2 3 4 5 6 7 8 9 10) ; -53
-(- 1234567890) ; -1234567890
-(- 0) ; 0
+(test (-  1234567890  9876543210)  -8641975320)
+(test (-  1234567890 -9876543210)  11111111100)
+(test (- -1234567890  9876543210) -11111111100)
+(test (- -1234567890 -9876543210)   8641975320)
+(test (-  9876543210  1234567890)   8641975320)
+(test (-  9876543210 -1234567890)  11111111100)
+(test (- -9876543210  1234567890) -11111111100)
+(test (- -9876543210 -1234567890)  -8641975320)
+(test (- 1234567890 0) 1234567890)
+(test (- 0 1234567890) -1234567890)
+(test (- 1 2 3 4 5 6 7 8 9 10) -53)
+(test (- 1234567890) -1234567890)
+(test (- 0) 0)
 
-(*  1234567  7654321)  ; 9449772114007
-(*  1234567 -7654321) ; -9449772114007
-(* -1234567  7654321) ; -9449772114007
-(* -1234567 -7654321)  ; 9449772114007
-(*  7654321  1234567)  ; 9449772114007
-(*  7654321 -1234567) ; -9449772114007
-(* -7654321  1234567) ; -9449772114007
-(* -7654321 -1234567)  ; 9449772114007
-(* 1234567 1) ; 1234567
-(* 1 1234567) ; 1234567
-(* 1234567 0) ; 0
-(* 0 1234567) ; 0
-(* 1 2 3 4 5 6 7 8 9 10) ; 3628800
-(* 1 2 3 4 5 6 7 8 9) ; 362880
-(* 2) ; 2
-(*) ; 1
+(test (*  1234567  7654321)  9449772114007)
+(test (*  1234567 -7654321) -9449772114007)
+(test (* -1234567  7654321) -9449772114007)
+(test (* -1234567 -7654321)  9449772114007)
+(test (*  7654321  1234567)  9449772114007)
+(test (*  7654321 -1234567) -9449772114007)
+(test (* -7654321  1234567) -9449772114007)
+(test (* -7654321 -1234567)  9449772114007)
+(test (* 1234567 1) 1234567)
+(test (* 1 1234567) 1234567)
+(test (* 1234567 0) 0)
+(test (* 0 1234567) 0)
+(test (* 1 2 3 4 5 6 7 8 9 10) 3628800)
+(test (* 1 2 3 4 5 6 7 8 9) 362880)
+(test (* 2) 2)
+(test (*) 1)
 
-"smaller"
-(<  1234567890  9876543210) ; #t
-(<  1234567890 -9876543210) ; #f
-(< -1234567890  9876543210) ; #t
-(< -1234567890 -9876543210) ; #f
-(<  9876543210  1234567890) ; #f
-(<  9876543210 -1234567890) ; #f
-(< -9876543210  1234567890) ; #t
-(< -9876543210 -1234567890) ; #t
-(< -1234567890 -1234567890) ; #f
-(<  1234567890  1234567890) ; #f
-(< 1234567890 0) ; #f
-(< 0 1234567890) ; #t
-(< 1 2 3 4 5 6 7 8 9 10) ; #t
-(< 1 2 3 4 5 6 7 8 9 9) ; #f
+(test (<  1234567890  9876543210) #t)
+(test (<  1234567890 -9876543210) #f)
+(test (< -1234567890  9876543210) #t)
+(test (< -1234567890 -9876543210) #f)
+(test (<  9876543210  1234567890) #f)
+(test (<  9876543210 -1234567890) #f)
+(test (< -9876543210  1234567890) #t)
+(test (< -9876543210 -1234567890) #t)
+(test (< -1234567890 -1234567890) #f)
+(test (<  1234567890  1234567890) #f)
+(test (< 1234567890 0) #f)
+(test (< 0 1234567890) #t)
+(test (< 1 2 3 4 5 6 7 8 9 10) #t)
+(test (< 1 2 3 4 5 6 7 8 9 9) #f)
 
-"smaller equal"
-(<=  1234567890  9876543210) ; #t
-(<=  1234567890 -9876543210) ; #f
-(<= -1234567890  9876543210) ; #t
-(<= -1234567890 -9876543210) ; #f
-(<=  9876543210  1234567890) ; #f
-(<=  9876543210 -1234567890) ; #f
-(<= -9876543210  1234567890) ; #t
-(<= -9876543210 -1234567890) ; #t
-(<= -1234567890 -1234567890) ; #t
-(<=  1234567890  1234567890) ; #t
-(<= 1234567890 0) ; #f
-(<= 0 1234567890) ; #t
-(<= 1 2 3 4 5 6 7 8 9 10) ; #t
-(<= 1 2 3 4 5 6 7 8 9 9) ; #t
+(test (<=  1234567890  9876543210) #t)
+(test (<=  1234567890 -9876543210) #f)
+(test (<= -1234567890  9876543210) #t)
+(test (<= -1234567890 -9876543210) #f)
+(test (<=  9876543210  1234567890) #f)
+(test (<=  9876543210 -1234567890) #f)
+(test (<= -9876543210  1234567890) #t)
+(test (<= -9876543210 -1234567890) #t)
+(test (<= -1234567890 -1234567890) #t)
+(test (<=  1234567890  1234567890) #t)
+(test (<= 1234567890 0) #f)
+(test (<= 0 1234567890) #t)
+(test (<= 1 2 3 4 5 6 7 8 9 10) #t)
+(test (<= 1 2 3 4 5 6 7 8 9 9) #t)
 
-"equal"
-(=  1234567890  9876543210) ; #f
-(=  1234567890 -9876543210) ; #f
-(= -1234567890  9876543210) ; #f
-(= -1234567890 -9876543210) ; #f
-(=  9876543210  1234567890) ; #f
-(=  9876543210 -1234567890) ; #f
-(= -9876543210  1234567890) ; #f
-(= -9876543210 -1234567890) ; #f
-(= -1234567890  1234567890) ; #f
-(=  1234567890 -1234567890) ; #f
-(=  1234567890  1234567890) ; #t
-(= -1234567890 -1234567890) ; #t
-(= 0 0) ; #t
-(= 0 1234567890) ; #f
-(= 1234567890 0) ; #f
-(= 1 1 1 1 1 1 1 1 1 1) ; #t
-(= 1 1 1 1 1 1 1 1 1 0) ; #f
+(test (=  1234567890  9876543210) #f)
+(test (=  1234567890 -9876543210) #f)
+(test (= -1234567890  9876543210) #f)
+(test (= -1234567890 -9876543210) #f)
+(test (=  9876543210  1234567890) #f)
+(test (=  9876543210 -1234567890) #f)
+(test (= -9876543210  1234567890) #f)
+(test (= -9876543210 -1234567890) #f)
+(test (= -1234567890  1234567890) #f)
+(test (=  1234567890 -1234567890) #f)
+(test (=  1234567890  1234567890) #t)
+(test (= -1234567890 -1234567890) #t)
+(test (= 0 0) #t)
+(test (= 0 1234567890) #f)
+(test (= 1234567890 0) #f)
+(test (= 1 1 1 1 1 1 1 1 1 1) #t)
+(test (= 1 1 1 1 1 1 1 1 1 0) #f)
 
-"greater"
-(>  1234567890  9876543210) ; #f
-(>  1234567890 -9876543210) ; #t
-(> -1234567890  9876543210) ; #f
-(> -1234567890 -9876543210) ; #t
-(>  9876543210  1234567890) ; #t
-(>  9876543210 -1234567890) ; #t
-(> -9876543210  1234567890) ; #f
-(> -9876543210 -1234567890) ; #f
-(> -1234567890 -1234567890) ; #f
-(>  1234567890  1234567890) ; #f
-(> 1234567890 0) ; #t
-(> 0 1234567890) ; #f
-(> 9 8 7 6 5 4 3 2 1 0) ; #t
-(> 9 8 7 6 5 4 3 2 1 1) ; #f
+(test (>  1234567890  9876543210) #f)
+(test (>  1234567890 -9876543210) #t)
+(test (> -1234567890  9876543210) #f)
+(test (> -1234567890 -9876543210) #t)
+(test (>  9876543210  1234567890) #t)
+(test (>  9876543210 -1234567890) #t)
+(test (> -9876543210  1234567890) #f)
+(test (> -9876543210 -1234567890) #f)
+(test (> -1234567890 -1234567890) #f)
+(test (>  1234567890  1234567890) #f)
+(test (> 1234567890 0) #t)
+(test (> 0 1234567890) #f)
+(test (> 9 8 7 6 5 4 3 2 1 0) #t)
+(test (> 9 8 7 6 5 4 3 2 1 1) #f)
 
-"greater equal"
-(>=  1234567890  9876543210) ; #f
-(>=  1234567890 -9876543210) ; #t
-(>= -1234567890  9876543210) ; #f
-(>= -1234567890 -9876543210) ; #t
-(>=  9876543210  1234567890) ; #t
-(>=  9876543210 -1234567890) ; #t
-(>= -9876543210  1234567890) ; #f
-(>= -9876543210 -1234567890) ; #f
-(>= -1234567890 -1234567890) ; #t
-(>=  1234567890  1234567890) ; #t
-(>= 1234567890 0) ; #t
-(>= 0 1234567890) ; #f
-(>= 9 8 7 6 5 4 3 2 1 0) ; #t
-(>= 9 8 7 6 5 4 3 2 1 1) ; #t
+(test (>=  1234567890  9876543210) #f)
+(test (>=  1234567890 -9876543210) #t)
+(test (>= -1234567890  9876543210) #f)
+(test (>= -1234567890 -9876543210) #t)
+(test (>=  9876543210  1234567890) #t)
+(test (>=  9876543210 -1234567890) #t)
+(test (>= -9876543210  1234567890) #f)
+(test (>= -9876543210 -1234567890) #f)
+(test (>= -1234567890 -1234567890) #t)
+(test (>=  1234567890  1234567890) #t)
+(test (>= 1234567890 0) #t)
+(test (>= 0 1234567890) #f)
+(test (>= 9 8 7 6 5 4 3 2 1 0) #t)
+(test (>= 9 8 7 6 5 4 3 2 1 1) #t)
 
-;(test (abs 1234567890) 1234567890)
-;(test (abs -1234567890) 1234567890)
-;(test (abs 0) 0)
+(test (abs 1234567890) 1234567890)
+(test (abs -1234567890) 1234567890)
+(test (abs 0) 0)
 
 ;(test (even? -1) #f)
 ;(test (even? 0) #t)
@@ -1214,36 +1210,35 @@
 ;(test (min 2 1 3) 1)
 ;(test (min 2 1 -2 -1 3) -2)
 
-;(test (max 1) 1)
-;(test (max 2 3 1) 3)
-;(test (max 2 -2 5 -1 3) 5)
+(test (max 1) 1)
+(test (max 2 3 1) 3)
+(test (max 2 -2 5 -1 3) 5)
 
-"modulo"
-(modulo  1234567890  12345)  ; 6165
-(modulo  1234567890 -12345) ; -6180
-(modulo -1234567890  12345)  ; 6180
-(modulo -1234567890 -12345) ; -6165
-(modulo  12345  1234567890)  ; 12345
-(modulo  12345 -1234567890) ; -1234555545
-(modulo -12345  1234567890)  ; 1234555545
-(modulo -12345 -1234567890) ; -12345
-(modulo  12345  12345) ; 0
-(modulo  12345 -12345) ; 0
-(modulo -12345  12345) ; 0
-(modulo -12345 -12345) ; 0
+(test (modulo  1234567890  12345)  6165)
+(test (modulo  1234567890 -12345) -6180)
+(test (modulo -1234567890  12345)  6180)
+(test (modulo -1234567890 -12345) -6165)
+(test (modulo  12345  1234567890)  12345)
+(test (modulo  12345 -1234567890) -1234555545)
+(test (modulo -12345  1234567890)  1234555545)
+(test (modulo -12345 -1234567890) -12345)
+(test (modulo  12345  12345) 0)
+(test (modulo  12345 -12345) 0)
+(test (modulo -12345  12345) 0)
+(test (modulo -12345 -12345) 0)
 
 ;(test (negative? -1) #t)
 ;(test (negative?  0) #f)
 ;(test (negative?  1) #f)
 
-;(test (not #f) #t)
-;(test (not #\c) #f)
-;(test (not 1) #f)
-;(test (not 1.1) #f)
-;(test (not '(pair)) #f)
-;(test (not (lambda () #f)) #f)
-;(test (not "string") #f)
-;(test (not 'symbol) #f)
+(test (not #f) #t)
+(test (not #\c) #f)
+(test (not 1) #f)
+(test (not 1.1) #f)
+(test (not '(pair)) #f)
+(test (not (lambda () #f)) #f)
+(test (not "string") #f)
+(test (not 'symbol) #f)
 ;(test (not '#(vector)) #f)
 ;(test (not (current-input-port)) #f)
 ;(test (not (current-output-port)) #f)
@@ -1259,18 +1254,18 @@
 ;(test (positive?  0) #f)
 ;(test (positive?  1) #t)
 
-(quotient  1234567890  12345)  ; 100005
-(quotient  1234567890 -12345) ; -100005
-(quotient -1234567890  12345) ; -100005
-(quotient -1234567890 -12345)  ; 100005
-(quotient  12345  1234567890)  ; 0
-(quotient  12345 -1234567890)  ; 0
-(quotient -12345  1234567890)  ; 0
-(quotient -12345 -1234567890)  ; 0
-(quotient  12345  12345)  ; 1
-(quotient  12345 -12345) ; -1
-(quotient -12345  12345) ; -1
-(quotient -12345 -12345)  ; 1
+(test (quotient  1234567890  12345)  100005)
+(test (quotient  1234567890 -12345) -100005)
+(test (quotient -1234567890  12345) -100005)
+(test (quotient -1234567890 -12345)  100005)
+(test (quotient  12345  1234567890)  0)
+(test (quotient  12345 -1234567890)  0)
+(test (quotient -12345  1234567890)  0)
+(test (quotient -12345 -1234567890)  0)
+(test (quotient  12345  12345)  1)
+(test (quotient  12345 -12345) -1)
+(test (quotient -12345  12345) -1)
+(test (quotient -12345 -12345)  1)
 
 ;(test (remainder  1234567890  12345)  6165)
 ;(test (remainder  1234567890 -12345)  6165)
@@ -1285,85 +1280,85 @@
 ;(test (remainder -12345  12345) 0)
 ;(test (remainder -12345 -12345) 0)
 
-(zero? -1) ; #f
-(zero?  0) ; #t
-(zero?  1) ; #f
+(test (zero? -1) #f)
+(test (zero?  0) #t)
+(test (zero?  1) #f)
 
 ;;; Equivalence
 
-(eq? eq? eq?) ; #t
-(eq? '() '()) ; #t
-(eq? 'x 'y) ; #f
-(eq? 'x '(x . y)) ; #f
-((lambda (x) (eq? x x)) '(x . y)) ; #t
-(eq? #t #t) ; #t
-(eq? #f #f) ; #t
-;(eq? (list 'pair) (list 'pair)) ; #f
-(eq? 'symbol 'symbol) ; #t
-;(eq? (vector 'vector) (vector 'vector)) ; #f
+(test (eq? eq? eq?) #t)
+(test (eq? '() '()) #t)
+(test (eq? 'x 'y) #f)
+(test (eq? 'x '(x . y)) #f)
+(test ((lambda (x) (eq? x x)) '(x . y)) #t)
+(test (eq? #t #t) #t)
+(test (eq? #f #f) #t)
+;(test (eq? (list 'pair) (list 'pair)) #f)
+(test (eq? 'symbol 'symbol) #t)
+;(test (eq? (vector 'vector) (vector 'vector)) #f)
 
-;(test (eqv? 'x 'y) #f)
-;(test (eqv? #f #f) #t)
-;(test (eqv? #\c #\c) #t)
-;(test (eqv? 1 1) #t)
+(test (eqv? 'x 'y) #f)
+(test (eqv? #f #f) #t)
+(test (eqv? #\c #\c) #t)
+(test (eqv? 1 1) #t)
 ;(test (eqv? (list 'pair) (list 'pair)) #f)
-;(test (eqv? 'symbol 'symbol) #t)
+(test (eqv? 'symbol 'symbol) #t)
 ;(test (eqv? (vector 'vector) (vector 'vector)) #f)
 ;(test (eqv? 1   1.0) #f)
 ;(test (eqv? 1.0 1  ) #f)
-;(test (eqv? 1.0 1.0) #t)
+(test (eqv? 1.0 1.0) #t)
 
-;(test (equal? 'x 'y) #f)
-;(test (equal? #f #f) #t)
-;(test (equal? #\c #\c) #t)
-;(test (equal? 1 1) #t)
-;(test (equal? '(pair) '(pair)) #t)
-;(test (equal? '(pair (1)) '(pair (2))) #f)
-;(test (equal? (lambda () #f) (lambda () #f)) #f)
-;(test (equal? "string" "string") #t)
-;(test (equal? 'symbol 'symbol) #t)
+(test (equal? 'x 'y) #f)
+(test (equal? #f #f) #t)
+(test (equal? #\c #\c) #t)
+(test (equal? 1 1) #t)
+(test (equal? '(pair) '(pair)) #t)
+(test (equal? '(pair (1)) '(pair (2))) #f)
+(test (equal? (lambda () #f) (lambda () #f)) #f)
+(test (equal? "string" "string") #t)
+(test (equal? 'symbol 'symbol) #t)
 ;(test (equal? '#(vector) #(vector)) #t)
 ;(test (equal? '#(vector (list) vector) #(vector (list) vector)) #t)
 ;(test (equal? '#(vector #(vector) vector) #(vector #(vector) vector)) #t)
 ;(test (equal? '#(vector #(vec1) vector) #(vector #(vec2) vector)) #f)
-;(test (equal? tree tree) #t)
+(test (equal? tree tree) #t)
 
-;(test (equal? #f #\c) #f)
-;(test (equal? #f 1) #f)
-;(test (equal? #f '(pair)) #f)
-;(test (equal? #f (lambda () #f)) #f)
-;(test (equal? #f "string") #f)
-;(test (equal? #f 'symbol) #f)
+(test (equal? #f #\c) #f)
+(test (equal? #f 1) #f)
+(test (equal? #f '(pair)) #f)
+(test (equal? #f (lambda () #f)) #f)
+(test (equal? #f "string") #f)
+(test (equal? #f 'symbol) #f)
 ;(test (equal? #f '#(vector)) #f)
 ;(test (equal? #f (current-input-port)) #f)
 ;(test (equal? #f (current-output-port)) #f)
-;(test (equal? #\c 1) #f)
-;(test (equal? #\c '(pair)) #f)
-;(test (equal? #\c (lambda () #f)) #f)
-;(test (equal? #\c "string") #f)
-;(test (equal? #\c 'symbol) #f)
+(test (equal? #\c 1) #f)
+(test (equal? #\c '(pair)) #f)
+(test (equal? #\c (lambda () #f)) #f)
+(test (equal? #\c "string") #f)
+(test (equal? #\c 'symbol) #f)
 ;(test (equal? #\c '#(vector)) #f)
 ;(test (equal? #\c (current-input-port)) #f)
 ;(test (equal? #\c (current-output-port)) #f)
-;(test (equal? 1 '(pair)) #f)
-;(test (equal? 1 (lambda () #f)) #f)
-;(test (equal? 1 "string") #f)
-;(test (equal? 1 'symbol) #f)
+(test (equal? 1 '(pair)) #f)
+(test (equal? 1 (lambda () #f)) #f)
+(test (equal? 1 "string") #f)
+(test (equal? 1 'symbol) #f)
 ;(test (equal? 1 '#(vector)) #f)
 ;(test (equal? 1 (current-input-port)) #f)
 ;(test (equal? 1 (current-output-port)) #f)
-;(test (equal? '(pair) (lambda () #f)) #f)
-;(test (equal? '(pair) "string") #f)
-;(test (equal? '(pair) 'symbol) #f)
+(test (equal? '(pair) (lambda () #f)) #f)
+(test (equal? '(pair) "string") #f)
+(test (equal? '(pair) 'symbol) #f)
 ;(test (equal? '(pair) '#(vector)) #f)
 ;(test (equal? '(pair) (current-input-port)) #f)
 ;(test (equal? '(pair) (current-output-port)) #f)
-;(test (equal? (lambda () #f) "string") #f)
-;(test (equal? (lambda () #f) 'symbol) #f)
+(test (equal? (lambda () #f) "string") #f)
+(test (equal? (lambda () #f) 'symbol) #f)
 ;(test (equal? (lambda () #f) '#(vector)) #f)
 ;(test (equal? (lambda () #f) (current-input-port)) #f)
 ;(test (equal? (lambda () #f) (current-output-port)) #f)
-;(test (equal? "string" 'symbol) #f)
+(test (equal? "string" 'symbol) #f)
 ;(test (equal? "string" '#(vector)) #f)
 ;(test (equal? "string" (current-input-port)) #f)
 ;(test (equal? "string" (current-output-port)) #f)
@@ -1375,12 +1370,12 @@
 ;(test (equal? (current-input-port) (current-output-port)) #f)
 ;(test (equal? 1   1.0) #f)
 ;(test (equal? 1.0 1  ) #f)
-;(test (equal? 1.0 1.0) #t)
+(test (equal? 1.0 1.0) #t)
 
 ;(test (let ((x (list 1))) (equal? x x)) #t)
 
-;(test (equal? '(a (b c) (d (e . f) g)) '(a (b c) (d (e . f) g))) #t)
-;(test (equal? '(a (b c) (d (e . x) g)) '(a (b c) (d (e . f) g))) #f)
+(test (equal? '(a (b c) (d (e . f) g)) '(a (b c) (d (e . f) g))) #t)
+(test (equal? '(a (b c) (d (e . x) g)) '(a (b c) (d (e . f) g))) #f)
 ;(test (equal? '#(a (b c) (d (e . f) g)) '#(a (b c) (d (e . f) g))) #t)
 ;(test (equal? '#(a (b c) (d (e . x) g)) '#(a (b c) (d (e . f) g))) #f)
 
@@ -1639,8 +1634,8 @@
 ;(test (make-string 1) " ")
 ;(test (make-string 3 #\x) "xxx")
 
-(number->string 0) ; "0"
-(number->string 123) ; "123"
+(test (number->string 0) "0")
+(test (number->string 123) "123")
 ;(test (number->string 165 2) "10100101")
 ;(test (number->string 375 8) "567")
 ;(test (number->string 789 10) "789")
@@ -1853,8 +1848,8 @@
 ;(test (string-ci>=? "cd" "cd" "ab") #t)
 ;(test (string-ci>=? "ef" "cd" "ab") #t)
 
-;(string-copy "") ; ""
-;(string-copy "abcdef") ; "abcdef"
+;(test (string-copy "") "")
+;(test (string-copy "abcdef") "abcdef")
 ;(test (begin (let ((s "abc"))
 ;                (let ((s2 (string-copy s)))
 ;                  (string-set! s2 1 #\x)
@@ -1864,11 +1859,11 @@
 ;(test (let ((s (make-string 1))) (string-fill! s #\x) s) "x")
 ;(test (let ((s (make-string 3))) (string-fill! s #\z) s) "zzz")
 
-(string-length "") ; 0
-(string-length "a") ; 1
-(string-length "ab") ; 2
-(string-length "abc") ; 3
-(string-length "Hello, World!") ; 13
+(test (string-length "") 0)
+(test (string-length "a") 1)
+(test (string-length "ab") 2)
+(test (string-length "abc") 3)
+(test (string-length "Hello, World!") 13)
 
 ;(test (string-ref "abc" 0) #\a)
 ;(test (string-ref "abc" 1) #\b)
@@ -1913,13 +1908,13 @@
 ;(test (string<=? "cd" "cd" "ab") #f)
 ;(test (string<=? "ef" "cd" "ab") #f)
 
-(string=? "abc" "abc") ; #t
-(string=? "aBc" "abc") ; #f
-(string=? "abc" "abd") ; #f
-(string=? "abc" "abcd") ; #f
-(string=? "abcd" "abc") ; #f
-(string=? "abc" "abc" "abc") ; #t
-(string=? "abc" "abc" "cba") ; #f
+(test (string=? "abc" "abc") #t)
+(test (string=? "aBc" "abc") #f)
+(test (string=? "abc" "abd") #f)
+(test (string=? "abc" "abcd") #f)
+(test (string=? "abcd" "abc") #f)
+(test (string=? "abc" "abc" "abc") #t)
+(test (string=? "abc" "abc" "cba") #f)
 
 ;(test (string>? "test" "test") #f)
 ;(test (string>? "test" "tesa") #t)
@@ -1955,17 +1950,17 @@
 ;(test (string>=? "cd" "cd" "ab") #t)
 ;(test (string>=? "ef" "cd" "ab") #t)
 
-(substring "" 0 0) ; ""
-(substring "abc" 0 0) ; ""
-(substring "abc" 0 1) ; "a"
-(substring "abc" 0 2) ; "ab"
-(substring "abc" 0 3) ; "abc"
-(substring "abc" 1 1) ; ""
-(substring "abc" 1 2) ; "b"
-(substring "abc" 1 3) ; "bc"
-(substring "abc" 2 2) ; ""
-(substring "abc" 2 3) ; "c"
-(substring "abc" 3 3) ; ""
+(test (substring "" 0 0) "")
+(test (substring "abc" 0 0) "")
+(test (substring "abc" 0 1) "a")
+(test (substring "abc" 0 2) "ab")
+(test (substring "abc" 0 3) "abc")
+(test (substring "abc" 1 1) "")
+(test (substring "abc" 1 2) "b")
+(test (substring "abc" 1 3) "bc")
+(test (substring "abc" 2 2) "")
+(test (substring "abc" 2 3) "c")
+(test (substring "abc" 3 3) "")
 
 ;;; Vectors
 
@@ -1996,7 +1991,7 @@
 ;(test (begin (vector-set! v 2 'c) v) '#(a 2 c))
 ;(test (begin (vector-set! v 1 'b) v) '#(a b c))
 
-;;;; Input/Output
+;;; Input/Output
 
 ;(if (file-exists? testfile) (delete-file testfile))
 
@@ -2131,8 +2126,8 @@
 ;          (cons c (while-not-eof in read-char))))
 ;       (cons #\space (with-range 32 126 integer->char)))
 
-;; Does GC close unused files?
-;; Set NFILES to a number that is greater than MAX_PORTS in s9.c
+; Does GC close unused files?
+; Set NFILES to a number that is greater than MAX_PORTS in s9.c
 ;(let ((NFILES 100))
 ;  (test (letrec
 ;          ((open
@@ -2144,7 +2139,7 @@
 ;          (open NFILES))
 ;        'okay))
 
-;;;; S9fES Extensions
+;;; S9fES Extensions
 
 ;(test (list? (command-line)) #t)
 ;(test (output-port? (current-error-port)) #t)
@@ -2217,7 +2212,7 @@
 ;(test (vector-append '#(foo) #(bar)) '#(foo bar))
 ;(test (vector-append '#(foo) #(bar) #(baz)) '#(foo bar baz))
 
-;; catch and throw
+; catch and throw
 
 ;(test (catch (lambda (k) 'foo)) 'foo)
 
@@ -2263,7 +2258,7 @@
 
 ;(test (catch-errors 'foo (catch-errors (car 'x) 'bar) 'baz) 'foo)
 
-;;;; Macros
+;;; Macros
 
 ;(define-macro (kwote x) (list 'quote x))
 ;(test (kwote (list 1 2 3)) '(list 1 2 3))
@@ -2303,7 +2298,7 @@
 ;(test (macro-expand-1 '(letrec* ((a 1) (b 2)) (a b)))
 ;      '(let ((a #f) (b #f)) (set! a 1) (set! b 2) (let () (a b))))
 
-;;;; APPLY of primitive procedures
+;;; APPLY of primitive procedures
 
 ;(test (list? (apply command-line '())) #t)
 ;(test (input-port? (apply current-input-port '())) #t)
@@ -2543,93 +2538,93 @@
 
 ; R4RS tests, 6.1 booleans
 
-#t ; #t
-#f ; #f
-'#f ; #f
+(test #t #t)
+(test #f #f)
+(test '#f #f)
 
-;(test (not #t) #f)
-;(test (not 3) #f)
+(test (not #t) #f)
+(test (not 3) #f)
 ;(test (not (list 3)) #f)
-;(test (not #f) #t)
-;(test (not '()) #f)
+(test (not #f) #t)
+(test (not '()) #f)
 ;(test (not (list)) #f)
-;(test (not 'nil) #f)
+(test (not 'nil) #f)
 
-(boolean? #f) ; #t
-(boolean? 0) ; #f
-(boolean? '()) ; #f
+(test (boolean? #f) #t)
+(test (boolean? 0) #f)
+(test (boolean? '()) #f)
 
 ; R4RS tests, 6.2 equivalence predicates
 
-;(test (eqv? 'a 'a) #t)
-;(test (eqv? 'a 'b) #f)
-;(test (eqv? 2 2) #t)
-;(test (eqv? '() '()) #t)
-;(test (eqv? 100000000 100000000) #t)
-;(test (eqv? (cons 1 2) (cons 1 2)) #f)
-;(test (eqv? (lambda () 1)
-;            (lambda () 2)) #f)
-;(test (eqv? #f 'nil) #f)
-;(test (let ((p (lambda (x) x)))
-;        (eqv? p p))
-;      #t)
+(test (eqv? 'a 'a) #t)
+(test (eqv? 'a 'b) #f)
+(test (eqv? 2 2) #t)
+(test (eqv? '() '()) #t)
+(test (eqv? 100000000 100000000) #t)
+(test (eqv? (cons 1 2) (cons 1 2)) #f)
+(test (eqv? (lambda () 1)
+            (lambda () 2)) #f)
+(test (eqv? #f 'nil) #f)
+(test (let ((p (lambda (x) x)))
+        (eqv? p p))
+      #t)
 
-;(define gen-counter
-;  (lambda ()
-;    (let ((n 0))
-;      (lambda () (set! n (+ n 1)) n))))
-;(test (let ((g (gen-counter)))
-;        (eqv? g g))
-;      #t)
-;(test (eqv? (gen-counter) (gen-counter)) #f)
+(define gen-counter
+  (lambda ()
+    (let ((n 0))
+      (lambda () (set! n (+ n 1)) n))))
+(test (let ((g (gen-counter)))
+        (eqv? g g))
+      #t)
+(test (eqv? (gen-counter) (gen-counter)) #f)
 
-;(define gen-loser
-;  (lambda ()
-;    (let ((n 0))
-;      (lambda () (set! n (+ n 1)) 27))))
-;(test (let ((g (gen-loser)))
-;        (eqv? g g))
-;      #t)
+(define gen-loser
+  (lambda ()
+    (let ((n 0))
+      (lambda () (set! n (+ n 1)) 27))))
+(test (let ((g (gen-loser)))
+        (eqv? g g))
+      #t)
 
 ;(test (letrec ((f (lambda () (if (eqv? f g) 'f 'both)))
 ;               (g (lambda () (if (eqv? f g) 'g 'both))))
 ;        (eqv? (f) (g)))
 ;      #t)
 
-;(test (let ((x '(a)))
-;        (eqv? x x))
-;      #t)
+(test (let ((x '(a)))
+        (eqv? x x))
+      #t)
 
-(eq? 'a 'a) ; #t
+(test (eq? 'a 'a) #t)
 ;(test (eq? (list 'a) (list 'a)) #f)
-(eq? '() '()) ; #t
-(eq? car car) ; #t
-;(test (let ((x '(a)))
-;        (eq? x x))
-;      #t)
+(test (eq? '() '()) #t)
+(test (eq? car car) #t)
+(test (let ((x '(a)))
+        (eq? x x))
+      #t)
 ;(test (let ((x '#()))
 ;        (eq? x x))
 ;      #t)
-;(test (let ((p (lambda (x) x)))
-;        (eq? p p))
-;      #t)
+(test (let ((p (lambda (x) x)))
+        (eq? p p))
+      #t)
 
-;(test (equal? 'a 'a) #t)
-;(test (equal? '(a) '(a)) #t)
-;(test (equal? '(a (b) c)
-;              '(a (b) c))
-;      #t)
-;(test (equal? "abc" "abc") #t)
-;(test (equal? 2 2) #t)
+(test (equal? 'a 'a) #t)
+(test (equal? '(a) '(a)) #t)
+(test (equal? '(a (b) c)
+              '(a (b) c))
+      #t)
+(test (equal? "abc" "abc") #t)
+(test (equal? 2 2) #t)
 ;(test (equal? (make-vector 5 'a)
 ;              (make-vector 5 'a))
 ;      #t)
 
 ; R4RS tests, 6.3 pairs and lists
 
-'(a . (b . (c . (d . (e . ()))))) ; '(a b c d e))
+(test '(a . (b . (c . (d . (e . ()))))) '(a b c d e))
 
-'(a . (b . (c . d))) ; '(a b c . d))
+(test '(a . (b . (c . d))) '(a b c . d))
 
 ;(define x (list 'a 'b 'c))
 ;(define y x)
@@ -2643,23 +2638,23 @@
 ;(set-cdr! x x)
 ;(test (list? x) #f)
 
-(pair? '(a . b)) ; #t
-(pair? '(a b c)) ; #t
-(pair? '()) ; #f
-;(pair? '#(a b)) ; #f
+(test (pair? '(a . b)) #t)
+(test (pair? '(a b c)) #t)
+(test (pair? '()) #f)
+;(test (pair? '#(a b)) #f)
 
-(cons 'a '()) ; '(a)
-(cons '(a) '(b c d)) ; '((a) b c d)
-(cons "a" '(b c)) ; '("a" b c)
-(cons 'a 3) ; '(a . 3)
-(cons '(a b) 'c) ; '((a b) . c)
+(test (cons 'a '()) '(a))
+(test (cons '(a) '(b c d)) '((a) b c d))
+(test (cons "a" '(b c)) '("a" b c))
+(test (cons 'a 3) '(a . 3))
+(test (cons '(a b) 'c) '((a b) . c))
 
-(car '(a b c)) ; 'a
-(car '((a) b c d)) ; '(a)
-(car '(1 . 2)) ; 1
+(test (car '(a b c)) 'a)
+(test (car '((a) b c d)) '(a))
+(test (car '(1 . 2)) 1)
 
-(cdr '((a) b c d)) ; '(b c d)
-(cdr '(1 . 2)) ; 2
+(test (cdr '((a) b c d)) '(b c d))
+(test (cdr '(1 . 2)) 2)
 
 ;(define x (list 'not-a-constant-list))
 ;(set-car! x 3)
@@ -2676,9 +2671,9 @@
 ;(test (list 'a (+ 3 4) 'c) '(a 7 c))
 ;(test (list) '())
 
-(length '(a b c)) ; 3
-(length '(a (b) (c d e))) ; 3
-(length '()) ; 0
+(test (length '(a b c)) 3)
+(test (length '(a (b) (c d e))) 3)
+(test (length '()) 0)
 
 ;(test (append '(x) '(y)) '(x y))
 ;(test (append '(a) '(b c d)) '(a b c d))
@@ -2687,12 +2682,12 @@
 ;(test (append '(a b) '(c . d)) '(a b c . d))
 ;(test (append '() 'a) 'a)
 
-;(test (reverse '(a b c)) '(c b a))
-;(test (reverse '(a (b c) d (e (f)))) '((e (f)) d (b c) a))
+(test (reverse '(a b c)) '(c b a))
+(test (reverse '(a (b c) d (e (f)))) '((e (f)) d (b c) a))
 
 ;(test (list-ref '(a b c d) 2) 'c)
 
-;(test (memq 'a '(a b c)) '(a b c))
+(test (memq 'a '(a b c)) '(a b c))
 ;(test (memq 'b '(a b c)) '(b c))
 ;(test (memq 'a '(b c d)) #f)
 ;(test (memq (list 'a) '(b (a) c)) #f)
@@ -2711,18 +2706,18 @@
 
 ; R4RS tests, 6.4 symbols
 
-(symbol? 'foo) ; #t
-(symbol? (car '(a b))) ; #t
-(symbol? "bar") ; #f
-(symbol? 'nil) ; #t
-(symbol? '()) ; #f
-(symbol? #f) ; #f
+(test (symbol? 'foo) #t)
+(test (symbol? (car '(a b))) #t)
+(test (symbol? "bar") #f)
+(test (symbol? 'nil) #t)
+(test (symbol? '()) #f)
+(test (symbol? #f) #f)
 
 ;(test (symbol->string 'flying-fish) "flying-fish")
 ;(test (symbol->string 'Martin) "martin")
 ;(test (symbol->string (string->symbol "Malvina")) "Malvina")
 
-(eq? 'mISSISSIppi 'mississippi) ; #f
+;(test (eq? 'mISSISSIppi 'mississippi) #t)
 ;(test (eq? 'bitBlt (string->symbol "bitBlt")) #f)
 ;(test (eq? 'JollyWog (string->symbol (symbol->string 'JollyWog))) #t)
 ;(test (string=? "K. Harper, M.D."
@@ -2731,30 +2726,30 @@
 
 ; R4RS tests, 6.5 numbers
 
-;(test (max 3 4) 4)
+(test (max 3 4) 4)
 
-(+ 3 4) ; 7
-(+ 3) ; 3
-(+) ; 0
-(* 4) ; 4
-(*) ; 1
+(test (+ 3 4) 7)
+(test (+ 3) 3)
+(test (+) 0)
+(test (* 4) 4)
+(test (*) 1)
 
-(- 3 4) ; -1
-(- 3 4 5) ; -6
-(- 3) ; -3
+(test (- 3 4) -1)
+(test (- 3 4 5) -6)
+(test (- 3) -3)
 
-;(test (abs -7) 7)
+(test (abs -7) 7)
 
-(modulo 13 4) ; 1
+(test (modulo 13 4) 1)
 ;(test (remainder 13 4) 1)
 
-(modulo -13 4) ; 3
+(test (modulo -13 4) 3)
 ;(test (remainder -13 4) -1)
 
-(modulo 13 -4) ; -3
+(test (modulo 13 -4) -3)
 ;(test (remainder 13 -4) 1)
 
-(modulo -13 -4) ; -1
+(test (modulo -13 -4) -1)
 ;(test (remainder -13 -4) -1)
 
 ;(test (gcd 32 -36) 4)
@@ -2767,12 +2762,12 @@
 
 ; R4RS tests, 6.6 characters
 
-#\a ; #\a
-#\A ; #\A
-#\( ; #\(
-#\  ; #\space
-;#\space ; #\space
-;#\newline ; #\newline
+(test #\a #\a)
+(test #\A #\A)
+(test #\( #\()
+;(test #\  #\space)
+;(test #\space #\space)
+;(test #\newline #\newline)
 
 ; R4RS tests, 6.7 strings
 
@@ -2801,10 +2796,10 @@
 
 ; R4RS tests, 6.9 control features
 
-(procedure? car) ; #t
-(procedure? 'car) ; #f
-(procedure? (lambda (x) (* x x))) ; #t
-(procedure? '(lambda (x) (* x x))) ; #f
+(test (procedure? car) #t)
+(test (procedure? 'car) #f)
+(test (procedure? (lambda (x) (* x x))) #t)
+(test (procedure? '(lambda (x) (* x x))) #f)
 
 ;(test (apply + (list 3 4)) 7)
 
