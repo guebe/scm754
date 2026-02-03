@@ -50,10 +50,9 @@ test-read.test: test-read.scm
 
 # test read/eval/apply cycle
 test.test: test.scm
-	./scm754 < $< > test.out
-	diff test.ref test.out
+	./scm754 $< > test.out
+	@if [ -s test.out ]; then cat test.out; exit 1; fi
 
 test-extra.test: test-extra.scm
 	./scm754 < $< > test-extra.out
 	diff test-extra.ref test-extra.out
-
