@@ -3,7 +3,7 @@
 
 #define SCM_TOKEN_SIZE  128
 #define SCM_STRING_SIZE 512
-#define SCM_READ_DEPTH 8192
+#define SCM_READ_DEPTH 32768U
 
 static size_t read_depth;
 

@@ -1,7 +1,7 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
 #include "scm754.h"
 
-#define SCM_CELL_NUM  16384U
+#define SCM_CELL_NUM  32768U
 #define SCM_STACK_NUM  8192U
 
 typedef struct
