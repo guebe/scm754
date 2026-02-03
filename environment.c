@@ -51,6 +51,7 @@ static const scm_ops_t ops[] =
 	[SCM_OP_DISPLAY] = { "display", 1 },
 	[SCM_OP_IS_EOF_OBJECT] = { "eof-object?", 1 },
 	[SCM_OP_IS_EQ] = { "eq?", 2 },
+	[SCM_OP_IS_EQV] = { "eqv?", 2 },
 	[SCM_OP_LENGTH] = { "length", 1 },
 	[SCM_OP_LOAD] = { "load", 1 },
 	[SCM_OP_MODULO] = { "modulo", 2 },
@@ -70,6 +71,8 @@ static const scm_ops_t ops[] =
 	[SCM_OP_IS_SYMBOL] = { "symbol?", 1 },
 	[SCM_OP_WRITE] = { "write", 1 },
 	[SCM_OP_IS_ZERO] = { "zero?", 1 },
+	[SCM_OP_APPLY] = { "apply", 2 },
+	[SCM_OP_MAX] = { "max", -1 },
 };
 
 static scm_obj_t intern(scm_obj_t symbol)

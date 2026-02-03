@@ -3,12 +3,12 @@
 
 extern size_t scm_length(scm_obj_t list)
 {
-       size_t i = 0;
-       while (scm_is_pair(list)) {
-               list = scm_cdr(list);
-               i++;
-       }
-       return i;
+	size_t i = 0;
+	while (scm_is_pair(list)) {
+		list = scm_cdr(list);
+		i++;
+	}
+	return i;
 }
 
 extern scm_obj_t scm_add(scm_obj_t args)
@@ -197,4 +197,36 @@ extern scm_obj_t scm_number_to_string(scm_obj_t number)
 	int ret = snprintf(buffer, sizeof(buffer), "%.16g", scm_number_value(number));
 	if (ret < 0 || (size_t)ret >= sizeof(buffer)) return scm_error("number->string: number too big");
 	return scm_string(buffer, (size_t)ret);
+}
+
+extern scm_obj_t scm_is_eqv(scm_obj_t a, scm_obj_t b)
+{
+	if (a == b)
+		return scm_true();
+	else if (scm_is_number(a) && scm_is_number(b))
+		return scm_boolean(scm_number_value(a) == scm_number_value(b));
+	else if (scm_is_char(a) && scm_is_char(b))
+		return scm_boolean(scm_char_value(a) == scm_char_value(b));
+	else
+		return scm_false();
+}
+
+extern scm_obj_t scm_max(scm_obj_t args)
+{
+	if (!scm_is_pair(args)) return scm_error("max: needs an argument");
+
+	scm_obj_t a = scm_car(args);
+	if (!scm_is_number(a)) return scm_error("max: needs a number");
+
+	double x = scm_number_value(a);
+	args = scm_cdr(args);
+
+	while (scm_is_pair(args)) {
+		a = scm_car(args);
+		if (!scm_is_number(a)) return scm_error("max: needs a number");
+		double y = scm_number_value(a);
+		if (y > x) x = y;
+		args = scm_cdr(args);
+	}
+	return scm_number(x);
 }

@@ -82,6 +82,9 @@ typedef enum {
 	SCM_OP_STRING_LENGTH,
 	SCM_OP_NUMBER_TO_STRING,
 	SCM_OP_IS_EQ,
+	SCM_OP_IS_EQV,
+	SCM_OP_APPLY,
+	SCM_OP_MAX,
 	SCM_OP_CONS,
 	SCM_OP_SET_CAR,
 	SCM_OP_SET_CDR,
@@ -186,6 +189,7 @@ extern scm_obj_t scm_sub(scm_obj_t args);
 extern scm_obj_t scm_mul(scm_obj_t args);
 extern scm_obj_t scm_div(scm_obj_t args);
 static inline scm_obj_t scm_is_eq(scm_obj_t obj1, scm_obj_t obj2) { return scm_boolean(obj1 == obj2); }
+extern scm_obj_t scm_is_eqv(scm_obj_t a, scm_obj_t b);
 extern size_t scm_length(scm_obj_t list);
 extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b);
 extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b);
@@ -197,6 +201,7 @@ extern scm_obj_t scm_le(scm_obj_t args);
 extern scm_obj_t scm_ge(scm_obj_t args);
 extern scm_obj_t scm_string_eq(scm_obj_t args);
 extern scm_obj_t scm_substring(scm_obj_t args);
+extern scm_obj_t scm_max(scm_obj_t args);
 
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);
