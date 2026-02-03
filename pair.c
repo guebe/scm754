@@ -14,6 +14,7 @@ typedef struct
 
 static scm_pair_t cell[SCM_CELL_NUM];
 static uint32_t head = 0;
+static uint32_t allocated = 0;
 
 static const scm_obj_t *stack[SCM_STACK_NUM];
 static uint32_t stack_index = 0;
@@ -69,6 +70,7 @@ extern void scm_gc_init(void)
 		cell[i].mark = 0;
 	}
 	head = 0;
+	allocated = 0;
 }
 
 static void mark(scm_obj_t obj)
@@ -95,6 +97,7 @@ static void mark_stack(void)
 static void sweep(void)
 {
 	uint32_t tail = UINT32_MAX;
+	allocated = 0;
 	for (uint32_t i = 0; i < SCM_CELL_NUM; i++) {
 		scm_pair_t *x = &cell[i];
 		if (!x->mark) {
@@ -105,15 +108,18 @@ static void sweep(void)
 			x->next = tail;
 			tail = i;
 		}
-		x->mark = 0;
+		else
+		{
+			allocated++;
+			x->mark = 0;
+		}
 	}
 	head = tail;
 }
 
 extern void scm_gc_collect(void)
 {
-	static int i = 0;
-	if (i++ % 3000 == 0) {
+	if (((allocated * 1024U) / SCM_CELL_NUM) > 900U) {
 		mark(scm_interaction_environment);
 		mark(scm_symbols);
 		mark_stack();
@@ -129,6 +135,7 @@ extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
 	cell[i].car = obj1;
 	cell[i].cdr = obj2;
 	head = cell[i].next;
+	allocated++;
 	return SCM_PAIR | i;
 }
 
