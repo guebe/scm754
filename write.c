@@ -5,7 +5,7 @@ static void print_list(scm_obj_t obj)
 {
 	size_t len;
 
-	if ((len = scm_length(obj)) >= 20) {
+	if ((len = scm_length(obj)) > 100) {
 		printf("(<toolong %lu>)", len);
 		return;
 	}
