@@ -776,9 +776,9 @@
 ;;; Apply
 
 ;(test (apply (lambda () 1) '()) 1)
-;(test (apply car '((a . b))) 'a)
-;(test (apply cdr '((a . b))) 'b)
-;(test (apply cons '(1 2)) '(1 . 2))
+(test (apply car '((a . b))) 'a)
+(test (apply cdr '((a . b))) 'b)
+(test (apply cons '(1 2)) '(1 . 2))
 ;(test (apply list '(1 2 3)) '(1 2 3))
 ;(test (apply list 1 '(2 3)) '(1 2 3))
 ;(test (apply list 1 2 '(3)) '(1 2 3))
@@ -861,7 +861,7 @@
 ;         a)
 ;      '((x) (y) (z)))
 
-;(test (map - '(1 2 3)) '(-1 -2 -3))
+(test (map - '(1 2 3)) '(-1 -2 -3))
 ;(test (map cons '(1 2 3) '(a b c))
 ;      '((1 . a) (2 . b) (3 . c)))
 ;(test (map list '(1 2 3) '(a b c) '(#\x #\y #\z))
@@ -1014,26 +1014,26 @@
 ;      (fail '(list? cyclic3) #t)
 ;      (test (list? 'cyclic3) #f)))
 
-;(test (member 'c '(a b)) #f)
-;(test (member 'b '(a b)) '(b))
-;(test (member 'a '(a b)) '(a b))
-;(test (member 'x '()) #f)
-;(test (member '(x) '((x))) '((x)))
-;(test (member "x" '("x")) '("x"))
-;(test (member 1 '(1)) '(1))
+(test (member 'c '(a b)) #f)
+(test (member 'b '(a b)) '(b))
+(test (member 'a '(a b)) '(a b))
+(test (member 'x '()) #f)
+(test (member '(x) '((x))) '((x)))
+(test (member "x" '("x")) '("x"))
+(test (member 1 '(1)) '(1))
 ;(test (member #\x '(#\x)) '(#\x))
 
-;(test (memv 'c '(a b)) #f)
-;(test (memv 'b '(a b)) '(b))
-;(test (memv 'a '(a b)) '(a b))
-;(test (memv 'x '()) #f)
-;(test (memv 1 '(1)) '(1))
+(test (memv 'c '(a b)) #f)
+(test (memv 'b '(a b)) '(b))
+(test (memv 'a '(a b)) '(a b))
+(test (memv 'x '()) #f)
+(test (memv 1 '(1)) '(1))
 ;(test (memv #\x '(#\x)) '(#\x))
 
-;(test (memq 'c '(a b)) #f)
-;(test (memq 'b '(a b)) '(b))
-;(test (memq 'a '(a b)) '(a b))
-;(test (memq 'x '()) #f)
+(test (memq 'c '(a b)) #f)
+(test (memq 'b '(a b)) '(b))
+(test (memq 'a '(a b)) '(a b))
+(test (memq 'x '()) #f)
 
 (test (null? #f) #f)
 (test (null? #\c) #f)
@@ -2308,9 +2308,9 @@
 ;(test (list? (apply symbols '())) #t)
 
 ;(test (apply abs '(-1)) 1)
-;(test (apply boolean? '(#f)) #t)
-;(test (apply car '((a . b))) 'a)
-;(test (apply cdr '((a . b))) 'b)
+(test (apply boolean? '(#f)) #t)
+(test (apply car '((a . b))) 'a)
+(test (apply cdr '((a . b))) 'b)
 ;(test (apply caar '(((a . b) . (c . d)))) 'a)
 ;(test (apply cadr '(((a . b) . (c . d)))) 'c)
 ;(test (apply cdar '(((a . b) . (c . d)))) 'b)
@@ -2354,35 +2354,35 @@
 ;(test (apply char-upcase '(#\m)) '#\M)
 ;(test (apply char-whitespace? '(#\space)) #t)
 ;(test (apply char? '(#\A)) #t)
-;; close-input-port
-;; close-output-port
-;; delete-file
-;(test (apply eof-object? '(x)) #f)
+; close-input-port
+; close-output-port
+; delete-file
+(test (apply eof-object? '(x)) #f)
 ;; environment-variable
 ;(test (apply eval '((+ 1 2))) 3)
 ;(test (apply even? '(2)) #t)
 ;(test (apply exact->inexact '(5)) 5.0)
 ;(test (apply exact? '(1)) #t)
 ;(test (apply exponent '(1.2)) -1)
-;; file-exists?
+; file-exists?
 ;(test (apply floor '(0.5)) 0.0)
 ;(test (apply inexact->exact '(1.0)) 1)
 ;(test (apply inexact? '(1)) #f)
 ;(test (apply input-port? `(,(current-input-port))) #t)
 ;(test (apply integer->char '(65)) #\A)
 ;(test (apply integer? '(5)) #t)
-;(test (apply length '((1 2 3))) 3)
+(test (apply length '((1 2 3))) 3)
 ;(test (apply list->string '((#\f #\o #\b))) "fob")
 ;(test (apply list->vector '((1 2 3))) '#(1 2 3))
-;; load
+; load
 ;(test (apply negative? '(-1)) #t)
 ;(test (apply not '(#f)) #t)
-;(test (apply null? '(())) #t)
-;(test (apply number? '(5)) #t)
+(test (apply null? '(())) #t)
+(test (apply number? '(5)) #t)
 ;(test (apply odd? '(3)) #t)
-;; open-append-file
-;; open-input-file
-;; open-output-file
+; open-append-file
+; open-input-file
+; open-output-file
 ;(test (apply output-port? `(,(current-output-port))) #t)
 ;(test (apply pair? `((a . b))) #t)
 ;(test (apply positive? '(3)) #t)
@@ -2390,22 +2390,22 @@
 ;(test (apply real? '(1.0)) #t)
 ;(test (apply reverse '((1 2 3))) '(3 2 1))
 ;(test (apply reverse! (list (list 1 2 3))) '(3 2 1))
-;; set-input-port!
-;; set-output-port!
+; set-input-port!
+; set-output-port!
 ;(test (car (apply stats '((cons 1 2)))) '(1 . 2))
 ;(test (apply string->list '("foo")) '(#\f #\o #\o))
 ;(test (apply string->symbol '("foo")) 'foo)
 ;(test (apply string-copy '("foo")) "foo")
-;(test (apply string-length '("foo")) 3)
+(test (apply string-length '("foo")) 3)
 ;(test (apply string? '("foo")) #t)
 ;(test (apply symbol->string '(foo)) "foo")
-;(test (apply symbol? '(foo)) #t)
-;; system-command
+(test (apply symbol? '(foo)) #t)
+; system-command
 ;(test (apply truncate '(5.7)) 5.0)
 ;(test (apply vector->list '(#(foo bar baz))) '(foo bar baz))
 ;(test (apply vector-length '(#(foo bar baz))) 3)
 ;(test (apply vector? '(#(foo bar baz))) #t)
-;(test (apply zero? '(0)) #t)
+(test (apply zero? '(0)) #t)
 
 ;(test (apply assq '(b ((a) (b) (c)))) '(b))
 ;(test (apply assv '(2 ((1) (2) (3)))) '(2))
@@ -2419,12 +2419,12 @@
 ;(test (apply char=? '(#\a #\b)) #f)
 ;(test (apply char>? '(#\a #\b)) #f)
 ;(test (apply char>=? '(#\a #\b)) #f)
-;(test (apply cons '(a b)) '(a . b))
-;(test (apply eq? '(x x)) #t)
-;(test (apply eqv? '(5 5)) #t)
+(test (apply cons '(a b)) '(a . b))
+(test (apply eq? '(x x)) #t)
+(test (apply eqv? '(5 5)) #t)
 ;(test (apply list-ref  '((1 2 3) 1)) 2)
 ;(test (apply list-tail  '((1 2 3) 1)) '(2 3))
-;(test (apply quotient '(14 4)) 3)
+(test (apply quotient '(14 4)) 3)
 ;(test (apply remainder '(14 4)) 2)
 ;(test (let () (define x (cons 1 2)) (apply set-car! `(,x 0)) x) '(0 . 2))
 ;(test (let () (define x (cons 1 2)) (apply set-cdr! `(,x 0)) x) '(1 . 0))
@@ -2480,14 +2480,14 @@
 ;(test (vector-length (apply vector-copy '(#(1 2 3) 2 5))) 3)
 ;(test (apply vector-copy '(#(1 2 3) 2 5 x)) '#(3 x x))
 
-;(test (apply + '()) 0)
-;(test (apply + '(1)) 1)
-;(test (apply + '(1 2)) 3)
-;(test (apply + '(1 2 3 4 5)) 15)
-;(test (apply * '()) 1)
-;(test (apply * '(2)) 2)
-;(test (apply * '(2 3)) 6)
-;(test (apply * '(1 2 3 4 5)) 120)
+(test (apply + '()) 0)
+(test (apply + '(1)) 1)
+(test (apply + '(1 2)) 3)
+(test (apply + '(1 2 3 4 5)) 15)
+(test (apply * '()) 1)
+(test (apply * '(2)) 2)
+(test (apply * '(2 3)) 6)
+(test (apply * '(1 2 3 4 5)) 120)
 ;(test (apply append '()) ())
 ;(test (apply append '(foo)) 'foo)
 ;(test (apply append '((foo) (bar))) '(foo bar))
@@ -2501,35 +2501,35 @@
 ;(test (apply vector-append '(#(foo) #(bar))) '#(foo bar))
 ;(test (apply vector-append '(#(foo) #(bar) #(baz))) '#(foo bar baz))
 
-;(test (apply / '(2)) 0.5)
-;(test (apply / '(2 5)) 0.4)
-;(test (apply / '(2 5 4)) 0.1)
-;(test (apply - '(1)) -1)
-;(test (apply - '(1 2)) -1)
-;(test (apply - '(1 2 3 4 5)) -13)
+(test (apply / '(2)) 0.5)
+(test (apply / '(2 5)) 0.4)
+(test (apply / '(2 5 4)) 0.1)
+(test (apply - '(1)) -1)
+(test (apply - '(1 2)) -1)
+(test (apply - '(1 2 3 4 5)) -13)
 ;(test (apply bit-op '(7 1 2 4 8)) 15)
-;(test (apply max '(1)) 1)
-;(test (apply max '(1 2)) 2)
-;(test (apply max '(1 3 2 5 4)) 5)
+(test (apply max '(1)) 1)
+(test (apply max '(1 2)) 2)
+(test (apply max '(1 3 2 5 4)) 5)
 ;(test (apply min '(3)) 3)
 ;(test (apply min '(2 3)) 2)
 ;(test (apply min '(3 2 1 5 4)) 1)
 
-;(test (apply = '(1 1)) #t)
-;(test (apply = '(1 1 1)) #t)
-;(test (apply = '(1 1 1 1 1)) #t)
-;(test (apply < '(1 2)) #t)
-;(test (apply < '(1 2 3)) #t)
-;(test (apply < '(1 2 3 4 5)) #t)
-;(test (apply <= '(1 2)) #t)
-;(test (apply <= '(1 2 2)) #t)
-;(test (apply <= '(1 2 3 3 5)) #t)
-;(test (apply > '(2 1)) #t)
-;(test (apply > '(3 2 1)) #t)
-;(test (apply > '(5 4 3 2 1)) #t)
-;(test (apply >= '(2 1)) #t)
-;(test (apply >= '(3 2 2)) #t)
-;(test (apply >= '(5 4 4 2 1)) #t)
+(test (apply = '(1 1)) #t)
+(test (apply = '(1 1 1)) #t)
+(test (apply = '(1 1 1 1 1)) #t)
+(test (apply < '(1 2)) #t)
+(test (apply < '(1 2 3)) #t)
+(test (apply < '(1 2 3 4 5)) #t)
+(test (apply <= '(1 2)) #t)
+(test (apply <= '(1 2 2)) #t)
+(test (apply <= '(1 2 3 3 5)) #t)
+(test (apply > '(2 1)) #t)
+(test (apply > '(3 2 1)) #t)
+(test (apply > '(5 4 3 2 1)) #t)
+(test (apply >= '(2 1)) #t)
+(test (apply >= '(3 2 2)) #t)
+(test (apply >= '(5 4 4 2 1)) #t)
 
 ;(test (apply apply `(,cons (a b))) '(a . b))
 ;(test (apply apply `(,list a b (c d))) '(a b c d))
@@ -2688,13 +2688,13 @@
 ;(test (list-ref '(a b c d) 2) 'c)
 
 (test (memq 'a '(a b c)) '(a b c))
-;(test (memq 'b '(a b c)) '(b c))
-;(test (memq 'a '(b c d)) #f)
+(test (memq 'b '(a b c)) '(b c))
+(test (memq 'a '(b c d)) #f)
 ;(test (memq (list 'a) '(b (a) c)) #f)
 ;(test (member (list 'a)
 ;              '(b (a) c))
 ;      '((a) c))
-;(test (memv 101 '(100 101 102)) '(101 102))
+(test (memv 101 '(100 101 102)) '(101 102))
 
 ;(define e '((a 1) (b 2) (c 3)))
 ;(test (assq 'a e) '(a 1))
@@ -2803,10 +2803,10 @@
 
 ;(test (apply + (list 3 4)) 7)
 
-;(define compose
-;  (lambda (f g)
-;    (lambda args
-;      (f (apply g args)))))
+(define compose
+  (lambda (f g)
+    (lambda args
+      (f (apply g args)))))
 
 ;(define (isqrt square)
 ;  (letrec
