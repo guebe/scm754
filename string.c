@@ -1,7 +1,7 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
 #include "scm754.h"
 
-#define SCM_STRING_NUM 1024U
+#define SCM_STRING_NUM 2048U
 
 typedef struct
 {
