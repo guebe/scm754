@@ -11,6 +11,14 @@ All Scheme objects are represented as 64-bit values, leveraging unused NaN space
 
 `scm754` is currently in the development phase and not suitable for production use.
 
+## Usage
+
+    $ rlwrap ./scm754
+    > (define (hello) (display "Hello, world!") (newline))
+    > (hello)
+    Hello, world!
+    >
+
 ## Correctness
 
 `scm754` emphasizes correctness using:
