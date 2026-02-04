@@ -25,7 +25,6 @@ extern scm_obj_t scm_add(scm_obj_t args)
 
 extern scm_obj_t scm_sub(scm_obj_t args)
 {
-	if (!scm_is_pair(args)) return scm_error("-: needs an argument");
 	scm_obj_t a = scm_car(args);
 	if (!scm_is_number(a)) return scm_error("-: needs a number");
 	double x = scm_number_value(a);
@@ -55,7 +54,6 @@ extern scm_obj_t scm_mul(scm_obj_t args)
 
 extern scm_obj_t scm_div(scm_obj_t args)
 {
-	if (!scm_is_pair(args)) return scm_error("/: needs an argument");
 	scm_obj_t a = scm_car(args);
 	if (!scm_is_number(a)) return scm_error("/: needs a number");
 	double x = scm_number_value(a);
@@ -101,8 +99,6 @@ extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b)
 
 extern scm_obj_t scm_substring(scm_obj_t args)
 {
-	if (!scm_is_pair(args)) return scm_error("string-copy: needs an argument");
-
 	scm_obj_t a = scm_car(args);
 	if (!scm_is_string(a)) return scm_error("string-copy: needs a string");
 	const char *x = scm_string_value(a);
@@ -158,8 +154,6 @@ extern scm_obj_t scm_is_eqv(scm_obj_t a, scm_obj_t b)
 
 extern scm_obj_t scm_max(scm_obj_t args)
 {
-	if (!scm_is_pair(args)) return scm_error("max: needs an argument");
-
 	scm_obj_t a = scm_car(args);
 	if (!scm_is_number(a)) return scm_error("max: needs a number");
 
@@ -178,7 +172,6 @@ extern scm_obj_t scm_max(scm_obj_t args)
 
 #define SCM_COMPARE(name, sname, type, is_t, get_v, cmp)                  \
 scm_obj_t name(scm_obj_t args) {                                          \
-    if (!scm_is_pair(args)) return scm_error(sname ": no args");          \
     scm_obj_t o = scm_car(args);                                          \
     if (!is_t(o)) return scm_error(sname ": type err");                   \
     type x = get_v(o);                                                    \
