@@ -324,18 +324,37 @@ out:
 	return result;
 }
 
+static scm_obj_t check_arity(scm_obj_t proc, size_t argc)
+{
+	sint8 arity = scm_procedure_arity(proc);
+
+	if (arity == SCM_ARITY_VAR) {
+		/* no arity check */
+	}
+	else if (arity >= 0) {
+		if ((size_t)arity != argc)
+			return scm_error("%s: takes exactly %d arguments, %lu given",
+					scm_procedure_string(proc), arity, argc);
+	}
+	else {
+		if ((size_t)(-arity) > argc)
+			return scm_error("%s: takes at least %d arguments, %lu given",
+					scm_procedure_string(proc), -arity, argc);
+	}
+	return scm_unspecified();
+}
+
 extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 {
+	scm_obj_t result;
+
 	if (!scm_is_procedure(proc)) return scm_error("apply: attempt to apply non-procedure");
 
 	if (debug) debug_print(false, proc, args);
 
-	int8_t arity = scm_procedure_arity(proc);
 	size_t argc = scm_length(args);
 
-	if (arity >= 0 && (size_t)arity != argc)
-		return scm_error("%s: takes %d arguments, %lu given",
-				 scm_procedure_string(proc), arity, argc);
+	if (scm_is_error(result = check_arity(proc, argc))) return result;
 
 	scm_obj_t arg1 = (argc >= 1) ? scm_car(args) : scm_nil();
 	scm_obj_t arg2 = (argc >= 2) ? scm_car(scm_cdr(args)): scm_nil();
