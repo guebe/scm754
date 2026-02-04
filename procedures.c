@@ -23,6 +23,18 @@ extern scm_obj_t scm_add(scm_obj_t args)
 	return scm_number(x);
 }
 
+extern scm_obj_t scm_mul(scm_obj_t args)
+{
+	double x = 1.0;
+	while (scm_is_pair(args)) {
+		scm_obj_t a = scm_car(args);
+		if (!scm_is_number(a)) return scm_error("*: needs a number");
+		x *= scm_number_value(a);
+		args = scm_cdr(args);
+	}
+	return scm_number(x);
+}
+
 extern scm_obj_t scm_sub(scm_obj_t args)
 {
 	scm_obj_t a = scm_car(args);
@@ -35,18 +47,6 @@ extern scm_obj_t scm_sub(scm_obj_t args)
 		a = scm_car(args);
 		if (!scm_is_number(a)) return scm_error("-: needs a number");
 		x -= scm_number_value(a);
-		args = scm_cdr(args);
-	}
-	return scm_number(x);
-}
-
-extern scm_obj_t scm_mul(scm_obj_t args)
-{
-	double x = 1.0;
-	while (scm_is_pair(args)) {
-		scm_obj_t a = scm_car(args);
-		if (!scm_is_number(a)) return scm_error("*: needs a number");
-		x *= scm_number_value(a);
 		args = scm_cdr(args);
 	}
 	return scm_number(x);
@@ -71,10 +71,21 @@ extern scm_obj_t scm_div(scm_obj_t args)
 	return scm_number(x);
 }
 
-extern scm_obj_t scm_is_zero(scm_obj_t z)
+extern scm_obj_t scm_max(scm_obj_t args)
 {
-	double x = scm_number_value(z);
-	return scm_boolean(x == 0.0);
+	scm_obj_t a = scm_car(args);
+	if (!scm_is_number(a)) return scm_error("max: needs a number");
+	double x = scm_number_value(a);
+	args = scm_cdr(args);
+
+	while (scm_is_pair(args)) {
+		a = scm_car(args);
+		if (!scm_is_number(a)) return scm_error("max: needs a number");
+		double y = scm_number_value(a);
+		if (y > x) x = y;
+		args = scm_cdr(args);
+	}
+	return scm_number(x);
 }
 
 extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b)
@@ -132,8 +143,16 @@ extern scm_obj_t scm_substring(scm_obj_t args)
 	return scm_string(x + start, end - start);
 }
 
+extern scm_obj_t scm_is_zero(scm_obj_t z)
+{
+	if (!scm_is_number(z)) return scm_error("zero?: needs a number");
+	double x = scm_number_value(z);
+	return scm_boolean(x == 0.0);
+}
+
 extern scm_obj_t scm_number_to_string(scm_obj_t number)
 {
+	if (!scm_is_number(number)) return scm_error("number->string: needs a number");
 	char buffer[64];
 	int ret = snprintf(buffer, sizeof(buffer), "%.16g", scm_number_value(number));
 	if (ret < 0 || (size_t)ret >= sizeof(buffer)) return scm_error("number->string: number too big");
@@ -150,24 +169,6 @@ extern scm_obj_t scm_is_eqv(scm_obj_t a, scm_obj_t b)
 		return scm_boolean(scm_char_value(a) == scm_char_value(b));
 	else
 		return scm_false();
-}
-
-extern scm_obj_t scm_max(scm_obj_t args)
-{
-	scm_obj_t a = scm_car(args);
-	if (!scm_is_number(a)) return scm_error("max: needs a number");
-
-	double x = scm_number_value(a);
-	args = scm_cdr(args);
-
-	while (scm_is_pair(args)) {
-		a = scm_car(args);
-		if (!scm_is_number(a)) return scm_error("max: needs a number");
-		double y = scm_number_value(a);
-		if (y > x) x = y;
-		args = scm_cdr(args);
-	}
-	return scm_number(x);
 }
 
 #define SCM_COMPARE(name, sname, type, is_t, get_v, cmp)                  \
