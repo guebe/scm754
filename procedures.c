@@ -99,40 +99,6 @@ extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b)
 	return scm_number(x - y * floor(x / y));
 }
 
-typedef bool (*cmp_func_t)(double, double);
-static bool lt(double a, double b) { return a < b; }
-static bool gt(double a, double b) { return a > b; }
-static bool le(double a, double b) { return a <= b; }
-static bool ge(double a, double b) { return a >= b; }
-static bool eq(double a, double b) { return a == b; }
-
-static scm_obj_t number_compare(scm_obj_t args, cmp_func_t cmp, const char *name)
-{
-	if (!scm_is_pair(args)) return scm_error("%s: needs an argument", name);
-
-	scm_obj_t a = scm_car(args);
-	if (!scm_is_number(a)) return scm_error("%s: needs a number", name);
-	double x = scm_number_value(a);
-
-	args = scm_cdr(args);
-	while (scm_is_pair(args)) {
-		a = scm_car(args);
-		if (!scm_is_number(a)) return scm_error("%s: needs a number", name);
-		double y = scm_number_value(a);
-		if (!cmp(x, y)) return scm_false();
-		x = y;
-		args = scm_cdr(args);
-	}
-
-	return scm_true();
-}
-
-extern scm_obj_t scm_lt(scm_obj_t args) { return number_compare(args, lt, "<"); }
-extern scm_obj_t scm_gt(scm_obj_t args) { return number_compare(args, gt, ">"); }
-extern scm_obj_t scm_le(scm_obj_t args) { return number_compare(args, le, "<="); }
-extern scm_obj_t scm_ge(scm_obj_t args) { return number_compare(args, ge, ">="); }
-extern scm_obj_t scm_number_eq(scm_obj_t args) { return number_compare(args, eq, "="); }
-
 extern scm_obj_t scm_string_eq(scm_obj_t args)
 {
 	if (!scm_is_pair(args)) return scm_error("string=?: needs an argument");
@@ -230,3 +196,37 @@ extern scm_obj_t scm_max(scm_obj_t args)
 	}
 	return scm_number(x);
 }
+
+#define SCM_ID(x) (x)
+
+#define SCM_COMPARE(name, sname, type, is_t, get_v, trans, op)            \
+scm_obj_t name(scm_obj_t args) {                                          \
+    if (!scm_is_pair(args)) return scm_error(sname ": no args");          \
+    scm_obj_t o = scm_car(args);                                          \
+    if (!is_t(o)) return scm_error(sname ": type err");                   \
+    type x = trans(get_v(o));                                             \
+    for (args = scm_cdr(args); scm_is_pair(args); args = scm_cdr(args)) { \
+        o = scm_car(args);                                                \
+        if (!is_t(o)) return scm_error(sname ": type err");               \
+        type y = trans(get_v(o));                                         \
+        if (!(x op y)) return scm_false();                                \
+        x = y;                                                            \
+    }                                                                     \
+    return scm_true();                                                    \
+}
+
+SCM_COMPARE(scm_char_lt, "char<?", int, scm_is_char, scm_char_value, SCM_ID, <)
+SCM_COMPARE(scm_char_gt, "char>?", int, scm_is_char, scm_char_value, SCM_ID, >)
+SCM_COMPARE(scm_char_le, "char<=?", int, scm_is_char, scm_char_value, SCM_ID, <=)
+SCM_COMPARE(scm_char_ge, "char>=?", int, scm_is_char, scm_char_value, SCM_ID, >=)
+SCM_COMPARE(scm_char_eq, "char=?", int, scm_is_char, scm_char_value, SCM_ID, ==)
+SCM_COMPARE(scm_char_ci_lt, "char-ci<?", int, scm_is_char, scm_char_value, tolower, <)
+SCM_COMPARE(scm_char_ci_gt, "char-ci>?", int, scm_is_char, scm_char_value, tolower, >)
+SCM_COMPARE(scm_char_ci_le, "char-ci<=?", int, scm_is_char, scm_char_value, tolower, <=)
+SCM_COMPARE(scm_char_ci_ge, "char-ci>=?", int, scm_is_char, scm_char_value, tolower, >=)
+SCM_COMPARE(scm_char_ci_eq, "char-ci=?", int, scm_is_char, scm_char_value, tolower, ==)
+SCM_COMPARE(scm_number_lt, "<", double, scm_is_number, scm_number_value, SCM_ID, <)
+SCM_COMPARE(scm_number_gt, ">", double, scm_is_number, scm_number_value, SCM_ID, >)
+SCM_COMPARE(scm_number_le, "<=", double, scm_is_number, scm_number_value, SCM_ID, <=)
+SCM_COMPARE(scm_number_ge, ">=", double, scm_is_number, scm_number_value, SCM_ID, >=)
+SCM_COMPARE(scm_number_eq, "=", double, scm_is_number, scm_number_value, SCM_ID, ==)

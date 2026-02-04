@@ -4,6 +4,7 @@
 #define __SCM754_H__
 
 #include <assert.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -95,11 +96,21 @@ typedef enum {
 	SCM_OP_MUL,
 	SCM_OP_DIV,
 	SCM_OP_WRITE,
+	SCM_OP_NUMBER_LT,
+	SCM_OP_NUMBER_GT,
+	SCM_OP_NUMBER_LE,
+	SCM_OP_NUMBER_GE,
 	SCM_OP_NUMBER_EQ,
-	SCM_OP_LT,
-	SCM_OP_GT,
-	SCM_OP_LE,
-	SCM_OP_GE,
+	SCM_OP_CHAR_LT,
+	SCM_OP_CHAR_GT,
+	SCM_OP_CHAR_LE,
+	SCM_OP_CHAR_GE,
+	SCM_OP_CHAR_EQ,
+	SCM_OP_CHAR_CI_LT,
+	SCM_OP_CHAR_CI_GT,
+	SCM_OP_CHAR_CI_LE,
+	SCM_OP_CHAR_CI_GE,
+	SCM_OP_CHAR_CI_EQ,
 	SCM_OP_STRING_EQ,
 	SCM_OP_SUBSTRING,
 	SCM_OP_PROCEDURE_LAST = SCM_OP_SUBSTRING,
@@ -129,7 +140,7 @@ static inline bool scm_is_number(scm_obj_t obj)
 /* accessors */
 static inline bool scm_boolean_value(scm_obj_t obj)          { return obj != SCM_FALSE; }
 static inline double scm_number_value(scm_obj_t number)      { double d; memcpy(&d, &number, sizeof d); return d; }
-static inline char scm_char_value(scm_obj_t c)               { return (char)c; }
+static inline int scm_char_value(scm_obj_t c)                { return (int)(uint32_t)c; }
 static inline uint32_t scm_procedure_id(scm_obj_t procedure) { return (uint32_t)procedure; }
 extern const char *scm_procedure_string(scm_obj_t proc);
 extern int8_t scm_procedure_arity(scm_obj_t proc);
@@ -153,7 +164,7 @@ static inline scm_obj_t scm_dot(void)              { return SCM_DOT; }
 static inline scm_obj_t scm_rparen(void)           { return SCM_RPAREN; }
 static inline scm_obj_t scm_unspecified(void)      { return SCM_UNSPECIFIED; }
 static inline scm_obj_t scm_number(double number)  { scm_obj_t d; memcpy(&d, &number, sizeof d); return d; }
-static inline scm_obj_t scm_char(char c)           { return SCM_CHAR | (uint32_t)c; }
+static inline scm_obj_t scm_char(int c)            { return SCM_CHAR | (uint32_t)c; }
 static inline scm_obj_t scm_procedure(uint32_t id) { return SCM_PROCEDURE | id; }
 static inline scm_obj_t scm_closure(scm_obj_t pair){ return SCM_CLOSURE | (uint32_t)pair; }
 extern scm_obj_t scm_string_to_number(const char *string, int radix);
@@ -193,15 +204,25 @@ extern scm_obj_t scm_is_eqv(scm_obj_t a, scm_obj_t b);
 extern size_t scm_length(scm_obj_t list);
 extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b);
 extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b);
-extern scm_obj_t scm_number_eq(scm_obj_t args);
 extern scm_obj_t scm_is_zero(scm_obj_t z);
-extern scm_obj_t scm_lt(scm_obj_t args);
-extern scm_obj_t scm_gt(scm_obj_t args);
-extern scm_obj_t scm_le(scm_obj_t args);
-extern scm_obj_t scm_ge(scm_obj_t args);
 extern scm_obj_t scm_string_eq(scm_obj_t args);
 extern scm_obj_t scm_substring(scm_obj_t args);
 extern scm_obj_t scm_max(scm_obj_t args);
+extern scm_obj_t scm_number_lt(scm_obj_t args);
+extern scm_obj_t scm_number_gt(scm_obj_t args);
+extern scm_obj_t scm_number_le(scm_obj_t args);
+extern scm_obj_t scm_number_ge(scm_obj_t args);
+extern scm_obj_t scm_number_eq(scm_obj_t args);
+extern scm_obj_t scm_char_lt(scm_obj_t args);
+extern scm_obj_t scm_char_gt(scm_obj_t args);
+extern scm_obj_t scm_char_le(scm_obj_t args);
+extern scm_obj_t scm_char_ge(scm_obj_t args);
+extern scm_obj_t scm_char_eq(scm_obj_t args);
+extern scm_obj_t scm_char_ci_lt(scm_obj_t args);
+extern scm_obj_t scm_char_ci_gt(scm_obj_t args);
+extern scm_obj_t scm_char_ci_le(scm_obj_t args);
+extern scm_obj_t scm_char_ci_ge(scm_obj_t args);
+extern scm_obj_t scm_char_ci_eq(scm_obj_t args);
 
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);

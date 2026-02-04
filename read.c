@@ -46,7 +46,7 @@ static scm_obj_t read_char(void)
 
 	c1 = scm_peek_char();
 	if (c1 == EOF || is_delimiter(c1))
-		return scm_char((char)c);
+		return scm_char(c);
 
 	return scm_error("read_char: unexpected #\\%c%c", c, c1);
 }
