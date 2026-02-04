@@ -1865,9 +1865,9 @@
 (test (string-length "abc") 3)
 (test (string-length "Hello, World!") 13)
 
-;(test (string-ref "abc" 0) #\a)
-;(test (string-ref "abc" 1) #\b)
-;(test (string-ref "abc" 2) #\c)
+(test (string-ref "abc" 0) #\a)
+(test (string-ref "abc" 1) #\b)
+(test (string-ref "abc" 2) #\c)
 
 ;(define s (string #\1 #\2 #\3))
 ;(test (begin (string-set! s 0 #\a) s) "a23")
@@ -2443,7 +2443,7 @@
 ;              (apply string-fill! `(,x #\x))
 ;              x)
 ;      "xxx")
-;(test (apply string-ref '("abc" 1)) #\b)
+(test (apply string-ref '("abc" 1)) #\b)
 ;(test (catch (lambda (x) (apply throw (list x 'foo)))) 'foo)
 ;(test (let () (define x (vector 1 2 3))
 ;              (apply vector-fill! `(,x zzz))

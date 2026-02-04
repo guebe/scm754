@@ -112,6 +112,7 @@ typedef enum {
 	SCM_OP_CHAR_CI_GE,
 	SCM_OP_CHAR_CI_EQ,
 	SCM_OP_STRING_EQ,
+	SCM_OP_STRING_REF,
 	SCM_OP_SUBSTRING,
 	SCM_OP_PROCEDURE_LAST = SCM_OP_SUBSTRING,
 } scm_op_t;
@@ -223,6 +224,7 @@ extern scm_obj_t scm_char_ci_gt(scm_obj_t args);
 extern scm_obj_t scm_char_ci_le(scm_obj_t args);
 extern scm_obj_t scm_char_ci_ge(scm_obj_t args);
 extern scm_obj_t scm_char_ci_eq(scm_obj_t args);
+extern scm_obj_t scm_string_ref(scm_obj_t str, scm_obj_t index);
 
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);

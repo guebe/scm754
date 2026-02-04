@@ -372,6 +372,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 	case SCM_OP_SET_CDR: return scm_set_cdr(arg1, arg2);
 	case SCM_OP_MODULO: return scm_modulo(arg1, arg2);
 	case SCM_OP_QUOTIENT: return scm_quotient(arg1, arg2);
+	case SCM_OP_STRING_REF: return scm_string_ref(arg1, arg2);
 	case SCM_OP_ADD: return scm_add(args);
 	case SCM_OP_SUB: return scm_sub(args);
 	case SCM_OP_MUL: return scm_mul(args);

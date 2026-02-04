@@ -74,6 +74,7 @@ static const scm_ops_t ops[] =
 	[SCM_OP_QUOTIENT] = { "quotient", 2 },
 	[SCM_OP_SET_CAR] = { "set-car!", 2 },
 	[SCM_OP_SET_CDR] = { "set-cdr!", 2 },
+	[SCM_OP_STRING_REF] = { "string-ref", 2 },
 	[SCM_OP_STRING_EQ] = { "string=?", -1 },
 	[SCM_OP_IS_STRING] = { "string?", 1 },
 	[SCM_OP_STRING_LENGTH] = { "string-length", 1 },

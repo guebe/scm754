@@ -143,6 +143,20 @@ extern scm_obj_t scm_substring(scm_obj_t args)
 	return scm_string(x + start, end - start);
 }
 
+extern scm_obj_t scm_string_ref(scm_obj_t str, scm_obj_t index)
+{
+	if (!scm_is_string(str) || !scm_is_number(index)) return scm_error("string-ref: type err");
+
+	const char *s = scm_string_value(str);
+	size_t len = scm_string_length(str);
+	size_t k = (size_t)scm_number_value(index);
+
+	if (k >= len)
+		return scm_error("string-ref: index %lu out of range for string of length %lu", k, len);
+
+	return scm_char(s[k]);
+}
+
 extern scm_obj_t scm_is_zero(scm_obj_t z)
 {
 	if (!scm_is_number(z)) return scm_error("zero?: needs a number");
