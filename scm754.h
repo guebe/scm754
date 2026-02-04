@@ -113,6 +113,8 @@ typedef enum {
 	SCM_OP_CHAR_CI_EQ,
 	SCM_OP_STRING_EQ,
 	SCM_OP_STRING_REF,
+	SCM_OP_STRING_SET,
+	SCM_OP_LIST_REF,
 	SCM_OP_SUBSTRING,
 	SCM_OP_PROCEDURE_LAST = SCM_OP_SUBSTRING,
 } scm_op_t;
@@ -148,7 +150,7 @@ extern int8_t scm_procedure_arity(scm_obj_t proc);
 static inline scm_obj_t scm_closure_value(scm_obj_t closure) { return SCM_PAIR | (uint32_t)closure; }
 extern scm_obj_t scm_car(scm_obj_t pair);
 extern scm_obj_t scm_cdr(scm_obj_t pair);
-extern const char *scm_string_value(scm_obj_t string);
+extern char *scm_string_value(scm_obj_t string);
 static inline size_t scm_string_length(scm_obj_t string)     { assert(scm_is_string(string)); return strlen(scm_string_value(string)); }
 
 /* mutators */
@@ -224,7 +226,9 @@ extern scm_obj_t scm_char_ci_gt(scm_obj_t args);
 extern scm_obj_t scm_char_ci_le(scm_obj_t args);
 extern scm_obj_t scm_char_ci_ge(scm_obj_t args);
 extern scm_obj_t scm_char_ci_eq(scm_obj_t args);
-extern scm_obj_t scm_string_ref(scm_obj_t str, scm_obj_t index);
+extern scm_obj_t scm_string_ref(scm_obj_t string, scm_obj_t k);
+extern scm_obj_t scm_string_set(scm_obj_t string, scm_obj_t k, scm_obj_t c);
+extern scm_obj_t scm_list_ref(scm_obj_t list, scm_obj_t k);
 
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);

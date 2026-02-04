@@ -373,6 +373,8 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 	case SCM_OP_MODULO: return scm_modulo(arg1, arg2);
 	case SCM_OP_QUOTIENT: return scm_quotient(arg1, arg2);
 	case SCM_OP_STRING_REF: return scm_string_ref(arg1, arg2);
+	case SCM_OP_STRING_SET: return scm_string_set(arg1, arg2, scm_car(scm_cdr(scm_cdr(args))));
+	case SCM_OP_LIST_REF: return scm_list_ref(arg1, arg2);
 	case SCM_OP_ADD: return scm_add(args);
 	case SCM_OP_SUB: return scm_sub(args);
 	case SCM_OP_MUL: return scm_mul(args);
@@ -395,7 +397,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 	case SCM_OP_STRING_EQ: return scm_string_eq(args);
 	case SCM_OP_SUBSTRING: return scm_substring(args);
 	case SCM_OP_MAX: return scm_max(args);
-	case SCM_OP_APPLY: return scm_apply(scm_car(args), scm_car(scm_cdr(args)));
+	case SCM_OP_APPLY: return scm_apply(arg1, arg2);
 	default: return scm_error("apply: unknown procedure");
 	}
 }

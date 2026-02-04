@@ -978,9 +978,9 @@
 ;(test (list 'a 'b 'c 'd) '(a b c d))
 ;(test (list 'a 'b 'c 'd 'e) '(a b c d e))
 
-;(test (list-ref '(1 2 3) 0) 1)
-;(test (list-ref '(1 2 3) 1) 2)
-;(test (list-ref '(1 2 3) 2) 3)
+(test (list-ref '(1 2 3) 0) 1)
+(test (list-ref '(1 2 3) 1) 2)
+(test (list-ref '(1 2 3) 2) 3)
 
 ;(test (list-tail '(1 2 3) 0) '(1 2 3))
 ;(test (list-tail '(1 2 3) 1) '(2 3))
@@ -1869,10 +1869,10 @@
 (test (string-ref "abc" 1) #\b)
 (test (string-ref "abc" 2) #\c)
 
-;(define s (string #\1 #\2 #\3))
-;(test (begin (string-set! s 0 #\a) s) "a23")
-;(test (begin (string-set! s 2 #\c) s) "a2c")
-;(test (begin (string-set! s 1 #\b) s) "abc")
+(define s "123")
+(test ((lambda () (string-set! s 0 #\a) s)) "a23")
+(test ((lambda () (string-set! s 2 #\c) s)) "a2c")
+(test ((lambda () (string-set! s 1 #\b) s)) "abc")
 
 ;(test (string<? "test" "test") #f)
 ;(test (string<? "test" "tesa") #f)
@@ -2422,7 +2422,7 @@
 (test (apply cons '(a b)) '(a . b))
 (test (apply eq? '(x x)) #t)
 (test (apply eqv? '(5 5)) #t)
-;(test (apply list-ref  '((1 2 3) 1)) 2)
+(test (apply list-ref  '((1 2 3) 1)) 2)
 ;(test (apply list-tail  '((1 2 3) 1)) '(2 3))
 (test (apply quotient '(14 4)) 3)
 ;(test (apply remainder '(14 4)) 2)
@@ -2685,7 +2685,7 @@
 (test (reverse '(a b c)) '(c b a))
 (test (reverse '(a (b c) d (e (f)))) '((e (f)) d (b c) a))
 
-;(test (list-ref '(a b c d) 2) 'c)
+(test (list-ref '(a b c d) 2) 'c)
 
 (test (memq 'a '(a b c)) '(a b c))
 (test (memq 'b '(a b c)) '(b c))

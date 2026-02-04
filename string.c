@@ -49,7 +49,7 @@ extern void scm_string_init(void)
 	head = 0;
 }
 
-extern const char *scm_string_value(scm_obj_t string)
+extern char *scm_string_value(scm_obj_t string)
 {
 	if (!scm_is_string(string)) {
 		(void)scm_error("error: scm_string_value: not a string");

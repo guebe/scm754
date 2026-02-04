@@ -11,6 +11,20 @@ extern size_t scm_length(scm_obj_t list)
 	return i;
 }
 
+extern scm_obj_t scm_list_ref(scm_obj_t list, scm_obj_t k)
+{
+	if (!scm_is_number(k)) return scm_error("list-ref: type err");
+	size_t i = (size_t)scm_number_value(k);
+	for (size_t j = 0; j < i; j++) {
+		if (!scm_is_pair(list)) goto err;
+		list = scm_cdr(list);
+	}
+	if (!scm_is_pair(list)) goto err;
+	return scm_car(list);
+err:
+	return scm_error("list-ref: index %lu out of bounds", i);
+}
+
 extern scm_obj_t scm_add(scm_obj_t args)
 {
 	double x = 0.0;
@@ -143,18 +157,33 @@ extern scm_obj_t scm_substring(scm_obj_t args)
 	return scm_string(x + start, end - start);
 }
 
-extern scm_obj_t scm_string_ref(scm_obj_t str, scm_obj_t index)
+extern scm_obj_t scm_string_ref(scm_obj_t string, scm_obj_t k)
 {
-	if (!scm_is_string(str) || !scm_is_number(index)) return scm_error("string-ref: type err");
+	if (!scm_is_string(string) || !scm_is_number(k)) return scm_error("string-ref: type err");
 
-	const char *s = scm_string_value(str);
-	size_t len = scm_string_length(str);
-	size_t k = (size_t)scm_number_value(index);
+	const char *s = scm_string_value(string);
+	size_t len = scm_string_length(string);
+	size_t i = (size_t)scm_number_value(k);
 
-	if (k >= len)
-		return scm_error("string-ref: index %lu out of range for string of length %lu", k, len);
+	if (i >= len)
+		return scm_error("string-ref: index %lu out of bounds (string length %lu)", i, len);
 
-	return scm_char(s[k]);
+	return scm_char(s[i]);
+}
+
+extern scm_obj_t scm_string_set(scm_obj_t string, scm_obj_t k, scm_obj_t c)
+{
+	if (!scm_is_string(string) || !scm_is_number(k) || !scm_is_char(c)) return scm_error("string-set!: type err");
+
+	char *s = scm_string_value(string);
+	size_t len = scm_string_length(string);
+	size_t i = (size_t)scm_number_value(k);
+
+	if (i >= len)
+		return scm_error("string-set!: index %lu out of bounds (string length %lu)", i, len);
+
+	s[i] = (char)scm_char_value(c);
+	return scm_unspecified();
 }
 
 extern scm_obj_t scm_is_zero(scm_obj_t z)
