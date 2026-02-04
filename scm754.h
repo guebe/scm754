@@ -45,6 +45,8 @@ typedef uint64_t scm_obj_t;
 #define SCM_QUOTE    (SCM_SYMBOL | SCM_OP_QUOTE)
 #define SCM_LAMBDA   (SCM_SYMBOL | SCM_OP_LAMBDA)
 
+#define SCM_ARITY_VAR -128
+
 extern scm_obj_t scm_interaction_environment;
 extern scm_obj_t scm_symbols;
 extern FILE *scm_current_input_port;
