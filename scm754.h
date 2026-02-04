@@ -84,6 +84,10 @@ typedef enum {
 	SCM_OP_NUMBER_TO_STRING,
 	SCM_OP_IS_EQ,
 	SCM_OP_IS_EQV,
+	SCM_OP_IS_EQUAL,
+	SCM_OP_MEMQ,
+	SCM_OP_MEMV,
+	SCM_OP_MEMBER,
 	SCM_OP_APPLY,
 	SCM_OP_MAX,
 	SCM_OP_CONS,
@@ -202,8 +206,23 @@ extern scm_obj_t scm_add(scm_obj_t args);
 extern scm_obj_t scm_sub(scm_obj_t args);
 extern scm_obj_t scm_mul(scm_obj_t args);
 extern scm_obj_t scm_div(scm_obj_t args);
-static inline scm_obj_t scm_is_eq(scm_obj_t obj1, scm_obj_t obj2) { return scm_boolean(obj1 == obj2); }
-extern scm_obj_t scm_is_eqv(scm_obj_t a, scm_obj_t b);
+static inline bool scm_is_eq(scm_obj_t obj1, scm_obj_t obj2)
+{
+	return obj1 == obj2;
+}
+static inline bool scm_is_eqv(scm_obj_t obj1, scm_obj_t obj2)
+{
+	if (obj1 == obj2) return true;
+
+	if (scm_is_number(obj1) && scm_is_number(obj2))
+		return scm_number_value(obj1) == scm_number_value(obj2);
+
+	return false;
+}
+extern bool scm_is_equal(scm_obj_t obj1, scm_obj_t obj2);
+extern scm_obj_t scm_memq(scm_obj_t obj, scm_obj_t list);
+extern scm_obj_t scm_memv(scm_obj_t obj, scm_obj_t list);
+extern scm_obj_t scm_member(scm_obj_t obj, scm_obj_t list);
 extern size_t scm_length(scm_obj_t list);
 extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b);
 extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b);

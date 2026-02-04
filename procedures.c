@@ -202,18 +202,6 @@ extern scm_obj_t scm_number_to_string(scm_obj_t number)
 	return scm_string(buffer, (size_t)ret);
 }
 
-extern scm_obj_t scm_is_eqv(scm_obj_t a, scm_obj_t b)
-{
-	if (a == b)
-		return scm_true();
-	else if (scm_is_number(a) && scm_is_number(b))
-		return scm_boolean(scm_number_value(a) == scm_number_value(b));
-	else if (scm_is_char(a) && scm_is_char(b))
-		return scm_boolean(scm_char_value(a) == scm_char_value(b));
-	else
-		return scm_false();
-}
-
 #define SCM_COMPARE(name, sname, type, is_t, get_v, cmp)                  \
 scm_obj_t name(scm_obj_t args) {                                          \
     scm_obj_t o = scm_car(args);                                          \
@@ -252,3 +240,51 @@ SCM_COMPARE(scm_number_le, "<=", double, scm_is_number, scm_number_value, SCM_CM
 SCM_COMPARE(scm_number_ge, ">=", double, scm_is_number, scm_number_value, SCM_CMP_GE)
 SCM_COMPARE(scm_number_eq, "=", double, scm_is_number, scm_number_value, SCM_CMP_EQ)
 SCM_COMPARE(scm_string_eq, "string=?", const char *, scm_is_string, scm_string_value, SCM_CMP_STRING)
+
+extern bool scm_is_equal(scm_obj_t obj1, scm_obj_t obj2)
+{
+tail_recurse:
+	if (scm_is_eqv(obj1, obj2)) return true;
+
+	if (scm_is_pair(obj1) && scm_is_pair(obj2)) {
+		if (!scm_is_equal(scm_car(obj1), scm_car(obj2))) return false;
+		obj1 = scm_cdr(obj1);
+		obj2 = scm_cdr(obj2);
+		goto tail_recurse;
+	}
+
+	if (scm_is_string(obj1) && scm_is_string(obj2))
+		return (strcmp(scm_string_value(obj1), scm_string_value(obj2)) == 0);
+
+	return false;
+}
+
+extern scm_obj_t scm_memq(scm_obj_t obj, scm_obj_t list)
+{
+	while (scm_is_pair(list)) {
+		scm_obj_t item = scm_car(list);
+		if (scm_is_eq(obj, item)) return list;
+		list = scm_cdr(list);
+	}
+	return scm_false();
+}
+
+extern scm_obj_t scm_memv(scm_obj_t obj, scm_obj_t list)
+{
+	while (scm_is_pair(list)) {
+		scm_obj_t item = scm_car(list);
+		if (scm_is_eqv(obj, item)) return list;
+		list = scm_cdr(list);
+	}
+	return scm_false();
+}
+
+extern scm_obj_t scm_member(scm_obj_t obj, scm_obj_t list)
+{
+	while (scm_is_pair(list)) {
+		scm_obj_t item = scm_car(list);
+		if (scm_is_equal(obj, item)) return list;
+		list = scm_cdr(list);
+	}
+	return scm_false();
+}

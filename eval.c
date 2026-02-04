@@ -365,8 +365,12 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 		if (!scm_is_string(arg1)) return scm_error("string-length: takes one string");
 		return scm_number((double)scm_string_length(arg1));
 	case SCM_OP_NUMBER_TO_STRING: return scm_number_to_string(arg1);
-	case SCM_OP_IS_EQ: return scm_is_eq(arg1, arg2);
-	case SCM_OP_IS_EQV: return scm_is_eqv(arg1, arg2);
+	case SCM_OP_IS_EQ: return scm_boolean(scm_is_eq(arg1, arg2));
+	case SCM_OP_IS_EQV: return scm_boolean(scm_is_eqv(arg1, arg2));
+	case SCM_OP_IS_EQUAL: return scm_boolean(scm_is_equal(arg1, arg2));
+	case SCM_OP_MEMV: return scm_memv(arg1, arg2);
+	case SCM_OP_MEMQ: return scm_memq(arg1, arg2);
+	case SCM_OP_MEMBER: return scm_member(arg1, arg2);
 	case SCM_OP_CONS: return scm_cons(arg1, arg2);
 	case SCM_OP_SET_CAR: return scm_set_car(arg1, arg2);
 	case SCM_OP_SET_CDR: return scm_set_cdr(arg1, arg2);
