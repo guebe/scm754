@@ -203,7 +203,8 @@ extern scm_obj_t scm_number_to_string(scm_obj_t number)
 }
 
 #define SCM_COMPARE(name, sname, type, is_t, get_v, cmp)                  \
-scm_obj_t name(scm_obj_t args) {                                          \
+scm_obj_t name(scm_obj_t args)                                            \
+{                                                                         \
     scm_obj_t o = scm_car(args);                                          \
     if (!is_t(o)) return scm_error(sname ": type err");                   \
     type x = get_v(o);                                                    \
@@ -259,32 +260,17 @@ tail_recurse:
 	return false;
 }
 
-extern scm_obj_t scm_memq(scm_obj_t obj, scm_obj_t list)
-{
-	while (scm_is_pair(list)) {
-		scm_obj_t item = scm_car(list);
-		if (scm_is_eq(obj, item)) return list;
-		list = scm_cdr(list);
-	}
-	return scm_false();
+#define SCM_MEMBER(name, cmp)                    \
+scm_obj_t name(scm_obj_t obj, scm_obj_t list)    \
+{                                                \
+	while (scm_is_pair(list)) {              \
+		scm_obj_t item = scm_car(list);  \
+		if (cmp(obj, item)) return list; \
+		list = scm_cdr(list);            \
+	}                                        \
+	return scm_false();                      \
 }
 
-extern scm_obj_t scm_memv(scm_obj_t obj, scm_obj_t list)
-{
-	while (scm_is_pair(list)) {
-		scm_obj_t item = scm_car(list);
-		if (scm_is_eqv(obj, item)) return list;
-		list = scm_cdr(list);
-	}
-	return scm_false();
-}
-
-extern scm_obj_t scm_member(scm_obj_t obj, scm_obj_t list)
-{
-	while (scm_is_pair(list)) {
-		scm_obj_t item = scm_car(list);
-		if (scm_is_equal(obj, item)) return list;
-		list = scm_cdr(list);
-	}
-	return scm_false();
-}
+SCM_MEMBER(scm_memq, scm_is_eq)
+SCM_MEMBER(scm_memv, scm_is_eqv)
+SCM_MEMBER(scm_member, scm_is_equal)
