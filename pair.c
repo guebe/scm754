@@ -6,17 +6,17 @@
 
 typedef struct
 {
-	scm_obj_t car;
+	scm_obj_t car_next;
 	scm_obj_t cdr;
-	uint32_t next;
 	uint8_t mark;
 } scm_pair_t;
 
 static scm_pair_t cell[SCM_CELL_NUM];
-static uint32_t head = 0;
+static size_t head = 0;
+#define TAIL UINT64_MAX
 
 static const scm_obj_t *stack[SCM_STACK_NUM];
-static uint32_t stack_index = 0;
+static size_t stack_index = 0;
 
 extern bool scm_gc_push(const scm_obj_t *obj)
 {
@@ -60,10 +60,9 @@ extern void scm_gc_init(void)
 {
 	scm_string_init();
 
-	for (uint32_t i = 0; i < SCM_CELL_NUM; i++) {
-		cell[i].next = ((i + 1) < SCM_CELL_NUM) ? i + 1 : UINT32_MAX;
+	for (size_t i = 0; i < SCM_CELL_NUM; i++) {
+		cell[i].car_next = ((i + 1) < SCM_CELL_NUM) ? i + 1 : TAIL;
 #ifndef NDEBUG
-		cell[i].car = SCM_ERROR;
 		cell[i].cdr = SCM_ERROR;
 #endif
 		cell[i].mark = 0;
@@ -77,7 +76,7 @@ static void mark(scm_obj_t obj)
 		scm_obj_t i = (uint32_t)obj;
 		if (cell[i].mark) return;
 		cell[i].mark = 1;
-		mark(cell[i].car);
+		mark(cell[i].car_next);
 		mark(cell[i].cdr);
 	}
 	else if (scm_is_string(obj) || scm_is_symbol(obj)) {
@@ -87,22 +86,21 @@ static void mark(scm_obj_t obj)
 
 static void mark_stack(void)
 {
-	for (uint32_t i = 0; i < stack_index; i++) {
+	for (size_t i = 0; i < stack_index; i++) {
 		mark(*stack[i]);
 	}
 }
 
 static void sweep(void)
 {
-	uint32_t tail = UINT32_MAX;
-	for (uint32_t i = 0; i < SCM_CELL_NUM; i++) {
+	size_t tail = TAIL;
+	for (size_t i = 0; i < SCM_CELL_NUM; i++) {
 		scm_pair_t *x = &cell[i];
 		if (!x->mark) {
+			x->car_next = tail;
 #ifndef NDEBUG
-			x->car = SCM_ERROR;
 			x->cdr = SCM_ERROR;
 #endif
-			x->next = tail;
 			tail = i;
 		}
 		x->mark = 0;
@@ -124,20 +122,18 @@ extern void scm_gc_collect(void)
 
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
 {
-	if (head == UINT32_MAX) return scm_error("out of memory");
-	uint32_t i = head;
-	cell[i].car = obj1;
+	if (head == TAIL) return scm_error("out of memory");
+	size_t i = head;
+	head = cell[i].car_next;
+	cell[i].car_next = obj1;
 	cell[i].cdr = obj2;
-	head = cell[i].next;
 	return SCM_PAIR | i;
 }
 
 extern scm_obj_t scm_car(scm_obj_t pair)
 {
 	if (!scm_is_pair(pair)) return scm_error("car: not a pair");
-	scm_obj_t car = cell[(uint32_t)pair].car;
-	assert(car != SCM_ERROR);
-	return car;
+	return cell[(uint32_t)pair].car_next;
 }
 
 extern scm_obj_t scm_cdr(scm_obj_t pair)
@@ -151,9 +147,7 @@ extern scm_obj_t scm_cdr(scm_obj_t pair)
 extern scm_obj_t scm_set_car(scm_obj_t pair, scm_obj_t obj)
 {
 	if (!scm_is_pair(pair)) return scm_error("set-car!: not a pair");
-	uint32_t i = (uint32_t)pair;
-	assert(cell[i].car != SCM_ERROR);
-	cell[i].car = obj;
+	cell[(uint32_t)pair].car_next = obj;
 	return scm_unspecified();
 }
 
