@@ -9,7 +9,7 @@ extern scm_obj_t scm_error(const char *message, ...)
 
 int LLVMFuzzerInitialize(void)
 {
-	scm_interaction_environment = scm_environment_create();
+	scm_interaction_environment = scm_env_create();
 	return 0;
 }
 
