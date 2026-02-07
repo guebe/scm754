@@ -8,12 +8,14 @@ typedef struct
 {
 	scm_obj_t car_next;
 	scm_obj_t cdr;
-	uint8_t mark;
 } scm_pair_t;
 
 static scm_pair_t cell[SCM_CELL_NUM];
 static size_t head = 0;
 #define TAIL UINT64_MAX
+
+static uint64_t mark_bits[SCM_CELL_NUM/64];
+_Static_assert(SCM_CELL_NUM % 64 == 0, "SCM_CELL_NUM must be multiple of 64");
 
 static const scm_obj_t *stack[SCM_STACK_NUM];
 static size_t stack_index = 0;
@@ -65,19 +67,22 @@ extern void scm_gc_init(void)
 #ifndef NDEBUG
 		cell[i].cdr = SCM_ERROR;
 #endif
-		cell[i].mark = 0;
 	}
 	head = 0;
+	memset(mark_bits, 0, sizeof(mark_bits));
 }
 
 static void mark(scm_obj_t obj)
 {
+tail_call:
 	if (scm_is_pair(obj) || scm_is_closure(obj)) {
-		scm_obj_t i = (uint32_t)obj;
-		if (cell[i].mark) return;
-		cell[i].mark = 1;
+		size_t i = (uint32_t)obj;
+		assert(i < SCM_CELL_NUM);
+		if (mark_bits[i/64] & (1ULL << (i%64))) return;
+		mark_bits[i/64] |= (1ULL << (i%64));
 		mark(cell[i].car_next);
-		mark(cell[i].cdr);
+		obj = cell[i].cdr;
+		goto tail_call;
 	}
 	else if (scm_is_string(obj) || scm_is_symbol(obj)) {
 		scm_mark_string(obj);
@@ -94,16 +99,37 @@ static void mark_stack(void)
 static void sweep(void)
 {
 	size_t tail = TAIL;
-	for (size_t i = 0; i < SCM_CELL_NUM; i++) {
-		scm_pair_t *x = &cell[i];
-		if (!x->mark) {
-			x->car_next = tail;
+	for (size_t i = 0; i < (SCM_CELL_NUM/64); i++) {
+		uint64_t dead = ~mark_bits[i];
+		mark_bits[i] = 0;
+		if (dead == 0) continue;
+
+		if (dead == UINT64_MAX) {
+			size_t k;
+			for (k = i*64; k < (i*64 + 63); k++) {
+				cell[k].car_next = k + 1;
 #ifndef NDEBUG
-			x->cdr = SCM_ERROR;
+				cell[k].cdr = SCM_ERROR;
 #endif
-			tail = i;
+			}
+			cell[k].car_next = tail;
+#ifndef NDEBUG
+			cell[k].cdr = SCM_ERROR;
+#endif
+			tail = i*64;
+			continue;
 		}
-		x->mark = 0;
+
+		while(dead) {
+			int j = __builtin_ctzll(dead); /* count trailing zeros */
+			size_t k = i*64 + (size_t)j;
+			cell[k].car_next = tail;
+#ifndef NDEBUG
+			cell[k].cdr = SCM_ERROR;
+#endif
+			tail = k;
+			dead &= (dead - 1); /* clear LSB */
+		}
 	}
 	head = tail;
 }
