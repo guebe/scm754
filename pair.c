@@ -59,7 +59,7 @@ extern void scm_gc_pop2(void)
 
 extern void scm_gc_init(void)
 {
-	scm_string_init();
+	scm_gc_string_init();
 
 	for (size_t i = 0; i < SCM_CELL_NUM; i++) {
 		cell[i].car_next = ((i + 1) < SCM_CELL_NUM) ? i + 1 : UINT64_MAX;
@@ -84,7 +84,7 @@ tail_call:
 		goto tail_call;
 	}
 	else if (scm_is_string(obj) || scm_is_symbol(obj)) {
-		scm_mark_string(obj);
+		scm_gc_string_mark(obj);
 	}
 }
 
@@ -134,7 +134,7 @@ extern void scm_gc_collect(void)
 			mark(*stack[j]);
 		}
 		sweep();
-		scm_sweep_string();
+		scm_gc_string_sweep();
 	}
 }
 
