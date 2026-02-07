@@ -1,7 +1,7 @@
 # (c) guenter.ebermann@htl-hl.ac.at
 
-SRC = error.c number.c pair.c port.c read.c write.c environment.c procedures.c eval.c string.c
-SRC_SCHEME = $(SRC) main.c
+SRC = number.c pair.c port.c read.c write.c environment.c procedures.c eval.c string.c
+SRC_SCHEME = $(SRC) error.c main.c
 SRC_FUZZ = $(SRC) fuzz.c
 
 CC = clang
@@ -22,7 +22,7 @@ analyze:
 	clang --analyze $(SRC_SCHEME)
 
 tidy:
-	clang-tidy $(SRC_SCHEME) -checks=misc-unused-functions,misc-unused-parameters,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling -- -I.
+	clang-tidy $(SRC_SCHEME) -checks=misc-unused-functions,misc-unused-parameters,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-clang-analyzer-valist.Uninitialized -- -I.
 
 fuzz-all:
 	./fuzz-blackbox

@@ -216,7 +216,7 @@ static scm_obj_t read_quote(void)
 	args = scm_cons(datum, scm_nil());
 	if (scm_is_error(args)) return args;
 
-	return scm_cons(SCM_QUOTE, args);
+	return scm_cons((SCM_SYMBOL | SCM_OP_QUOTE), args);
 }
 
 static scm_obj_t read(bool dot_ok, bool rparen_ok, bool eof_ok)

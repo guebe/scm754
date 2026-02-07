@@ -1,7 +1,7 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
 #include "scm754.h"
 
-static bool debug = false;
+#define SCM_LAMBDA (SCM_SYMBOL | SCM_OP_LAMBDA)
 
 static scm_obj_t eval_list(scm_obj_t list, scm_obj_t environment_specifier)
 {
@@ -77,7 +77,7 @@ static scm_obj_t eval_define(scm_obj_t args, scm_obj_t env)
 	else return scm_error("define: bad form, should be (define var value) or (define (f x y) body)");
 out:
 	if (scm_is_error(value)) return value;
-	scm_environment_define(env, var, value);
+	scm_env_define(env, var, value);
 	return scm_unspecified();
 }
 
@@ -206,11 +206,7 @@ static scm_obj_t eval_or(scm_obj_t args, scm_obj_t env)
 	return scm_car(args);
 }
 
-extern void scm_enable_debug(void)
-{
-	debug = true;
-}
-
+#ifdef SCM_DEBUG
 static void debug_print(bool is_closure, scm_obj_t op, scm_obj_t args)
 {
 	if (is_closure) fputs("; lambda ", stdout);
@@ -220,11 +216,13 @@ static void debug_print(bool is_closure, scm_obj_t op, scm_obj_t args)
 	scm_write(args);
 	putchar('\n');
 }
+#endif
 
-static scm_obj_t apply_closure(scm_obj_t proc, scm_obj_t evlist, scm_obj_t env)
+static scm_obj_t apply_closure(scm_obj_t proc, scm_obj_t env)
 {
-	if (debug) debug_print(true, proc, evlist);
-
+#ifdef SCM_DEBUG
+	debug_print(true, proc, env);
+#endif
 	scm_obj_t body = scm_cdr(proc);
 	while (scm_is_pair(scm_cdr(body))) {
 	    scm_obj_t result = scm_eval(scm_car(body), env);
@@ -248,7 +246,7 @@ tail_call:
 		result = scm_error("eval: can not eval empty list object ()");
 	}
 	else if (scm_is_symbol(expr)) {
-		result = scm_environment_lookup(env, expr);
+		result = scm_env_lookup(env, expr);
 	}
 	else if (!scm_is_pair(expr)) {
 		result = expr; /* self-evaluating */
@@ -307,9 +305,9 @@ tail_call:
 		else if (scm_is_closure(op)) {
 			op = scm_closure_value(op);
 			scm_obj_t param_body = scm_cdr(op);
-			env = result = scm_environment_extend(scm_car(op), scm_car(param_body), args);
+			env = result = scm_env_extend(scm_car(op), scm_car(param_body), args);
 			if (scm_is_error(result)) goto out2;
-			expr = apply_closure(param_body, args, env);
+			expr = apply_closure(param_body, env);
 			scm_gc_pop2();
 			goto tail_call;
 		}
@@ -327,9 +325,9 @@ out:
 extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 {
 	if (!scm_is_procedure(proc)) return scm_error("apply: attempt to apply non-procedure");
-
-	if (debug) debug_print(false, proc, args);
-
+#ifdef SCM_DEBUG
+	debug_print(false, proc, args);
+#endif
 	int8_t arity = scm_procedure_arity(proc);
 	size_t argc = scm_length(args);
 

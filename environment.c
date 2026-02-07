@@ -134,7 +134,7 @@ extern int8_t scm_procedure_arity(scm_obj_t proc)
 	return ops[id].arity;
 }
 
-extern scm_obj_t scm_environment_create(void)
+extern scm_obj_t scm_env_create(void)
 {
 	bool result;
 
@@ -155,7 +155,7 @@ extern scm_obj_t scm_environment_create(void)
 	return scm_cons(scm_nil(), scm_nil());
 }
 
-extern scm_obj_t scm_environment_lookup(scm_obj_t env, scm_obj_t symbol)
+extern scm_obj_t scm_env_lookup(scm_obj_t env, scm_obj_t symbol)
 {
 	scm_obj_t x, y;
 
@@ -179,14 +179,14 @@ extern scm_obj_t scm_environment_lookup(scm_obj_t env, scm_obj_t symbol)
 	return scm_error("unbound variable %s", scm_string_value(scm_symbol_to_string(symbol)));
 }
 
-extern void scm_environment_define(scm_obj_t env, scm_obj_t symbol, scm_obj_t value)
+extern void scm_env_define(scm_obj_t env, scm_obj_t symbol, scm_obj_t value)
 {
 	assert(scm_is_pair(env));
 	assert(scm_is_symbol(symbol));
 	scm_set_car(env, scm_cons(scm_cons(symbol, value), scm_car(env)));
 }
 
-extern scm_obj_t scm_environment_extend(scm_obj_t env, scm_obj_t params, scm_obj_t args)
+extern scm_obj_t scm_env_extend(scm_obj_t env, scm_obj_t params, scm_obj_t args)
 {
 	if (scm_is_null(params) && scm_is_null(args))
 		return env;

@@ -13,7 +13,7 @@ typedef struct
 static scm_string_t strings[SCM_STRING_NUM];
 static uint32_t head = 0;
 
-extern void scm_mark_string(scm_obj_t obj)
+extern void scm_gc_string_mark(scm_obj_t obj)
 {
 	assert(scm_is_string(obj) || scm_is_symbol(obj));
 	uint32_t i = (uint32_t)obj;
@@ -24,7 +24,7 @@ extern void scm_mark_string(scm_obj_t obj)
 	strings[i].mark = 1;
 }
 
-extern void scm_sweep_string(void)
+extern void scm_gc_string_sweep(void)
 {
 	uint32_t tail = UINT32_MAX;
 	for (uint32_t i = 0; i < SCM_STRING_NUM; i++) {
@@ -40,7 +40,7 @@ extern void scm_sweep_string(void)
 	head = tail;
 }
 
-extern void scm_string_init(void)
+extern void scm_gc_string_init(void)
 {
 	for (uint32_t i = 0; i < SCM_STRING_NUM; i++) {
 		strings[i].next = ((i + 1) < SCM_STRING_NUM) ? i + 1 : UINT32_MAX;

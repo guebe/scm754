@@ -33,9 +33,7 @@ int main(int argc, char *argv[])
 	FILE *f;
 	bool repl;
 
-	scm_enable_error();
-
-	scm_interaction_environment = scm_environment_create();
+	scm_interaction_environment = scm_env_create();
 
 	if (load_library() < 0) return 1;
 
@@ -44,16 +42,8 @@ int main(int argc, char *argv[])
 		scm_current_input_port = stdin;
 	}
 	else {
-		const char *file;
 		repl = false;
-		if (argc == 2) {
-			file = argv[1];
-		}
-		else {
-			scm_enable_debug();
-			file = argv[2];
-		}
-
+		const char *file = argv[1];
 		f = fopen(file, "r");
 		if (f == NULL) {
 			printf("cant open file %s\n", file);
@@ -76,7 +66,7 @@ int main(int argc, char *argv[])
 		if (scm_is_error(obj)) { if (repl) continue; else break; }
 #endif
 
-		/* unspecified is returned by e.g. define as per specification. we do _not_ want to print the unspecified value in a REPL */
+		/* Unspecified is returned by e.g. define. Dont print it. */
 		if (!scm_is_unspecified(obj)) {
 			scm_write(obj);
 			putchar('\n');

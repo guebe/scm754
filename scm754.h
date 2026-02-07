@@ -1,5 +1,4 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
-
 #ifndef __SCM754_H__
 #define __SCM754_H__
 
@@ -11,11 +10,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* All Scheme objects are of type scm_obj_t */
 typedef uint64_t scm_obj_t;
 
-/* tags */
+/* Tags for scm_obj_t */
 #define SCM_MASK         0xffff000000000000
-/* do not use: -inf      0xfff0000000000000 */
+/* Do not use: -inf      0xfff0000000000000 */
 #define SCM_NIL          0xfff1000000000000
 #define SCM_TRUE         0xfff2000000000000
 #define SCM_FALSE        0xfff3000000000000
@@ -23,35 +23,22 @@ typedef uint64_t scm_obj_t;
 #define SCM_DOT          0xfff5000000000000
 #define SCM_RPAREN       0xfff6000000000000
 #define SCM_UNSPECIFIED  0xfff7000000000000
-/* do not use: -nan      0xfff8000000000000 */
+/* Do not use: -nan      0xfff8000000000000 */
 #define SCM_ERROR        0xfff9000000000000
 #define SCM_SYMBOL       0xfffa000000000000
 #define SCM_STRING       0xfffb000000000000
 #define SCM_PAIR         0xfffc000000000000
 #define SCM_CHAR         0xfffd000000000000
-/* procedure is a built-in - evaluate arguments then apply procedure - the
- * caller already evaluated all arguments - the callee takes already evaluated
- * arguments */
 #define SCM_PROCEDURE    0xfffe000000000000
-/* closure is a user defined function (lambda or define special form) - index
- * to cell with a pair ((variables) . (body)) stored in the environment */
 #define SCM_CLOSURE      0xffff000000000000
 
-/* primitives - special forms which control evaluation and thus are kept
- * separate from procedures. Each primitive itself (callee) evaluates its
- * arguments according to special rules defined by the specification. Those
- * primitives are interned constants to speed-up evaluation but _not_ stored in
- * any environment. */
-#define SCM_QUOTE    (SCM_SYMBOL | SCM_OP_QUOTE)
-#define SCM_LAMBDA   (SCM_SYMBOL | SCM_OP_LAMBDA)
-
-extern scm_obj_t scm_interaction_environment;
-extern FILE *scm_current_input_port;
-
-/* primitives and procedures need a contiguous index for interning the symbols
- * with a stable id. This eases operation dispatching in eval. */
+/* Primitives and procedures get a contiguous index for interning the symbols
+ * with a stable id. Eases jump-table generation in eval. */
 typedef enum {
-	/* primitives */
+	/* Primitive and derived expression types
+	 * Argument evaluation: individually by each expression
+	 * Interned: yes
+	 * Maybe stored in environment: no */
 	SCM_OP_IF = 0,
 	SCM_OP_OR,
 	SCM_OP_LET,
@@ -61,9 +48,12 @@ typedef enum {
 	SCM_OP_LAMBDA,
 	SCM_OP_DEFINE,
 
-	/* procedures */
-	SCM_OP_NEWLINE,
-	SCM_OP_PROCEDURE_FIRST = SCM_OP_NEWLINE,
+	/* Standard procedures
+	 * Argument evaluation: uniformly before application
+	 * Interned: yes
+	 * Maybe stored in environment: yes */
+	SCM_OP_PROCEDURE_FIRST,
+	SCM_OP_NEWLINE = SCM_OP_PROCEDURE_FIRST,
 	SCM_OP_CAR,
 	SCM_OP_CDR,
 	SCM_OP_IS_PROCEDURE,
@@ -122,7 +112,13 @@ typedef enum {
 	SCM_OP_PROCEDURE_LAST = SCM_OP_SUBSTRING,
 } scm_op_t;
 
-/* type predicates */
+/* Default environment for REPL */
+extern scm_obj_t scm_interaction_environment;
+
+/* Default input port */
+extern FILE *scm_current_input_port;
+
+/* Type predicates */
 static inline bool scm_is_null(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_NIL; }
 static inline bool scm_is_boolean(scm_obj_t obj)      { return ((obj & SCM_MASK) == SCM_TRUE) || ((obj & SCM_MASK) == SCM_FALSE); }
 static inline bool scm_is_eof_object(scm_obj_t obj)   { return (obj & SCM_MASK) == SCM_EOF; }
@@ -143,42 +139,40 @@ static inline bool scm_is_number(scm_obj_t obj)
 	return (exp != 0x7FF) || (((tag == 0) || (tag == 8)) && (exp == 0x7FF));
 }
 
-/* accessors */
+/* Accessors */
 static inline bool scm_boolean_value(scm_obj_t obj)          { return obj != SCM_FALSE; }
 static inline double scm_number_value(scm_obj_t number)      { double d; memcpy(&d, &number, sizeof d); return d; }
 static inline int scm_char_value(scm_obj_t c)                { return (int)(uint32_t)c; }
-static inline uint32_t scm_procedure_id(scm_obj_t procedure) { return (uint32_t)procedure; }
-extern const char *scm_procedure_string(scm_obj_t proc);
-extern int8_t scm_procedure_arity(scm_obj_t proc);
 static inline scm_obj_t scm_closure_value(scm_obj_t closure) { return SCM_PAIR | (uint32_t)closure; }
-extern scm_obj_t scm_car(scm_obj_t pair);
-extern scm_obj_t scm_cdr(scm_obj_t pair);
+static inline uint32_t scm_procedure_id(scm_obj_t procedure) { return (uint32_t)procedure; }
+extern int8_t scm_procedure_arity(scm_obj_t proc);
+extern const char *scm_procedure_string(scm_obj_t proc);
 extern char *scm_string_value(scm_obj_t string);
 static inline size_t scm_string_length(scm_obj_t string)     { assert(scm_is_string(string)); return strlen(scm_string_value(string)); }
+extern scm_obj_t scm_car(scm_obj_t pair);
+extern scm_obj_t scm_cdr(scm_obj_t pair);
 
-/* mutators */
+/* Mutators */
 extern scm_obj_t scm_set_car(scm_obj_t pair, scm_obj_t obj);
 extern scm_obj_t scm_set_cdr(scm_obj_t pair, scm_obj_t obj);
 
-/* constructors */
-static inline scm_obj_t scm_nil(void)              { return SCM_NIL; }
-static inline scm_obj_t scm_boolean(bool x)        { return x?SCM_TRUE:SCM_FALSE; }
-static inline scm_obj_t scm_true(void)             { return SCM_TRUE; }
-static inline scm_obj_t scm_false(void)            { return SCM_FALSE; }
-static inline scm_obj_t scm_eof_object(void)       { return SCM_EOF; }
-static inline scm_obj_t scm_dot(void)              { return SCM_DOT; }
-static inline scm_obj_t scm_rparen(void)           { return SCM_RPAREN; }
-static inline scm_obj_t scm_unspecified(void)      { return SCM_UNSPECIFIED; }
-static inline scm_obj_t scm_number(double number)  { scm_obj_t d; memcpy(&d, &number, sizeof d); return d; }
-static inline scm_obj_t scm_char(int c)            { return SCM_CHAR | (uint32_t)c; }
-static inline scm_obj_t scm_procedure(uint32_t id) { return SCM_PROCEDURE | id; }
-static inline scm_obj_t scm_closure(scm_obj_t pair){ return SCM_CLOSURE | (uint32_t)pair; }
-extern scm_obj_t scm_string_to_number(const char *string, int radix);
-extern scm_obj_t scm_number_to_string(scm_obj_t number);
+/* Constructors */
+static inline scm_obj_t scm_nil(void)               { return SCM_NIL; }
+static inline scm_obj_t scm_boolean(bool x)         { return x?SCM_TRUE:SCM_FALSE; }
+static inline scm_obj_t scm_true(void)              { return SCM_TRUE; }
+static inline scm_obj_t scm_false(void)             { return SCM_FALSE; }
+static inline scm_obj_t scm_eof_object(void)        { return SCM_EOF; }
+static inline scm_obj_t scm_dot(void)               { return SCM_DOT; }
+static inline scm_obj_t scm_rparen(void)            { return SCM_RPAREN; }
+static inline scm_obj_t scm_unspecified(void)       { return SCM_UNSPECIFIED; }
+static inline scm_obj_t scm_number(double number)   { scm_obj_t d; memcpy(&d, &number, sizeof d); return d; }
+static inline scm_obj_t scm_char(int c)             { return SCM_CHAR | (uint32_t)c; }
+static inline scm_obj_t scm_procedure(uint32_t id)  { return SCM_PROCEDURE | id; }
+static inline scm_obj_t scm_closure(scm_obj_t pair) { return SCM_CLOSURE | (uint32_t)pair; }
 extern scm_obj_t scm_string(const char *string, size_t k);
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2);
 
-/* primitives */
+/* Standard procedures */
 __attribute__((format(printf, 1, 2)))
 __attribute__((warn_unused_result))
 extern scm_obj_t scm_error(const char *message, ...);
@@ -191,11 +185,9 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env);
 extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args);
 extern int scm_read_char(void);
 extern int scm_peek_char(void);
-extern scm_obj_t scm_environment_create(void);
-extern scm_obj_t scm_environment_lookup(scm_obj_t env, scm_obj_t symbol);
-extern void scm_environment_define(scm_obj_t env, scm_obj_t symbol, scm_obj_t value);
-extern scm_obj_t scm_environment_extend(scm_obj_t env, scm_obj_t params, scm_obj_t args);
+extern scm_obj_t scm_number_to_string(scm_obj_t number);
 extern scm_obj_t scm_string_to_symbol(scm_obj_t string);
+extern scm_obj_t scm_string_to_number(const char *string, int radix);
 static inline scm_obj_t scm_symbol_to_string(scm_obj_t symbol)
 {
 	if (!scm_is_symbol(symbol)) return scm_error("not a symbol");
@@ -212,10 +204,8 @@ static inline bool scm_is_eq(scm_obj_t obj1, scm_obj_t obj2)
 static inline bool scm_is_eqv(scm_obj_t obj1, scm_obj_t obj2)
 {
 	if (obj1 == obj2) return true;
-
 	if (scm_is_number(obj1) && scm_is_number(obj2))
 		return scm_number_value(obj1) == scm_number_value(obj2);
-
 	return false;
 }
 extern bool scm_is_equal(scm_obj_t obj1, scm_obj_t obj2);
@@ -248,16 +238,21 @@ extern scm_obj_t scm_string_ref(scm_obj_t string, scm_obj_t k);
 extern scm_obj_t scm_string_set(scm_obj_t string, scm_obj_t k, scm_obj_t c);
 extern scm_obj_t scm_list_ref(scm_obj_t list, scm_obj_t k);
 
+/* Environment */
+extern scm_obj_t scm_env_create(void);
+extern scm_obj_t scm_env_lookup(scm_obj_t env, scm_obj_t symbol);
+extern void scm_env_define(scm_obj_t env, scm_obj_t symbol, scm_obj_t value);
+extern scm_obj_t scm_env_extend(scm_obj_t env, scm_obj_t params, scm_obj_t args);
+
+/* Garbage collector */
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);
 __attribute__((warn_unused_result))
 extern bool scm_gc_push(const scm_obj_t *obj);
+extern void scm_gc_pop(void);
 extern bool scm_gc_push2(const scm_obj_t *obj1, const scm_obj_t *obj2);
 extern void scm_gc_pop2(void);
-extern void scm_gc_pop(void);
-extern void scm_string_init(void);
-extern void scm_mark_string(scm_obj_t string);
-extern void scm_sweep_string(void);
-extern void scm_enable_debug(void);
-extern void scm_enable_error(void);
+extern void scm_gc_string_init(void);
+extern void scm_gc_string_mark(scm_obj_t string);
+extern void scm_gc_string_sweep(void);
 #endif
