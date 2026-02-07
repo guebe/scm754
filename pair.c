@@ -11,8 +11,7 @@ typedef struct
 } scm_pair_t;
 
 static scm_pair_t cell[SCM_CELL_NUM];
-static size_t head = 0;
-#define TAIL UINT64_MAX
+static size_t cell_head = 0;
 
 static uint64_t mark_bits[SCM_CELL_NUM/64];
 _Static_assert(SCM_CELL_NUM % 64 == 0, "SCM_CELL_NUM must be multiple of 64");
@@ -63,12 +62,12 @@ extern void scm_gc_init(void)
 	scm_string_init();
 
 	for (size_t i = 0; i < SCM_CELL_NUM; i++) {
-		cell[i].car_next = ((i + 1) < SCM_CELL_NUM) ? i + 1 : TAIL;
+		cell[i].car_next = ((i + 1) < SCM_CELL_NUM) ? i + 1 : UINT64_MAX;
 #ifndef NDEBUG
 		cell[i].cdr = SCM_ERROR;
 #endif
 	}
-	head = 0;
+	cell_head = 0;
 	memset(mark_bits, 0, sizeof(mark_bits));
 }
 
@@ -98,7 +97,7 @@ static void mark_stack(void)
 
 static void sweep(void)
 {
-	size_t tail = TAIL;
+	size_t head = UINT64_MAX;
 	for (size_t i = 0; i < (SCM_CELL_NUM/64); i++) {
 		uint64_t dead = ~mark_bits[i];
 		mark_bits[i] = 0;
@@ -112,26 +111,26 @@ static void sweep(void)
 				cell[k].cdr = SCM_ERROR;
 #endif
 			}
-			cell[k].car_next = tail;
+			cell[k].car_next = head;
 #ifndef NDEBUG
 			cell[k].cdr = SCM_ERROR;
 #endif
-			tail = i*64;
+			head = i*64;
 			continue;
 		}
 
 		while(dead) {
 			int j = __builtin_ctzll(dead); /* count trailing zeros */
 			size_t k = i*64 + (size_t)j;
-			cell[k].car_next = tail;
+			cell[k].car_next = head;
 #ifndef NDEBUG
 			cell[k].cdr = SCM_ERROR;
 #endif
-			tail = k;
+			head = k;
 			dead &= (dead - 1); /* clear LSB */
 		}
 	}
-	head = tail;
+	cell_head = head;
 }
 
 extern void scm_gc_collect(void)
@@ -148,9 +147,9 @@ extern void scm_gc_collect(void)
 
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
 {
-	if (head == TAIL) return scm_error("out of memory");
-	size_t i = head;
-	head = cell[i].car_next;
+	if (cell_head == UINT64_MAX) return scm_error("out of memory");
+	size_t i = cell_head;
+	cell_head = cell[i].car_next;
 	cell[i].car_next = obj1;
 	cell[i].cdr = obj2;
 	return SCM_PAIR | i;
