@@ -88,13 +88,6 @@ tail_call:
 	}
 }
 
-static void mark_stack(void)
-{
-	for (size_t i = 0; i < stack_index; i++) {
-		mark(*stack[i]);
-	}
-}
-
 static void sweep(void)
 {
 	size_t head = UINT64_MAX;
@@ -137,9 +130,9 @@ extern void scm_gc_collect(void)
 {
 	static int i = 0;
 	if (i++ % 3000 == 0) {
-		mark(scm_interaction_environment);
-		mark(scm_symbols);
-		mark_stack();
+		for (size_t j = 0; j < stack_index; j++) {
+			mark(*stack[j]);
+		}
 		sweep();
 		scm_sweep_string();
 	}

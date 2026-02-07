@@ -46,7 +46,6 @@ typedef uint64_t scm_obj_t;
 #define SCM_LAMBDA   (SCM_SYMBOL | SCM_OP_LAMBDA)
 
 extern scm_obj_t scm_interaction_environment;
-extern scm_obj_t scm_symbols;
 extern FILE *scm_current_input_port;
 
 /* primitives and procedures need a contiguous index for interning the symbols
