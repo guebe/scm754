@@ -3,7 +3,6 @@
 
 int LLVMFuzzerInitialize(void)
 {
-	//scm_interaction_environment = scm_environment_create();
 	scm_gc_init();
 	return 0;
 }
