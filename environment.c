@@ -92,6 +92,8 @@ static const scm_ops_t ops[] =
 	[SCM_OP_MAX] = { "max", -1 },
 };
 
+_Static_assert((SCM_OP_PROCEDURE_LAST + 1) == sizeof(ops)/sizeof(ops[0]), "OP array and enum out of sync");
+
 static scm_obj_t intern(scm_obj_t symbol)
 {
 	scm_obj_t x, y, z, w;
@@ -135,8 +137,6 @@ extern int8_t scm_procedure_arity(scm_obj_t proc)
 extern scm_obj_t scm_environment_create(void)
 {
 	scm_gc_init();
-
-	assert((SCM_OP_PROCEDURE_LAST + 1) == sizeof(ops)/sizeof(ops[0]));
 
 	/* pre-intern all operations (special forms and procedures) to get
 	 * stable index and O(1) lookup during eval */
