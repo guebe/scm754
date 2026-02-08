@@ -14,8 +14,8 @@ scm754: $(SRC) error.c main.c scm754.h
 scm754-debug: $(SRC) error.c main.c scm754.h
 	$(CC) $(CFLAGS) -O1 -g -fsanitize=address,undefined -o $@ $(SRC) error.c main.c -lm
 
-fuzzer: $(SRC) fuzz.c scm754.h
-	$(CC) $(CFLAGS) -O1 -g -fsanitize=fuzzer,address,undefined -o $@ $(SRC) fuzz.c -lm
+fuzzer: $(SRC) fuzzer.c scm754.h
+	$(CC) $(CFLAGS) -O1 -g -fsanitize=fuzzer,address,undefined -o $@ $(SRC) fuzzer.c -lm
 
 test: test.scm
 	./scm754 $< > test.out
