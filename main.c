@@ -61,10 +61,8 @@ int main(int argc, char *argv[])
 		if (scm_is_eof_object(obj)) { break; }
 		else if (scm_is_error(obj)) { if (repl) continue; else break; }
 
-#ifndef SCM_NO_EVAL
 		obj = scm_eval(obj, scm_interaction_environment);
 		if (scm_is_error(obj)) { if (repl) continue; else break; }
-#endif
 
 		/* Unspecified is returned by e.g. define. Dont print it. */
 		if (!scm_is_unspecified(obj)) {
