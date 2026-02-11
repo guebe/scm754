@@ -13,3 +13,9 @@ extern scm_obj_t scm_error(const char *message, ...)
 
 	return SCM_ERROR;
 }
+
+extern void scm_fatal(const char *message)
+{
+	puts(message);
+	abort();
+}

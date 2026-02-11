@@ -26,7 +26,7 @@ test-r7rs: test-r7rs.scm
 	@if [ -s test-r7rs.out ]; then cat test-r7rs.out; exit 1; fi
 
 fuzz:
-	./fuzzer -max_total_time=3 -verbosity=0
+	./fuzzer -max_total_time=3 -verbosity=0 -dict=scheme.dict corpus
 
 analyze:
 	clang --analyze $(SRC) error.c main.c

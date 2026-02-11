@@ -9,7 +9,7 @@ static scm_obj_t eval_list(scm_obj_t list, scm_obj_t environment_specifier)
 	scm_obj_t tail = scm_nil();
 	scm_obj_t result;
 
-	if (!scm_gc_push(&head)) return scm_error("eval: stack overflow");
+	scm_gc_push(&head);
 
 	while (scm_is_pair(list)) {
 		result = scm_eval(scm_car(list), environment_specifier);
@@ -236,9 +236,7 @@ extern scm_obj_t scm_eval(scm_obj_t expr, scm_obj_t env)
 {
 	scm_obj_t result;
 
-	if (!scm_gc_push2(&expr, &env)) {
-		return scm_error("eval: stack overflow");
-	}
+	scm_gc_push2(&expr, &env);
 
 tail_call:
 
@@ -288,9 +286,7 @@ tail_call:
 
 		scm_gc_collect();
 
-		if (!scm_gc_push2(&op, &args)) {
-			return scm_error("eval: stack overflow");
-		}
+		scm_gc_push2(&op, &args);
 
 		/* application */
 		op = result = scm_eval(op, env);

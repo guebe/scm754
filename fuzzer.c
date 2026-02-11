@@ -7,19 +7,21 @@ extern scm_obj_t scm_error(const char *message, ...)
 	return SCM_ERROR;
 }
 
-int LLVMFuzzerInitialize(void)
+extern void scm_fatal(const char *message)
 {
-	scm_interaction_environment = scm_env_create();
-	return 0;
+	puts(message);
+	abort();
 }
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
 	FILE *mem = fmemopen((void *)data, size, "r");
 	if (!mem) return 0;
+	scm_interaction_environment = scm_env_create();
 	scm_current_input_port = mem;
 	scm_read();
 	scm_gc_collect();
+	scm_gc_string_free();
 	fclose(mem);
 	return 0;
 }

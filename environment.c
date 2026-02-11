@@ -21,7 +21,7 @@ scm_obj_t scm_interaction_environment;
 
 /* Symbol table: list of interned symbols
  * (a b c) (cons a (cons b (cons c '()))) */
-static scm_obj_t symbols = SCM_NIL;
+static scm_obj_t symbols;
 
 static const scm_ops_t ops[] =
 {
@@ -136,15 +136,11 @@ extern int8_t scm_procedure_arity(scm_obj_t proc)
 
 extern scm_obj_t scm_env_create(void)
 {
-	bool result;
-
 	scm_gc_init();
 
-	result = scm_gc_push(&scm_interaction_environment);
-	if (!result) abort();
-
-	result = scm_gc_push(&symbols);
-	if (!result) abort();
+	symbols = SCM_NIL;
+	scm_gc_push(&scm_interaction_environment);
+	scm_gc_push(&symbols);
 
 	/* pre-intern all operations (special forms and procedures) to get
 	 * stable index and O(1) lookup during eval */

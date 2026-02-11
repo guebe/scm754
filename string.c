@@ -49,6 +49,12 @@ extern void scm_gc_string_init(void)
 	head = 0;
 }
 
+extern void scm_gc_string_free(void)
+{
+	for (uint32_t i = 0; i < SCM_STRING_NUM; i++)
+		free(strings[i].string);
+}
+
 extern char *scm_string_value(scm_obj_t string)
 {
 	if (!scm_is_string(string)) {
@@ -66,7 +72,7 @@ extern char *scm_string_value(scm_obj_t string)
 
 extern scm_obj_t scm_string(const char *string, size_t k)
 {
-	if (head == UINT32_MAX) return scm_error("out of string memory");
+	if (head == UINT32_MAX) scm_fatal("out of string memory");
 
 	char *cstr = strndup(string, k);
 	if (cstr == NULL) return scm_error("string allocation failed");

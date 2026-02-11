@@ -173,6 +173,8 @@ extern scm_obj_t scm_string(const char *string, size_t k);
 extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2);
 
 /* Standard procedures */
+__attribute__((noreturn, nonnull))
+extern void scm_fatal(const char *message);
 __attribute__((format(printf, 1, 2)))
 __attribute__((warn_unused_result))
 extern scm_obj_t scm_error(const char *message, ...);
@@ -247,12 +249,12 @@ extern scm_obj_t scm_env_extend(scm_obj_t env, scm_obj_t params, scm_obj_t args)
 /* Garbage collector */
 extern void scm_gc_init(void);
 extern void scm_gc_collect(void);
-__attribute__((warn_unused_result))
-extern bool scm_gc_push(const scm_obj_t *obj);
+extern void scm_gc_push(const scm_obj_t *obj);
 extern void scm_gc_pop(void);
-extern bool scm_gc_push2(const scm_obj_t *obj1, const scm_obj_t *obj2);
+extern void scm_gc_push2(const scm_obj_t *obj1, const scm_obj_t *obj2);
 extern void scm_gc_pop2(void);
 extern void scm_gc_string_init(void);
 extern void scm_gc_string_mark(scm_obj_t string);
 extern void scm_gc_string_sweep(void);
+extern void scm_gc_string_free(void);
 #endif
