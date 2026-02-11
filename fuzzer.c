@@ -19,7 +19,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	if (!mem) return 0;
 	scm_interaction_environment = scm_env_create();
 	scm_current_input_port = mem;
-	scm_read();
+	scm_obj_t obj = scm_read();
+	(void) scm_eval(obj, scm_interaction_environment);
 	scm_gc_collect();
 	scm_gc_string_free();
 	fclose(mem);
