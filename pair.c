@@ -1,21 +1,13 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
 #include "scm754.h"
 
-#define SCM_CELL_NUM  32768U
-#define SCM_STACK_NUM  8192U
-
-typedef struct
-{
-	scm_obj_t car_next;
-	scm_obj_t cdr;
-} scm_pair_t;
-
-static scm_pair_t cell[SCM_CELL_NUM];
-static size_t cell_head;
+scm_pair_t cell[SCM_CELL_NUM];
+size_t cell_head;
 
 static uint64_t mark_bits[SCM_CELL_NUM/64];
 _Static_assert(SCM_CELL_NUM % 64 == 0, "SCM_CELL_NUM must be multiple of 64");
 
+#define SCM_STACK_NUM  8192U
 static const scm_obj_t *stack[SCM_STACK_NUM];
 static size_t stack_index;
 
@@ -136,44 +128,4 @@ extern void scm_gc_collect(void)
 		sweep();
 		scm_gc_string_sweep();
 	}
-}
-
-extern scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
-{
-	if (cell_head == UINT64_MAX) scm_fatal("out of cell memory");
-	size_t i = cell_head;
-	cell_head = cell[i].car_next;
-	cell[i].car_next = obj1;
-	cell[i].cdr = obj2;
-	return SCM_PAIR | i;
-}
-
-extern scm_obj_t scm_car(scm_obj_t pair)
-{
-	if (!scm_is_pair(pair)) return scm_error("car: not a pair");
-	return cell[(uint32_t)pair].car_next;
-}
-
-extern scm_obj_t scm_cdr(scm_obj_t pair)
-{
-	if (!scm_is_pair(pair)) return scm_error("cdr: not a pair");
-	scm_obj_t cdr = cell[(uint32_t)pair].cdr;
-	assert(cdr != SCM_ERROR);
-	return cdr;
-}
-
-extern scm_obj_t scm_set_car(scm_obj_t pair, scm_obj_t obj)
-{
-	if (!scm_is_pair(pair)) return scm_error("set-car!: not a pair");
-	cell[(uint32_t)pair].car_next = obj;
-	return scm_unspecified();
-}
-
-extern scm_obj_t scm_set_cdr(scm_obj_t pair, scm_obj_t obj)
-{
-	if (!scm_is_pair(pair)) return scm_error("set-cdr!: not a pair");
-	size_t i = (uint32_t)pair;
-	assert(cell[i].cdr != SCM_ERROR);
-	cell[i].cdr = obj;
-	return scm_unspecified();
 }
