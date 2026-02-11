@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -142,6 +143,12 @@ static inline bool scm_is_number(scm_obj_t obj)
 /* Accessors */
 static inline bool scm_boolean_value(scm_obj_t obj)          { return obj != SCM_FALSE; }
 static inline double scm_number_value(scm_obj_t number)      { double d; memcpy(&d, &number, sizeof d); return d; }
+static inline size_t scm_number_to_size(scm_obj_t number)
+{
+	double d = scm_number_value(number);
+	if (d >= 0.0 && d < (double)SIZE_MAX && d == floor(d)) return (size_t)d;
+	return SIZE_MAX;
+}
 static inline int scm_char_value(scm_obj_t c)                { return (int)(uint32_t)c; }
 static inline scm_obj_t scm_closure_value(scm_obj_t closure) { return SCM_PAIR | (uint32_t)closure; }
 static inline uint32_t scm_procedure_id(scm_obj_t procedure) { return (uint32_t)procedure; }

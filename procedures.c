@@ -1,5 +1,4 @@
 #include "scm754.h"
-#include <math.h>
 
 extern size_t scm_length(scm_obj_t list)
 {
@@ -14,7 +13,8 @@ extern size_t scm_length(scm_obj_t list)
 extern scm_obj_t scm_list_ref(scm_obj_t list, scm_obj_t k)
 {
 	if (!scm_is_number(k)) return scm_error("list-ref: type err");
-	size_t i = (size_t)scm_number_value(k);
+	size_t i = scm_number_to_size(k);
+	if (i == SIZE_MAX) return scm_error("list-ref: can't convert to size_t");
 	for (size_t j = 0; j < i; j++) {
 		if (!scm_is_pair(list)) goto err;
 		list = scm_cdr(list);
@@ -136,16 +136,18 @@ extern scm_obj_t scm_substring(scm_obj_t args)
 	args = scm_cdr(args);
 	if (!scm_is_null(args)) {
 		scm_obj_t b = scm_car(args);
-		if (!scm_is_number(b)) return scm_error("string-copy: needs a number");
-		start = (size_t)scm_number_value(b);
+		if (!scm_is_number(b)) return scm_error("substring: needs a number");
+		start = scm_number_to_size(b);
+		if (start == SIZE_MAX) return scm_error("substring: can't convert to size_t");
 
 		args = scm_cdr(args);
 		if (!scm_is_null(args)) {
 			scm_obj_t c = scm_car(args);
-			if (!scm_is_number(c)) return scm_error("string-copy: needs a number");
-			end = (size_t)scm_number_value(c);
+			if (!scm_is_number(c)) return scm_error("substring: needs a number");
+			end = scm_number_to_size(c);
+			if (end == SIZE_MAX) return scm_error("substring: can't convert to size_t");
 
-			if (!scm_is_null(scm_cdr(args))) return scm_error("string-copy: too many arguments");
+			if (!scm_is_null(scm_cdr(args))) return scm_error("substring: too many arguments");
 			end_avail = true;
 		}
 	}
@@ -163,7 +165,8 @@ extern scm_obj_t scm_string_ref(scm_obj_t string, scm_obj_t k)
 
 	const char *s = scm_string_value(string);
 	size_t len = scm_string_length(string);
-	size_t i = (size_t)scm_number_value(k);
+	size_t i = scm_number_to_size(k);
+	if (i == SIZE_MAX) return scm_error("string-ref: can't convert to size_t");
 
 	if (i >= len)
 		return scm_error("string-ref: index %lu out of bounds (string length %lu)", i, len);
@@ -177,7 +180,8 @@ extern scm_obj_t scm_string_set(scm_obj_t string, scm_obj_t k, scm_obj_t c)
 
 	char *s = scm_string_value(string);
 	size_t len = scm_string_length(string);
-	size_t i = (size_t)scm_number_value(k);
+	size_t i = scm_number_to_size(k);
+	if (i == SIZE_MAX) return scm_error("string-set!: can't convert to size_t");
 
 	if (i >= len)
 		return scm_error("string-set!: index %lu out of bounds (string length %lu)", i, len);
