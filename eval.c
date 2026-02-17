@@ -365,6 +365,9 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 	case SCM_OP_MEMV: return scm_memv(arg1, arg2);
 	case SCM_OP_MEMQ: return scm_memq(arg1, arg2);
 	case SCM_OP_MEMBER: return scm_member(arg1, arg2);
+	case SCM_OP_ASSV: return scm_assv(arg1, arg2);
+	case SCM_OP_ASSQ: return scm_assq(arg1, arg2);
+	case SCM_OP_ASSOC: return scm_assoc(arg1, arg2);
 	case SCM_OP_CONS: return scm_cons(arg1, arg2);
 	case SCM_OP_SET_CAR: return scm_set_car(arg1, arg2);
 	case SCM_OP_SET_CDR: return scm_set_cdr(arg1, arg2);

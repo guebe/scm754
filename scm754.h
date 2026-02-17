@@ -78,6 +78,9 @@ typedef enum {
 	SCM_OP_MEMQ,
 	SCM_OP_MEMV,
 	SCM_OP_MEMBER,
+	SCM_OP_ASSQ,
+	SCM_OP_ASSV,
+	SCM_OP_ASSOC,
 	SCM_OP_APPLY,
 	SCM_OP_MAX,
 	SCM_OP_CONS,
@@ -264,6 +267,9 @@ extern bool scm_is_equal(scm_obj_t obj1, scm_obj_t obj2);
 extern scm_obj_t scm_memq(scm_obj_t obj, scm_obj_t list);
 extern scm_obj_t scm_memv(scm_obj_t obj, scm_obj_t list);
 extern scm_obj_t scm_member(scm_obj_t obj, scm_obj_t list);
+extern scm_obj_t scm_assq(scm_obj_t obj, scm_obj_t alist);
+extern scm_obj_t scm_assv(scm_obj_t obj, scm_obj_t alist);
+extern scm_obj_t scm_assoc(scm_obj_t obj, scm_obj_t alist);
 extern size_t scm_length(scm_obj_t list);
 extern scm_obj_t scm_quotient(scm_obj_t a, scm_obj_t b);
 extern scm_obj_t scm_modulo(scm_obj_t a, scm_obj_t b);

@@ -278,3 +278,19 @@ scm_obj_t name(scm_obj_t obj, scm_obj_t list)    \
 SCM_MEMBER(scm_memq, scm_is_eq)
 SCM_MEMBER(scm_memv, scm_is_eqv)
 SCM_MEMBER(scm_member, scm_is_equal)
+
+#define SCM_ASSOC(name, cmp)                                      \
+scm_obj_t name(scm_obj_t obj, scm_obj_t alist)                    \
+{                                                                 \
+	while (scm_is_pair(alist)) {                              \
+		scm_obj_t pair = scm_car(alist);                  \
+		if (scm_is_pair(pair) && cmp(obj, scm_car(pair))) \
+		return pair;                                      \
+		alist = scm_cdr(alist);                           \
+	}                                                         \
+	return scm_false();                                       \
+}
+
+SCM_ASSOC(scm_assq,  scm_is_eq)
+SCM_ASSOC(scm_assv,  scm_is_eqv)
+SCM_ASSOC(scm_assoc, scm_is_equal)
