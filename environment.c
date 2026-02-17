@@ -156,17 +156,12 @@ extern scm_obj_t scm_env_create(void)
 
 extern scm_obj_t scm_env_lookup(scm_obj_t env, scm_obj_t symbol)
 {
-	scm_obj_t x, y;
-
 	assert(scm_is_symbol(symbol));
+
 	while (scm_is_pair(env)) {
-		x = scm_car(env);
-		while (scm_is_pair(x)) {
-			y = scm_car(x);
-			assert(scm_is_pair(y));
-			if (scm_car(y) == symbol) return scm_cdr(y);
-			x = scm_cdr(x);
-		}
+		scm_obj_t frame = scm_car(env);
+		scm_obj_t binding = scm_assq(symbol, frame);
+		if (binding != scm_false()) return scm_cdr(binding);
 		env = scm_cdr(env);
 	}
 
