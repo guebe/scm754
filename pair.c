@@ -104,7 +104,7 @@ static void sweep(void)
 			continue;
 		}
 
-		while(dead) {
+		while (dead) {
 			int j = __builtin_ctzll(dead); /* count trailing zeros */
 			size_t k = i*64 + (size_t)j;
 			cell[k].car_next = head;

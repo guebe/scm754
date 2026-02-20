@@ -7,35 +7,42 @@ typedef struct
 {
 	char *string;
 	uint32_t next;
-	uint8_t mark;
 } scm_string_t;
 
 static scm_string_t strings[SCM_STRING_NUM];
 static uint32_t head = 0;
 
+static uint64_t mark_bits[SCM_STRING_NUM/64];
+_Static_assert(SCM_STRING_NUM % 64 == 0, "SCM_STRING_NUM must be multiple of 64");
+
 extern void scm_gc_string_mark(scm_obj_t obj)
 {
 	assert(scm_is_string(obj) || scm_is_symbol(obj));
-	uint32_t i = (uint32_t)obj;
+	size_t i = (uint32_t)obj;
 
 	assert(i < SCM_STRING_NUM);
 	assert(strings[i].string != NULL);
 
-	strings[i].mark = 1;
+	mark_bits[i/64] |= (1ULL << (i%64));
 }
 
 extern void scm_gc_string_sweep(void)
 {
 	uint32_t tail = UINT32_MAX;
-	for (uint32_t i = 0; i < SCM_STRING_NUM; i++) {
-		scm_string_t *x = &strings[i];
-		if (!x->mark) {
-			free(x->string);
-			x->string = NULL;
-			x->next = tail;
-			tail = i;
+
+	for (size_t i = 0; i < (SCM_STRING_NUM/64); i++) {
+		uint64_t dead = ~mark_bits[i];
+		mark_bits[i] = 0;
+
+		while (dead) {
+			int j = __builtin_ctzll(dead); /* count trailing zeros */
+			size_t k = i*64 + (size_t)j;
+			free(strings[k].string);
+			strings[k].string = NULL;
+			strings[k].next = tail;
+			tail = (uint32_t)k;
+			dead &= (dead - 1); /* clear LSB */
 		}
-		x->mark = 0;
 	}
 	head = tail;
 }
@@ -47,6 +54,7 @@ extern void scm_gc_string_init(void)
 		strings[i].string = NULL;
 	}
 	head = 0;
+	memset(mark_bits, 0, sizeof(mark_bits));
 }
 
 extern void scm_gc_string_free(void)
