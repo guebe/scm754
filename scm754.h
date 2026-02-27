@@ -216,6 +216,7 @@ static inline size_t alloc_cell(void) {
 static inline scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
 {
 	size_t i = alloc_cell();
+	assert(i < SCM_CELL_NUM);
 	cell[i].car = obj1;
 	cell[i].cdr = obj2;
 	return SCM_PAIR | i;
