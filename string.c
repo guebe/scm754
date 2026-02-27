@@ -1,4 +1,17 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
+
+/*
+ * Custom string and symbol implementation for scm754.
+ *
+ * - Strings and symbols are handled uniformly.
+ * - The allocator uses a fixed-size, memory-contiguous pool.
+ * - The garbage collection algorithm is mark and sweep; no per-string reference counting.
+ *   It uses a bitvector for marking and for freelist handling. This leads to
+ *   simple and fast code (the compiler generates SIMD instructions).
+ * - Each string is a heap allocated (malloc) null-terminated C-string; no
+ *   explicit length field is stored. This is different from traditional
+ *   scheme implementations.
+ */
 #include "scm754.h"
 
 #define SCM_STRING_NUM 2048U
