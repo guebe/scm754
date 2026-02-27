@@ -2,12 +2,13 @@
 #include "scm754.h"
 
 scm_pair_t cell[SCM_CELL_NUM];
-size_t cell_head;
 
 static uint64_t mark_bits[SCM_CELL_NUM/64];
+uint64_t free_bits[SCM_CELL_NUM/64];
+size_t free_index;
 _Static_assert(SCM_CELL_NUM % 64 == 0, "SCM_CELL_NUM must be multiple of 64");
 
-#define SCM_STACK_NUM  8192U
+#define SCM_STACK_NUM 8192U
 static const scm_obj_t *stack[SCM_STACK_NUM];
 static size_t stack_index;
 
@@ -51,16 +52,11 @@ extern void scm_gc_init(void)
 {
 	scm_gc_string_init();
 
-	for (size_t i = 0; i < SCM_CELL_NUM; i++) {
-		cell[i].car_next = ((i + 1) < SCM_CELL_NUM) ? i + 1 : UINT64_MAX;
-#ifndef NDEBUG
-		cell[i].cdr = SCM_ERROR;
-#endif
-	}
-	cell_head = 0;
+	memset(free_bits, 0xFF, sizeof(free_bits));
 	memset(mark_bits, 0, sizeof(mark_bits));
 	memset(stack, 0, sizeof(stack));
 	stack_index = 0;
+	free_index = 0;
 }
 
 static void mark(scm_obj_t obj)
@@ -71,7 +67,7 @@ tail_call:
 		assert(i < SCM_CELL_NUM);
 		if (mark_bits[i/64] & (1ULL << (i%64))) return;
 		mark_bits[i/64] |= (1ULL << (i%64));
-		mark(cell[i].car_next);
+		mark(cell[i].car);
 		obj = cell[i].cdr;
 		goto tail_call;
 	}
@@ -82,40 +78,11 @@ tail_call:
 
 static void sweep(void)
 {
-	size_t head = UINT64_MAX;
-	for (size_t i = 0; i < (SCM_CELL_NUM/64); i++) {
-		uint64_t dead = ~mark_bits[i];
+	for (size_t i = 0; i < SCM_CELL_NUM/64; i++) {
+		free_bits[i] = ~mark_bits[i];
 		mark_bits[i] = 0;
-		if (dead == 0) continue;
-
-		if (dead == UINT64_MAX) {
-			size_t k;
-			for (k = i*64; k < (i*64 + 63); k++) {
-				cell[k].car_next = k + 1;
-#ifndef NDEBUG
-				cell[k].cdr = SCM_ERROR;
-#endif
-			}
-			cell[k].car_next = head;
-#ifndef NDEBUG
-			cell[k].cdr = SCM_ERROR;
-#endif
-			head = i*64;
-			continue;
-		}
-
-		while (dead) {
-			int j = __builtin_ctzll(dead); /* count trailing zeros */
-			size_t k = i*64 + (size_t)j;
-			cell[k].car_next = head;
-#ifndef NDEBUG
-			cell[k].cdr = SCM_ERROR;
-#endif
-			head = k;
-			dead &= (dead - 1); /* clear LSB */
-		}
 	}
-	cell_head = head;
+	free_index = 0;
 }
 
 extern void scm_gc_collect(void)

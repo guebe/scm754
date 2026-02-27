@@ -118,13 +118,15 @@ typedef enum {
 
 typedef struct
 {
-	scm_obj_t car_next;
+	scm_obj_t car;
 	scm_obj_t cdr;
 } scm_pair_t;
 
 #define SCM_CELL_NUM  32768U
 extern scm_pair_t cell[SCM_CELL_NUM];
 extern size_t cell_head;
+extern uint64_t free_bits[SCM_CELL_NUM/64];
+extern size_t free_index;
 
 /* Default environment for REPL */
 extern scm_obj_t scm_interaction_environment;
@@ -179,16 +181,13 @@ static inline size_t scm_string_length(scm_obj_t string)     { assert(scm_is_str
 static inline scm_obj_t scm_car(scm_obj_t pair)
 {
 	if (!scm_is_pair(pair)) return scm_error("car: not a pair");
-	return cell[(uint32_t)pair].car_next;
+	return cell[(uint32_t)pair].car;
 }
 static inline scm_obj_t scm_cdr(scm_obj_t pair)
 {
 	if (!scm_is_pair(pair)) return scm_error("cdr: not a pair");
-	scm_obj_t cdr = cell[(uint32_t)pair].cdr;
-	assert(cdr != SCM_ERROR);
-	return cdr;
+	return cell[(uint32_t)pair].cdr;
 }
-
 
 /* Constructors */
 static inline scm_obj_t scm_nil(void)               { return SCM_NIL; }
@@ -204,12 +203,21 @@ static inline scm_obj_t scm_char(int c)             { return SCM_CHAR | (uint32_
 static inline scm_obj_t scm_procedure(uint32_t id)  { return SCM_PROCEDURE | id; }
 static inline scm_obj_t scm_closure(scm_obj_t pair) { return SCM_CLOSURE | (uint32_t)pair; }
 extern scm_obj_t scm_string(const char *string, size_t k);
+static inline size_t alloc_cell(void) {
+	for (size_t i = free_index; i < SCM_CELL_NUM/64; i++) {
+		if (free_bits[i]) {
+			int bit = __builtin_ctzll(free_bits[i]); /* count trailing zeros */
+			free_bits[i] &= free_bits[i] - 1;
+			free_index = i;
+			return i * 64 + (size_t)bit;
+		}
+	}
+	scm_fatal("out of cell memory");
+}
 static inline scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
 {
-	if (cell_head == UINT64_MAX) scm_fatal("out of cell memory");
-	size_t i = cell_head;
-	cell_head = cell[i].car_next;
-	cell[i].car_next = obj1;
+	size_t i = alloc_cell();
+	cell[i].car = obj1;
 	cell[i].cdr = obj2;
 	return SCM_PAIR | i;
 }
@@ -218,15 +226,13 @@ static inline scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
 static inline scm_obj_t scm_set_car(scm_obj_t pair, scm_obj_t obj)
 {
 	if (!scm_is_pair(pair)) return scm_error("set-car!: not a pair");
-	cell[(uint32_t)pair].car_next = obj;
+	cell[(uint32_t)pair].car = obj;
 	return scm_unspecified();
 }
 static inline scm_obj_t scm_set_cdr(scm_obj_t pair, scm_obj_t obj)
 {
 	if (!scm_is_pair(pair)) return scm_error("set-cdr!: not a pair");
-	size_t i = (uint32_t)pair;
-	assert(cell[i].cdr != SCM_ERROR);
-	cell[i].cdr = obj;
+	cell[(uint32_t)pair].cdr = obj;
 	return scm_unspecified();
 }
 
