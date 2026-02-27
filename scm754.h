@@ -124,7 +124,6 @@ typedef struct
 
 #define SCM_CELL_NUM  32768U
 extern scm_pair_t cell[SCM_CELL_NUM];
-extern size_t cell_head;
 extern uint64_t free_bits[SCM_CELL_NUM/64];
 extern size_t free_index;
 
