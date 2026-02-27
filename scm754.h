@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "gc.h"
+
 /* All Scheme objects are of type scm_obj_t */
 typedef uint64_t scm_obj_t;
 
@@ -202,21 +204,10 @@ static inline scm_obj_t scm_char(int c)             { return SCM_CHAR | (uint32_
 static inline scm_obj_t scm_procedure(uint32_t id)  { return SCM_PROCEDURE | id; }
 static inline scm_obj_t scm_closure(scm_obj_t pair) { return SCM_CLOSURE | (uint32_t)pair; }
 extern scm_obj_t scm_string(const char *string, size_t k);
-static inline size_t alloc_cell(void) {
-	for (size_t i = free_index; i < SCM_CELL_NUM/64; i++) {
-		if (free_bits[i]) {
-			int bit = __builtin_ctzll(free_bits[i]); /* count trailing zeros */
-			free_bits[i] &= free_bits[i] - 1;
-			free_index = i;
-			return i * 64 + (size_t)bit;
-		}
-	}
-	scm_fatal("out of cell memory");
-}
 static inline scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
 {
-	size_t i = alloc_cell();
-	assert(i < SCM_CELL_NUM);
+	size_t i = scm_gc_alloc(free_bits, sizeof(free_bits), &free_index);
+	if (i >= SCM_CELL_NUM) scm_fatal("out of cell memory");
 	cell[i].car = obj1;
 	cell[i].cdr = obj2;
 	return SCM_PAIR | i;

@@ -66,22 +66,10 @@ extern char *scm_string_value(scm_obj_t string)
 	return strings[i];
 }
 
-static inline size_t alloc_string(void) {
-	for (size_t i = string_free_index; i < SCM_STRING_NUM/64; i++) {
-		if (string_free_bits[i]) {
-			int bit = __builtin_ctzll(string_free_bits[i]); /* count trailing zeros */
-			string_free_bits[i] &= string_free_bits[i] - 1;
-			string_free_index = i;
-			return i * 64 + (size_t)bit;
-		}
-	}
-	scm_fatal("out of string memory");
-}
-
 extern scm_obj_t scm_string(const char *string, size_t k)
 {
-	size_t i = alloc_string();
-	assert(i < SCM_STRING_NUM);
+	size_t i = scm_gc_alloc(string_free_bits, sizeof(string_free_bits), &string_free_index);
+	if (i >= SCM_STRING_NUM) scm_fatal("out of string memory");
 
 	char *s = strings[i];
 

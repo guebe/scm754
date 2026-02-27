@@ -8,13 +8,13 @@ all: scm754 scm754 scm754-debug fuzzer test test-r7rs fuzz analyze tidy
 clean:
 	rm -f scm754 scm754-debug fuzzer *.out *.plist
 
-scm754: $(SRC) error.c main.c scm754.h
+scm754: $(SRC) error.c main.c scm754.h gc.h
 	$(CC) $(CFLAGS) -DNDEBUG -O3 -flto -g -o $@ $(SRC) error.c main.c -lm
 
-scm754-debug: $(SRC) error.c main.c scm754.h
+scm754-debug: $(SRC) error.c main.c scm754.h gc.h
 	$(CC) $(CFLAGS) -O1 -g -fsanitize=address,undefined -o $@ $(SRC) error.c main.c -lm
 
-fuzzer: $(SRC) fuzzer.c scm754.h
+fuzzer: $(SRC) fuzzer.c scm754.h gc.h
 	$(CC) $(CFLAGS) -O1 -g -fsanitize=fuzzer,address,undefined -o $@ $(SRC) fuzzer.c -lm
 
 test: test.scm
