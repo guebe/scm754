@@ -28,7 +28,7 @@ extern void scm_gc_string_sweep(void)
 
 extern void scm_gc_string_init(void)
 {
-	for (uint32_t i = 0; i < SCM_STRING_NUM; i++) {
+	for (size_t i = 0; i < SCM_STRING_NUM; i++) {
 		strings[i] = NULL;
 	}
 	memset(string_free_bits, 0xFF, sizeof(string_free_bits));
@@ -38,7 +38,7 @@ extern void scm_gc_string_init(void)
 
 extern void scm_gc_string_free(void)
 {
-	for (uint32_t i = 0; i < SCM_STRING_NUM; i++)
+	for (size_t i = 0; i < SCM_STRING_NUM; i++)
 		free(strings[i]);
 }
 
