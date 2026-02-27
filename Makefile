@@ -1,7 +1,7 @@
 # (c) guenter.ebermann@htl-hl.ac.at
 SRC = number.c pair.c port.c read.c write.c environment.c procedures.c eval.c string.c
 CC = clang
-CFLAGS = -Wall -Wextra -Wshadow -Wconversion -Wpedantic -Wstrict-prototypes -Wsign-compare -Wformat-security -Wmisleading-indentation -Wnonnull -Wold-style-definition -Wnested-externs -Werror -fjump-tables
+CFLAGS = -Wall -Wextra -Wshadow -Wconversion -Wpedantic -Wstrict-prototypes -Wsign-compare -Wformat-security -Wmisleading-indentation -Wnonnull -Wold-style-definition -Wnested-externs -Werror -fjump-tables -march=native
 
 all: scm754 scm754 scm754-debug fuzzer test test-r7rs fuzz analyze tidy
 
@@ -9,7 +9,7 @@ clean:
 	rm -f scm754 scm754-debug fuzzer *.out *.plist
 
 scm754: $(SRC) error.c main.c scm754.h
-	$(CC) $(CFLAGS) -DNDEBUG -O2 -flto -g -o $@ $(SRC) error.c main.c -lm
+	$(CC) $(CFLAGS) -DNDEBUG -O3 -flto -g -o $@ $(SRC) error.c main.c -lm
 
 scm754-debug: $(SRC) error.c main.c scm754.h
 	$(CC) $(CFLAGS) -O1 -g -fsanitize=address,undefined -o $@ $(SRC) error.c main.c -lm
