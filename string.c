@@ -1,52 +1,6 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
 
-/*
- * Custom string and symbol implementation for scm754.
- *
- * - Strings and symbols are handled uniformly.
- * - The allocator uses a fixed-size, memory-contiguous pool.
- * - The garbage collection algorithm is mark and sweep; no per-string reference counting.
- *   It uses a bitvector for marking and for freelist handling. This leads to
- *   simple and fast code (the compiler generates SIMD instructions).
- * - Each string is a heap allocated (malloc) null-terminated C-string; no
- *   explicit length field is stored. This is different from traditional
- *   scheme implementations.
- */
 #include "scm754.h"
-
-#define SCM_STRING_NUM 2048U
-static char *strings[SCM_STRING_NUM];
-
-static uint64_t mark_bits[SCM_STRING_NUM/64];
-static uint64_t string_free_bits[SCM_STRING_NUM/64];
-static size_t string_free_index;
-_Static_assert(SCM_STRING_NUM % 64 == 0, "SCM_STRING_NUM must be multiple of 64");
-
-extern void scm_gc_string_mark(scm_obj_t obj)
-{
-	size_t i = (uint32_t)obj;
-	assert(i < SCM_STRING_NUM);
-	mark_bits[i/64] |= (1ULL << (i%64));
-}
-
-extern void scm_gc_string_sweep(void)
-{
-	scm_gc_sweep(string_free_bits, sizeof(string_free_bits), &string_free_index, mark_bits);
-}
-
-extern void scm_gc_string_init(void)
-{
-	for (size_t i = 0; i < SCM_STRING_NUM; i++) {
-		strings[i] = NULL;
-	}
-	scm_gc_init2(string_free_bits, sizeof(string_free_bits), &string_free_index, mark_bits);
-}
-
-extern void scm_gc_string_free(void)
-{
-	for (size_t i = 0; i < SCM_STRING_NUM; i++)
-		free(strings[i]);
-}
 
 extern char *scm_string_value(scm_obj_t string)
 {

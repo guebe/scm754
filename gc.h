@@ -1,13 +1,26 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
+#ifndef __GC_H__
+#define __GC_H__
 
-/* garbage collector helpers */
+/* garbage collector implementation */
 
-static inline void scm_gc_init2(uint64_t free_bits[], size_t free_bits_size, size_t *free_idx, uint64_t mark_bits[])
+typedef struct
 {
-	memset(free_bits, 0xFF, free_bits_size);
-	memset(mark_bits, 0, free_bits_size);
-	*free_idx = 0;
-}
+	scm_obj_t car;
+	scm_obj_t cdr;
+} scm_pair_t;
+
+#define SCM_CELL_NUM 32768U
+_Static_assert(SCM_CELL_NUM % 64 == 0, "SCM_CELL_NUM must be multiple of 64");
+extern scm_pair_t cell[SCM_CELL_NUM];
+extern uint64_t cell_free_bits[SCM_CELL_NUM/64];
+extern size_t cell_free_index;
+
+#define SCM_STRING_NUM 2048U
+_Static_assert(SCM_STRING_NUM % 64 == 0, "SCM_STRING_NUM must be multiple of 64");
+extern char *strings[SCM_STRING_NUM];
+extern uint64_t string_free_bits[SCM_STRING_NUM/64];
+extern size_t string_free_index;
 
 static inline size_t scm_gc_alloc(uint64_t free_bits[], size_t free_bits_size, size_t *free_idx)
 {
@@ -22,11 +35,11 @@ static inline size_t scm_gc_alloc(uint64_t free_bits[], size_t free_bits_size, s
 	return free_bits_size;
 }
 
-static inline void scm_gc_sweep(uint64_t free_bits[], size_t free_bits_size, size_t *free_idx, uint64_t mark_bits[])
-{
-	for (size_t i = 0; i < free_bits_size/sizeof(free_bits[0]); i++) {
-		free_bits[i] = ~mark_bits[i];
-		mark_bits[i] = 0;
-	}
-	*free_idx = 0;
-}
+extern void scm_gc_init(void);
+extern void scm_gc_deinit(void);
+extern void scm_gc_collect(void);
+extern void scm_gc_push(const scm_obj_t *obj);
+extern void scm_gc_pop(void);
+extern void scm_gc_push2(const scm_obj_t *obj1, const scm_obj_t *obj2);
+extern void scm_gc_pop2(void);
+#endif

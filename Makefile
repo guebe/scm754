@@ -1,5 +1,5 @@
 # (c) guenter.ebermann@htl-hl.ac.at
-SRC = number.c pair.c port.c read.c write.c environment.c procedures.c eval.c string.c
+SRC = number.c gc.c port.c read.c write.c environment.c procedures.c eval.c string.c
 CC = clang
 CFLAGS = -Wall -Wextra -Wshadow -Wconversion -Wpedantic -Wstrict-prototypes -Wsign-compare -Wformat-security -Wmisleading-indentation -Wnonnull -Wold-style-definition -Wnested-externs -Werror -fjump-tables -march=native
 

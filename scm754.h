@@ -11,10 +11,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "gc.h"
-
 /* All Scheme objects are of type scm_obj_t */
 typedef uint64_t scm_obj_t;
+
+#include "gc.h"
 
 /* Tags for scm_obj_t */
 #define SCM_MASK         0xffff000000000000
@@ -118,17 +118,6 @@ typedef enum {
 	SCM_OP_PROCEDURE_LAST = SCM_OP_SUBSTRING,
 } scm_op_t;
 
-typedef struct
-{
-	scm_obj_t car;
-	scm_obj_t cdr;
-} scm_pair_t;
-
-#define SCM_CELL_NUM  32768U
-extern scm_pair_t cell[SCM_CELL_NUM];
-extern uint64_t free_bits[SCM_CELL_NUM/64];
-extern size_t free_index;
-
 /* Default environment for REPL */
 extern scm_obj_t scm_interaction_environment;
 
@@ -206,7 +195,7 @@ static inline scm_obj_t scm_closure(scm_obj_t pair) { return SCM_CLOSURE | (uint
 extern scm_obj_t scm_string(const char *string, size_t k);
 static inline scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
 {
-	size_t i = scm_gc_alloc(free_bits, sizeof(free_bits), &free_index);
+	size_t i = scm_gc_alloc(cell_free_bits, sizeof(cell_free_bits), &cell_free_index);
 	if (i >= SCM_CELL_NUM) scm_fatal("out of cell memory");
 	cell[i].car = obj1;
 	cell[i].cdr = obj2;
@@ -298,16 +287,4 @@ extern scm_obj_t scm_env_create(void);
 extern scm_obj_t scm_env_lookup(scm_obj_t env, scm_obj_t symbol);
 extern void scm_env_define(scm_obj_t env, scm_obj_t symbol, scm_obj_t value);
 extern scm_obj_t scm_env_extend(scm_obj_t env, scm_obj_t params, scm_obj_t args);
-
-/* Garbage collector */
-extern void scm_gc_init(void);
-extern void scm_gc_collect(void);
-extern void scm_gc_push(const scm_obj_t *obj);
-extern void scm_gc_pop(void);
-extern void scm_gc_push2(const scm_obj_t *obj1, const scm_obj_t *obj2);
-extern void scm_gc_pop2(void);
-extern void scm_gc_string_init(void);
-extern void scm_gc_string_mark(scm_obj_t string);
-extern void scm_gc_string_sweep(void);
-extern void scm_gc_string_free(void);
 #endif
