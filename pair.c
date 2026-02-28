@@ -51,12 +51,9 @@ extern void scm_gc_pop2(void)
 extern void scm_gc_init(void)
 {
 	scm_gc_string_init();
-
-	memset(free_bits, 0xFF, sizeof(free_bits));
-	memset(mark_bits, 0, sizeof(mark_bits));
+	scm_gc_init2(free_bits, sizeof(free_bits), &free_index, mark_bits);
 	memset(stack, 0, sizeof(stack));
 	stack_index = 0;
-	free_index = 0;
 }
 
 static void mark(scm_obj_t obj)
@@ -76,15 +73,6 @@ tail_call:
 	}
 }
 
-static void sweep(void)
-{
-	for (size_t i = 0; i < SCM_CELL_NUM/64; i++) {
-		free_bits[i] = ~mark_bits[i];
-		mark_bits[i] = 0;
-	}
-	free_index = 0;
-}
-
 extern void scm_gc_collect(void)
 {
 	static int i = 0;
@@ -92,7 +80,7 @@ extern void scm_gc_collect(void)
 		for (size_t j = 0; j < stack_index; j++) {
 			mark(*stack[j]);
 		}
-		sweep();
+		scm_gc_sweep(free_bits, sizeof(free_bits), &free_index, mark_bits);
 		scm_gc_string_sweep();
 	}
 }

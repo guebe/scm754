@@ -24,7 +24,6 @@ _Static_assert(SCM_STRING_NUM % 64 == 0, "SCM_STRING_NUM must be multiple of 64"
 
 extern void scm_gc_string_mark(scm_obj_t obj)
 {
-	assert(scm_is_string(obj) || scm_is_symbol(obj));
 	size_t i = (uint32_t)obj;
 	assert(i < SCM_STRING_NUM);
 	mark_bits[i/64] |= (1ULL << (i%64));
@@ -32,11 +31,7 @@ extern void scm_gc_string_mark(scm_obj_t obj)
 
 extern void scm_gc_string_sweep(void)
 {
-	for (size_t i = 0; i < SCM_STRING_NUM/64; i++) {
-		string_free_bits[i] = ~mark_bits[i];
-		mark_bits[i] = 0;
-	}
-	string_free_index = 0;
+	scm_gc_sweep(string_free_bits, sizeof(string_free_bits), &string_free_index, mark_bits);
 }
 
 extern void scm_gc_string_init(void)
@@ -44,9 +39,7 @@ extern void scm_gc_string_init(void)
 	for (size_t i = 0; i < SCM_STRING_NUM; i++) {
 		strings[i] = NULL;
 	}
-	memset(string_free_bits, 0xFF, sizeof(string_free_bits));
-	memset(mark_bits, 0, sizeof(mark_bits));
-	string_free_index = 0;
+	scm_gc_init2(string_free_bits, sizeof(string_free_bits), &string_free_index, mark_bits);
 }
 
 extern void scm_gc_string_free(void)
