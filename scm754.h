@@ -20,8 +20,10 @@ typedef uint64_t scm_obj_t;
 #define SCM_MASK         0xffff000000000000
 /* Do not use: -inf      0xfff0000000000000 */
 #define SCM_NIL          0xfff1000000000000
-#define SCM_TRUE         0xfff2000000000000
-#define SCM_FALSE        0xfff3000000000000
+#define SCM_BOOLEAN      0xfff2000000000000
+#define SCM_FALSE        0xfff2000000000000
+#define SCM_TRUE         0xfff2000000000001
+#define SCM_VECTOR       0xfff3000000000000
 #define SCM_EOF          0xfff4000000000000
 #define SCM_DOT          0xfff5000000000000
 #define SCM_RPAREN       0xfff6000000000000
@@ -133,7 +135,8 @@ extern scm_obj_t scm_error(const char *message, ...);
 
 /* Type predicates */
 static inline bool scm_is_null(scm_obj_t obj)         { return (obj & SCM_MASK) == SCM_NIL; }
-static inline bool scm_is_boolean(scm_obj_t obj)      { return ((obj & SCM_MASK) == SCM_TRUE) || ((obj & SCM_MASK) == SCM_FALSE); }
+static inline bool scm_is_boolean(scm_obj_t obj)      { return ((obj & SCM_MASK) == SCM_BOOLEAN); }
+static inline bool scm_is_vector(scm_obj_t obj)       { return ((obj & SCM_MASK) == SCM_VECTOR); }
 static inline bool scm_is_eof_object(scm_obj_t obj)   { return (obj & SCM_MASK) == SCM_EOF; }
 static inline bool scm_is_dot(scm_obj_t obj)          { return (obj & SCM_MASK) == SCM_DOT; }
 static inline bool scm_is_rparen(scm_obj_t obj)       { return (obj & SCM_MASK) == SCM_RPAREN; }
@@ -178,6 +181,7 @@ static inline scm_obj_t scm_cdr(scm_obj_t pair)
 	if (!scm_is_pair(pair)) return scm_error("cdr: not a pair");
 	return cell[(uint32_t)pair].cdr;
 }
+extern size_t scm_vector_length(scm_obj_t vec);
 
 /* Constructors */
 static inline scm_obj_t scm_nil(void)               { return SCM_NIL; }
@@ -201,6 +205,7 @@ static inline scm_obj_t scm_cons(scm_obj_t obj1, scm_obj_t obj2)
 	cell[i].cdr = obj2;
 	return SCM_PAIR | i;
 }
+extern scm_obj_t scm_make_vector(size_t k, scm_obj_t fill);
 
 /* Mutators */
 static inline scm_obj_t scm_set_car(scm_obj_t pair, scm_obj_t obj)
@@ -281,6 +286,8 @@ extern scm_obj_t scm_char_ci_eq(scm_obj_t args);
 extern scm_obj_t scm_string_ref(scm_obj_t string, scm_obj_t k);
 extern scm_obj_t scm_string_set(scm_obj_t string, scm_obj_t k, scm_obj_t c);
 extern scm_obj_t scm_list_ref(scm_obj_t list, scm_obj_t k);
+extern scm_obj_t scm_vector_ref(scm_obj_t vec, size_t k);
+extern scm_obj_t scm_vector_set(scm_obj_t vec, size_t k, scm_obj_t value);
 
 /* Environment */
 extern scm_obj_t scm_env_create(void);

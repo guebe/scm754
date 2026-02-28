@@ -10,6 +10,12 @@ typedef struct
 	scm_obj_t cdr;
 } scm_pair_t;
 
+typedef struct
+{
+    scm_obj_t *obj;
+    size_t len;
+} scm_vector_t;
+
 #define SCM_CELL_NUM 32768U
 _Static_assert(SCM_CELL_NUM % 64 == 0, "SCM_CELL_NUM must be multiple of 64");
 extern scm_pair_t cell[SCM_CELL_NUM];
@@ -21,6 +27,12 @@ _Static_assert(SCM_STRING_NUM % 64 == 0, "SCM_STRING_NUM must be multiple of 64"
 extern char *strings[SCM_STRING_NUM];
 extern uint64_t string_free_bits[SCM_STRING_NUM/64];
 extern size_t string_free_index;
+
+#define SCM_VECTOR_NUM 1024U
+_Static_assert(SCM_VECTOR_NUM % 64 == 0, "SCM_VECTOR_NUM must be multiple of 64");
+extern scm_vector_t vector[SCM_VECTOR_NUM];
+extern uint64_t vector_free_bits[SCM_VECTOR_NUM/64];
+extern size_t vector_free_index;
 
 static inline size_t scm_gc_alloc(uint64_t free_bits[], size_t free_bits_size, size_t *free_idx)
 {

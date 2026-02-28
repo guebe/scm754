@@ -28,6 +28,11 @@ static uint64_t string_mark_bits[SCM_STRING_NUM/64];
 uint64_t string_free_bits[SCM_STRING_NUM/64];
 size_t string_free_index;
 
+scm_vector_t vector[SCM_VECTOR_NUM];
+static uint64_t vector_mark_bits[SCM_VECTOR_NUM/64];
+uint64_t vector_free_bits[SCM_VECTOR_NUM/64];
+size_t vector_free_index;
+
 #define SCM_STACK_NUM 8192U
 static const scm_obj_t *stack[SCM_STACK_NUM];
 static size_t stack_index;
@@ -68,43 +73,105 @@ extern void scm_gc_pop2(void)
 	stack_index -= 2;
 }
 
-extern void scm_gc_init(void)
+static void scm_gc_init_cell(void)
+{
+	memset(cell_free_bits, 0xFF, SCM_CELL_NUM/64);
+	memset(cell_mark_bits, 0, SCM_CELL_NUM/64);
+	cell_free_index = 0;
+}
+
+static void scm_gc_init_string(void)
 {
 	for (size_t i = 0; i < SCM_STRING_NUM; i++) {
 		strings[i] = NULL;
 	}
-	memset(cell_free_bits, 0xFF, SCM_CELL_NUM/64);
-	memset(cell_mark_bits, 0, SCM_CELL_NUM/64);
-	cell_free_index = 0;
 	memset(string_free_bits, 0xFF, SCM_STRING_NUM/64);
 	memset(string_mark_bits, 0, SCM_STRING_NUM/64);
 	string_free_index = 0;
+}
+
+static void scm_gc_init_vector(void)
+{
+	for (size_t i = 0; i < SCM_VECTOR_NUM; i++) {
+		vector[i].obj = NULL;
+		vector[i].len = 0;
+	}
+	memset(vector_free_bits, 0xFF, SCM_VECTOR_NUM/64);
+	memset(vector_mark_bits, 0, SCM_VECTOR_NUM/64);
+	vector_free_index = 0;
+}
+
+static void scm_gc_init_stack(void)
+{
 	memset(stack, 0, sizeof(stack));
 	stack_index = 0;
 }
 
-extern void scm_gc_deinit(void)
+extern void scm_gc_init(void)
+{
+	scm_gc_init_stack();
+	scm_gc_init_cell();
+	scm_gc_init_string();
+	scm_gc_init_vector();
+}
+
+static void scm_gc_deinit_string(void)
 {
 	for (size_t i = 0; i < SCM_STRING_NUM; i++)
 		free(strings[i]);
+}
+
+static void scm_gc_deinit_vector(void)
+{
+	for (size_t i = 0; i < SCM_VECTOR_NUM; i++)
+		free(vector[i].obj);
+}
+
+extern void scm_gc_deinit(void)
+{
+	scm_gc_deinit_string();
+	scm_gc_deinit_vector();
+}
+
+static void scm_gc_mark(scm_obj_t obj);
+
+static scm_obj_t scm_gc_mark_pair(scm_obj_t obj)
+{
+	size_t i = (uint32_t)obj;
+	assert(i < SCM_CELL_NUM);
+	if (cell_mark_bits[i/64] & (1ULL << (i%64))) return scm_unspecified();
+	cell_mark_bits[i/64] |= (1ULL << (i%64));
+	scm_gc_mark(cell[i].car);
+	return cell[i].cdr;
+}
+
+static void scm_gc_mark_string(scm_obj_t obj)
+{
+	size_t i = (uint32_t)obj;
+	assert(i < SCM_STRING_NUM);
+	string_mark_bits[i/64] |= (1ULL << (i%64));
+}
+
+static void scm_gc_mark_vector(scm_obj_t obj)
+{
+	size_t i = (uint32_t)obj;
+	assert(i < SCM_VECTOR_NUM);
+	for (size_t k = 0; k < vector[i].len; k++)
+		scm_gc_mark(vector[i].obj[k]);
 }
 
 static void scm_gc_mark(scm_obj_t obj)
 {
 tail_call:
 	if (scm_is_pair(obj) || scm_is_closure(obj)) {
-		size_t i = (uint32_t)obj;
-		assert(i < SCM_CELL_NUM);
-		if (cell_mark_bits[i/64] & (1ULL << (i%64))) return;
-		cell_mark_bits[i/64] |= (1ULL << (i%64));
-		scm_gc_mark(cell[i].car);
-		obj = cell[i].cdr;
+		obj = scm_gc_mark_pair(obj);
 		goto tail_call;
 	}
 	else if (scm_is_string(obj) || scm_is_symbol(obj)) {
-		size_t i = (uint32_t)obj;
-		assert(i < SCM_STRING_NUM);
-		string_mark_bits[i/64] |= (1ULL << (i%64));
+		scm_gc_mark_string(obj);
+	}
+	else if (scm_is_vector(obj)) {
+		scm_gc_mark_vector(obj);
 	}
 }
 
