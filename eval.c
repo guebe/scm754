@@ -381,7 +381,9 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 		return scm_number((double)scm_vector_length(arg1));
 	case SCM_OP_VECTOR_REF: return scm_vector_ref(arg1, arg2);
 	case SCM_OP_VECTOR_SET: return scm_vector_set(arg1, arg2, scm_car(scm_cdr(scm_cdr(args))));
-	case SCM_OP_MAKE_VECTOR: return scm_make_vector(arg1, arg2);
+	case SCM_OP_MAKE_VECTOR:
+		if (!scm_is_number(arg1)) return scm_error("make-vector: first arg must be a number");
+		return scm_make_vector((size_t)scm_number_value(arg1), arg2);
 	case SCM_OP_ADD: return scm_add(args);
 	case SCM_OP_SUB: return scm_sub(args);
 	case SCM_OP_MUL: return scm_mul(args);

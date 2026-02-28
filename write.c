@@ -23,6 +23,23 @@ static void print_list(scm_obj_t obj)
 	putchar(')');
 }
 
+static void print_vector(scm_obj_t obj)
+{
+	size_t len, k;
+
+	if ((len = scm_vector_length(obj)) > 100) {
+		printf("(<toolong %lu>)", len);
+		return;
+	}
+	fputs("#(", stdout);
+	for (k = 0; k + 1 < len; k++) {
+		scm_write(scm_vector_ref(obj, k));
+		putchar(' ');
+	}
+	scm_write(scm_vector_ref(obj, k));
+	putchar(')');
+}
+
 extern void print(scm_obj_t obj, bool readable)
 {
 	if (scm_is_null(obj)) {
@@ -62,6 +79,9 @@ extern void print(scm_obj_t obj, bool readable)
 	}
 	else if (scm_is_pair(obj)) {
 		print_list(obj);
+	}
+	else if (scm_is_vector(obj)) {
+		print_vector(obj);
 	}
 	else if (scm_is_char(obj)) {
 		fputs("#\\", stdout);
