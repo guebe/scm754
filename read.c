@@ -78,10 +78,38 @@ static scm_obj_t read_number_radix(int radix)
 	return scm_string_to_number(buf, radix);
 }
 
+static scm_obj_t read(bool dot_ok, bool rparen_ok, bool eof_ok);
+static scm_obj_t read_vector(void)
+{
+	scm_obj_t obj, head, last;
+
+	obj = read(0, 1, 0);
+	if (scm_is_error(obj)) return obj;
+	if (scm_is_rparen(obj)) return scm_nil();
+
+	head = last = scm_cons(obj, scm_nil());
+	if (scm_is_error(head)) return head;
+
+	while (1) {
+		obj = read(0, 1, 0);
+		if (scm_is_error(obj)) return obj;
+		if (scm_is_rparen(obj)) return head;
+		else {
+			/* Normal cons */
+			obj = scm_cons(obj, scm_nil());
+			if (scm_is_error(obj)) return obj;
+
+			scm_set_cdr(last, obj);
+			last = obj;
+		}
+	}
+}
 static scm_obj_t read_sharp(void)
 {
 	int c = scm_read_char();
 
+	if (c == '(')
+		return scm_list_to_vector(read_vector());
 	if (c == 'f' || c == 'F' || c == 't' || c == 'T')
 		return read_boolean(c);
 	else if (c == '\\')
@@ -166,7 +194,6 @@ static scm_obj_t read_string(void)
 	return scm_string(buf, n);
 }
 
-static scm_obj_t read(bool dot_ok, bool rparen_ok, bool eof_ok);
 static scm_obj_t read_list(void)
 {
 	scm_obj_t obj, head, last;

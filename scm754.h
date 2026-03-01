@@ -292,6 +292,7 @@ extern scm_obj_t scm_string_set(scm_obj_t string, scm_obj_t k, scm_obj_t c);
 extern scm_obj_t scm_list_ref(scm_obj_t list, scm_obj_t k);
 extern scm_obj_t scm_vector_ref(scm_obj_t vec, size_t k);
 extern scm_obj_t scm_vector_set(scm_obj_t vec, size_t k, scm_obj_t value);
+extern scm_obj_t scm_list_to_vector(scm_obj_t list);
 
 /* Environment */
 extern scm_obj_t scm_env_create(void);

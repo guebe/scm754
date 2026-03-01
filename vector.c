@@ -40,10 +40,26 @@ extern scm_obj_t scm_make_vector(size_t k, scm_obj_t fill)
 
 	obj = realloc(obj, k*sizeof(scm_obj_t));
 	if (obj == NULL) scm_fatal("vector allocation failed");
-	for (size_t j = 0; j < k; j++)
-		obj[j] = fill;
+	if (fill != scm_unspecified()) {
+		for (size_t j = 0; j < k; j++)
+			obj[j] = fill;
+	}
 
 	vector[i].obj = obj;
 	vector[i].len = k;
 	return SCM_VECTOR | i;
+}
+
+extern scm_obj_t scm_list_to_vector(scm_obj_t list)
+{
+	size_t k = scm_length(list);
+	scm_obj_t v = scm_make_vector(k, scm_unspecified());
+	if (scm_is_error(v)) return v;
+
+	size_t i = 0;
+	while (scm_is_pair(list)) {
+		scm_vector_set(v, i++, scm_car(list));
+		list = scm_cdr(list);
+	}
+	return v;
 }
