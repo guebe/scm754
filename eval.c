@@ -347,6 +347,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 	case SCM_OP_IS_PAIR: return scm_boolean(scm_is_pair(arg1));
 	case SCM_OP_IS_CHAR: return scm_boolean(scm_is_char(arg1));
 	case SCM_OP_IS_NUMBER: return scm_boolean(scm_is_number(arg1));
+	case SCM_OP_IS_VECTOR: return scm_boolean(scm_is_vector(arg1));
 	case SCM_OP_LENGTH: return scm_number((double)scm_length(arg1));
 	case SCM_OP_DISPLAY: return scm_display(arg1);
 	case SCM_OP_WRITE: return scm_write(arg1);
@@ -388,6 +389,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 	case SCM_OP_MAKE_VECTOR:
 		if (!scm_is_number(arg1) || argc > 2) return scm_error("make-vector: bad form");
 		return scm_make_vector(scm_number_to_size(arg1), argc == 2 ? arg2: scm_unspecified());
+	case SCM_OP_LIST_TO_VECTOR: return scm_list_to_vector(arg1);
 	case SCM_OP_ADD: return scm_add(args);
 	case SCM_OP_SUB: return scm_sub(args);
 	case SCM_OP_MUL: return scm_mul(args);

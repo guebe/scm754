@@ -725,16 +725,16 @@
 ;(test (symbol? (current-input-port)) #f)
 ;(test (symbol? (current-output-port)) #f)
 
-;(test (vector? #f) #f)
-;(test (vector? #\c) #f)
-;(test (vector? 1) #f)
-;(test (vector? 1.1) #f)
-;(test (vector? '(pair)) #f)
-;(test (vector? (lambda () #f)) #f)
+(test (vector? #f) #f)
+(test (vector? #\c) #f)
+(test (vector? 1) #f)
+(test (vector? 1.1) #f)
+(test (vector? '(pair)) #f)
+(test (vector? (lambda () #f)) #f)
 ;(test (vector? (catch (lambda (ct) ct))) #f)
-;(test (vector? "string") #f)
-;(test (vector? 'symbol) #f)
-;(test (vector? '#(vector)) #t)
+(test (vector? "string") #f)
+(test (vector? 'symbol) #f)
+(test (vector? '#(vector)) #t)
 ;(test (vector? (current-input-port)) #f)
 ;(test (vector? (current-output-port)) #f)
 
@@ -753,9 +753,9 @@
 ;(test (list->string '(#\S #\t #\r #\i #\n #\g)) "String")
 ;(test (list->string '()) "")
 
-;(test (list->vector '(#t foo 1 #\c "s" (1 2 3) #(u v)))
-;      '#(#t foo 1 #\c "s" (1 2 3) #(u v)))
-;(test (list->vector '()) '#())
+(test (list->vector '(#t foo 1 #\c "s" (1 2 3) #(u v)))
+      '#(#t foo 1 #\c "s" (1 2 3) #(u v)))
+(test (list->vector '()) '#())
 
 ;(test (string->list "String") '(#\S #\t #\r #\i #\n #\g))
 ;(test (string->list "") '())
@@ -2373,7 +2373,7 @@
 ;(test (apply integer? '(5)) #t)
 (test (apply length '((1 2 3))) 3)
 ;(test (apply list->string '((#\f #\o #\b))) "fob")
-;(test (apply list->vector '((1 2 3))) '#(1 2 3))
+(test (apply list->vector '((1 2 3))) '#(1 2 3))
 ; load
 ;(test (apply negative? '(-1)) #t)
 ;(test (apply not '(#f)) #t)
@@ -2404,7 +2404,7 @@
 ;(test (apply truncate '(5.7)) 5.0)
 ;(test (apply vector->list '(#(foo bar baz))) '(foo bar baz))
 (test (apply vector-length '(#(foo bar baz))) 3)
-;(test (apply vector? '(#(foo bar baz))) #t)
+(test (apply vector? '(#(foo bar baz))) #t)
 (test (apply zero? '(0)) #t)
 
 (test (apply assq '(b ((a) (b) (c)))) '(b))
@@ -2792,7 +2792,7 @@
 ;      #(0 ("Sue" "Sue") "Anna"))
 
 ;(test (vector->list '#(dah dah didah)) '(dah dah didah))
-;(test (list->vector '(dididit dah)) '#(dididit dah))
+(test (list->vector '(dididit dah)) '#(dididit dah))
 
 ; R4RS tests, 6.9 control features
 
