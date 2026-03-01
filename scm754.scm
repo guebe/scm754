@@ -29,3 +29,8 @@
       ((lambda ()
         (f (car lst))
 	(for-each f (cdr lst))))))
+
+(define (gcd r0 r1)
+  (if (zero? r1)
+      r0
+      (gcd r1 (modulo r0 r1))))

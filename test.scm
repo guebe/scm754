@@ -1198,7 +1198,7 @@
 
 ;(test (gcd) 0)
 ;(test (gcd 17) 17)
-;(test (gcd 18 12) 6)
+(test (gcd 18 12) 6)
 ;(test (gcd 289 85 34) 17)
 
 ;(test (lcm) 1)
