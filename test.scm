@@ -1021,14 +1021,14 @@
 (test (member '(x) '((x))) '((x)))
 (test (member "x" '("x")) '("x"))
 (test (member 1 '(1)) '(1))
-;(test (member #\x '(#\x)) '(#\x))
+(test (member #\x '(#\x)) '(#\x))
 
 (test (memv 'c '(a b)) #f)
 (test (memv 'b '(a b)) '(b))
 (test (memv 'a '(a b)) '(a b))
 (test (memv 'x '()) #f)
 (test (memv 1 '(1)) '(1))
-;(test (memv #\x '(#\x)) '(#\x))
+(test (memv #\x '(#\x)) '(#\x))
 
 (test (memq 'c '(a b)) #f)
 (test (memq 'b '(a b)) '(b))
@@ -1965,7 +1965,7 @@
 ;;; Vectors
 
 (test (make-vector 0) #())
-;(test (make-vector 1) (#(#f))   ; this is unspecified per specificiation
+;(test (make-vector 1) (#(#f)) ;; this is unspecified
 (test (make-vector 3 'x) #(x x x))
 
 ;(test (vector) '#())
@@ -2407,8 +2407,8 @@
 ;(test (apply vector? '(#(foo bar baz))) #t)
 (test (apply zero? '(0)) #t)
 
-;(test (apply assq '(b ((a) (b) (c)))) '(b))
-;(test (apply assv '(2 ((1) (2) (3)))) '(2))
+(test (apply assq '(b ((a) (b) (c)))) '(b))
+(test (apply assv '(2 ((1) (2) (3)))) '(2))
 (test (apply char-ci<? '(#\A #\b)) #t)
 (test (apply char-ci<=? '(#\A #\b)) #t)
 (test (apply char-ci=? '(#\A #\b)) #f)
