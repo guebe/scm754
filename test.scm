@@ -330,11 +330,11 @@
 ;(test (let () (define f (lambda x x)) (f 1)) '(1))
 ;(test (let () (define f (lambda x x)) (f 1 2)) '(1 2))
 ;(test (let () (define f (lambda (x . y) y)) (f 1 2)) '(2))
-;(test ((lambda ()
-;          (define (e x) (or (zero? x) (o (- x 1))))
-;          (define (o x) (if (zero? x) #f (e (- x 1))))
-;          (list (o 5) (e 5))))
-;      '(#t #f))
+(test ((lambda ()
+          (define (e x) (or (zero? x) (o (- x 1))))
+          (define (o x) (if (zero? x) #f (e (- x 1))))
+          (list (o 5) (e 5))))
+      '(#t #f))
 
 ; do
 
@@ -379,7 +379,7 @@
 
 (test ((lambda () '())) '())
 (test ((lambda (x) x) 1) 1)
-;(test ((lambda (x y z) (list x y z)) 1 2 3) '(1 2 3))
+(test ((lambda (x y z) (list x y z)) 1 2 3) '(1 2 3))
 
 (test (((lambda (x) (lambda (y) (cons x y))) 1) 2) '(1 . 2))
 
@@ -442,7 +442,7 @@
 (test (let () 1) 1)
 (test (let () 1 2 3) 3)
 (test (let ((x 1)) x) 1)
-;(test (let ((x 1) (y 2) (z 3)) (list x y z)) '(1 2 3))
+(test (let ((x 1) (y 2) (z 3)) (list x y z)) '(1 2 3))
 
 (test (let ((x 0))
          (let ((x 1)
@@ -484,8 +484,8 @@
 (test (let* () 1) 1)
 (test (let* () 1 2 3) 3)
 (test (let* ((x 'first)) x) 'first)
-;(test (let* ((x 'first) (y 'second) (z 'third)) (list x y z))
-;      '(first second third))
+(test (let* ((x 'first) (y 'second) (z 'third)) (list x y z))
+      '(first second third))
 (test (let* ((x 0))
          (let* ((x 1)
                 (y (* x 5)))
@@ -852,10 +852,10 @@
 
 ;;; Mapping and iteration
 
-;(test (let ((a (list (list 'a) (list 'b) (list 'c))))
-;         (for-each (lambda (x) (set-car! x 'x)) a)
-;         a)
-;      '((x) (x) (x)))
+(test (let ((a (list (list 'a) (list 'b) (list 'c))))
+         (for-each (lambda (x) (set-car! x 'x)) a)
+         a)
+      '((x) (x) (x)))
 ;(test (let ((a (list (list 'a) (list 'b) (list 'c))))
 ;         (for-each (lambda (x y) (set-car! x y)) a '(x y z))
 ;         a)
@@ -969,14 +969,14 @@
 (test (length '(1)) 1)
 (test (length '(1 2 3)) 3)
 
-;(test (list) '())
-;(test (list '()) '(()))
-;(test (list 'x) '(x))
-;(test (list (list 'x)) '((x)))
-;(test (list 'a 'b) '(a b))
-;(test (list 'a 'b 'c) '(a b c))
-;(test (list 'a 'b 'c 'd) '(a b c d))
-;(test (list 'a 'b 'c 'd 'e) '(a b c d e))
+(test (list) '())
+(test (list '()) '(()))
+(test (list 'x) '(x))
+(test (list (list 'x)) '((x)))
+(test (list 'a 'b) '(a b))
+(test (list 'a 'b 'c) '(a b c))
+(test (list 'a 'b 'c 'd) '(a b c d))
+(test (list 'a 'b 'c 'd 'e) '(a b c d e))
 
 (test (list-ref '(1 2 3) 0) 1)
 (test (list-ref '(1 2 3) 1) 2)
@@ -1293,7 +1293,7 @@
 (test ((lambda (x) (eq? x x)) '(x . y)) #t)
 (test (eq? #t #t) #t)
 (test (eq? #f #f) #t)
-;(test (eq? (list 'pair) (list 'pair)) #f)
+(test (eq? (list 'pair) (list 'pair)) #f)
 (test (eq? 'symbol 'symbol) #t)
 (test (eq? (vector 'vector) (vector 'vector)) #f)
 
@@ -1301,7 +1301,7 @@
 (test (eqv? #f #f) #t)
 (test (eqv? #\c #\c) #t)
 (test (eqv? 1 1) #t)
-;(test (eqv? (list 'pair) (list 'pair)) #f)
+(test (eqv? (list 'pair) (list 'pair)) #f)
 (test (eqv? 'symbol 'symbol) #t)
 (test (eqv? (vector 'vector) (vector 'vector)) #f)
 ;(test (eqv? 1   1.0) #f)
@@ -1372,7 +1372,7 @@
 ;(test (equal? 1.0 1  ) #f)
 (test (equal? 1.0 1.0) #t)
 
-;(test (let ((x (list 1))) (equal? x x)) #t)
+(test (let ((x (list 1))) (equal? x x)) #t)
 
 (test (equal? '(a (b c) (d (e . f) g)) '(a (b c) (d (e . f) g))) #t)
 (test (equal? '(a (b c) (d (e . x) g)) '(a (b c) (d (e . f) g))) #f)
@@ -2544,10 +2544,10 @@
 
 (test (not #t) #f)
 (test (not 3) #f)
-;(test (not (list 3)) #f)
+(test (not (list 3)) #f)
 (test (not #f) #t)
 (test (not '()) #f)
-;(test (not (list)) #f)
+(test (not (list)) #f)
 (test (not 'nil) #f)
 
 (test (boolean? #f) #t)
@@ -2596,7 +2596,7 @@
       #t)
 
 (test (eq? 'a 'a) #t)
-;(test (eq? (list 'a) (list 'a)) #f)
+(test (eq? (list 'a) (list 'a)) #f)
 (test (eq? '() '()) #t)
 (test (eq? car car) #t)
 (test (let ((x '(a)))
@@ -2626,16 +2626,16 @@
 
 (test '(a . (b . (c . d))) '(a b c . d))
 
-;(define x (list 'a 'b 'c))
-;(define y x)
-;(test y '(a b c))
+(define x (list 'a 'b 'c))
+(define y x)
+(test y '(a b c))
 ;(test (list? y) #t)
-;(set-cdr! x 4)
-;(test x '(a . 4))
-;(test (eqv? x y) #t)
-;(test y '(a . 4))
+(set-cdr! x 4)
+(test x '(a . 4))
+(test (eqv? x y) #t)
+(test y '(a . 4))
 ;(test (list? y) #f)
-;(set-cdr! x x)
+(set-cdr! x x)
 ;(test (list? x) #f)
 
 (test (pair? '(a . b)) #t)
@@ -2656,9 +2656,9 @@
 (test (cdr '((a) b c d)) '(b c d))
 (test (cdr '(1 . 2)) 2)
 
-;(define x (list 'not-a-constant-list))
-;(set-car! x 3)
-;(test x '(3))
+(define x (list 'not-a-constant-list))
+(set-car! x 3)
+(test x '(3))
 
 ;(test (list? '(a b c)) #t)
 ;(test (list? '()) #t)
@@ -2668,8 +2668,8 @@
 ;        (list? x))
 ;      #f)
 
-;(test (list 'a (+ 3 4) 'c) '(a 7 c))
-;(test (list) '())
+(test (list 'a (+ 3 4) 'c) '(a 7 c))
+(test (list) '())
 
 (test (length '(a b c)) 3)
 (test (length '(a (b) (c d e))) 3)
@@ -2690,18 +2690,18 @@
 (test (memq 'a '(a b c)) '(a b c))
 (test (memq 'b '(a b c)) '(b c))
 (test (memq 'a '(b c d)) #f)
-;(test (memq (list 'a) '(b (a) c)) #f)
-;(test (member (list 'a)
-;              '(b (a) c))
-;      '((a) c))
+(test (memq (list 'a) '(b (a) c)) #f)
+(test (member (list 'a)
+              '(b (a) c))
+      '((a) c))
 (test (memv 101 '(100 101 102)) '(101 102))
 
 (define e '((a 1) (b 2) (c 3)))
 (test (assq 'a e) '(a 1))
 (test (assq 'b e) '(b 2))
 (test (assq 'd e) #f)
-;(test (assq (list 'a) '(((a)) ((b)) ((c)))) #f)
-;(test (assoc (list 'a) '(((a)) ((b)) ((c)))) '((a)))
+(test (assq (list 'a) '(((a)) ((b)) ((c)))) #f)
+(test (assoc (list 'a) '(((a)) ((b)) ((c)))) '((a)))
 (test (assv 5 '((2 3) (5 7) (11 13))) '(5 7))
 
 ; R4RS tests, 6.4 symbols
@@ -2801,7 +2801,7 @@
 (test (procedure? (lambda (x) (* x x))) #t)
 (test (procedure? '(lambda (x) (* x x))) #f)
 
-;(test (apply + (list 3 4)) 7)
+(test (apply + (list 3 4)) 7)
 
 (define compose
   (lambda (f g)
