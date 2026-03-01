@@ -1295,7 +1295,7 @@
 (test (eq? #f #f) #t)
 ;(test (eq? (list 'pair) (list 'pair)) #f)
 (test (eq? 'symbol 'symbol) #t)
-;(test (eq? (vector 'vector) (vector 'vector)) #f)
+(test (eq? (vector 'vector) (vector 'vector)) #f)
 
 (test (eqv? 'x 'y) #f)
 (test (eqv? #f #f) #t)
@@ -1303,7 +1303,7 @@
 (test (eqv? 1 1) #t)
 ;(test (eqv? (list 'pair) (list 'pair)) #f)
 (test (eqv? 'symbol 'symbol) #t)
-;(test (eqv? (vector 'vector) (vector 'vector)) #f)
+(test (eqv? (vector 'vector) (vector 'vector)) #f)
 ;(test (eqv? 1   1.0) #f)
 ;(test (eqv? 1.0 1  ) #f)
 (test (eqv? 1.0 1.0) #t)
@@ -1968,10 +1968,10 @@
 ;(test (make-vector 1) (#(#f)) ;; this is unspecified
 (test (make-vector 3 'x) #(x x x))
 
-;(test (vector) '#())
-;(test (vector 'x) '#(x))
-;(test (vector 1 2 3) '#(1 2 3))
-;(test (vector (vector 'x)) '#(#(x)))
+(test (vector) '#())
+(test (vector 'x) '#(x))
+(test (vector 1 2 3) '#(1 2 3))
+(test (vector (vector 'x)) '#(#(x)))
 
 ;(test (let ((v (vector))) (vector-fill! v 'x) v) '#())
 ;(test (let ((v (vector 1 2 3))) (vector-fill! v 'z) v) '#(z z z))
@@ -2459,7 +2459,7 @@
 ;              (apply vector-set! `(,x 2 z))
 ;              x)
 ;      '#(b a z))
-;(test (apply substring '("abcdef" 2 4)) "cd")
+(test (apply substring '("abcdef" 2 4)) "cd")
 
 ; read
 ; read-char
@@ -2782,14 +2782,14 @@
 
 (test '#(0 (2 2 2 2) "Anna")  #(0 (2 2 2 2) "Anna"))
 
-;(test (vector 'a 'b 'c) #(a b c))
+(test (vector 'a 'b 'c) #(a b c))
 
 (test (vector-ref '#(1 1 2 3 5 8 13 21) 5) 8)
 
-;(test (let ((vec (vector 0 '(2 2 2 2) "Anna")))
-;        (vector-set! vec 1 '("Sue" "Sue"))
-;        vec)      
-;      #(0 ("Sue" "Sue") "Anna"))
+(test (let ((vec (vector 0 '(2 2 2 2) "Anna")))
+        (vector-set! vec 1 '("Sue" "Sue"))
+        vec)      
+      #(0 ("Sue" "Sue") "Anna"))
 
 ;(test (vector->list '#(dah dah didah)) '(dah dah didah))
 (test (list->vector '(dididit dah)) '#(dididit dah))

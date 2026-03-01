@@ -99,6 +99,7 @@ static const scm_ops_t ops[] =
 	[SCM_OP_MAKE_VECTOR] = { "make-vector", -1 },
 	[SCM_OP_LIST_TO_VECTOR] = { "list->vector", 1 },
 	[SCM_OP_IS_VECTOR] = { "vector?", 1 },
+	[SCM_OP_VECTOR] = { "vector", -1 },
 };
 
 _Static_assert((SCM_OP_PROCEDURE_LAST + 1) == sizeof(ops)/sizeof(ops[0]), "OP array and enum out of sync");

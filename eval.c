@@ -390,6 +390,7 @@ extern scm_obj_t scm_apply(scm_obj_t proc, scm_obj_t args)
 		if (!scm_is_number(arg1) || argc > 2) return scm_error("make-vector: bad form");
 		return scm_make_vector(scm_number_to_size(arg1), argc == 2 ? arg2: scm_unspecified());
 	case SCM_OP_LIST_TO_VECTOR: return scm_list_to_vector(arg1);
+	case SCM_OP_VECTOR: return scm_list_to_vector(args);
 	case SCM_OP_ADD: return scm_add(args);
 	case SCM_OP_SUB: return scm_sub(args);
 	case SCM_OP_MUL: return scm_mul(args);
