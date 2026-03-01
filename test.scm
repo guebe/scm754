@@ -114,13 +114,13 @@
 
 ; Vectors
 
-;(test '#() '#())
-;(test '#(a b c) '#(a b c))
-;(test '#(a (b) c) '#(a (b) c))
-;(test '#(((((x))))) '#(((((x))))))
-;(test '#((caar cadar) (caadr  cadadr)) '#((caar cadar) (caadr  cadadr)))
-;(test '#(#(a b c) #(d e f)) '#(#(a b c) #(d e f)))
-;(test '#(#(#(#(#(x))))) '#(#(#(#(#(x))))))
+(test '#() '#())
+(test '#(a b c) '#(a b c))
+(test '#(a (b) c) '#(a (b) c))
+(test '#(((((x))))) '#(((((x))))))
+(test '#((caar cadar) (caadr  cadadr)) '#((caar cadar) (caadr  cadadr)))
+(test '#(#(a b c) #(d e f)) '#(#(a b c) #(d e f)))
+(test '#(#(#(#(#(x))))) '#(#(#(#(#(x))))))
 
 ; Integers
 
@@ -241,7 +241,7 @@
 (test (and "x") "x")
 (test (and '(x)) '(x))
 (test (and '()) '())
-;(test (and '#(x)) '#(x))
+(test (and '#(x)) '#(x))
 (test (and (lambda (x) x) #t) #t)
 
 ; begin
@@ -357,7 +357,7 @@
 (test (if "a" 1) 1)
 (test (if '(1 2 3) 1) 1)
 (test (if '() 1) 1)
-;(test (if '#(1 2 3) 1) 1)
+(test (if '#(1 2 3) 1) 1)
 (test (if #t 1 2) 1)
 (test (if #f 1 2) 2)
 (test (if #f (#f)) (void))
@@ -521,7 +521,7 @@
 (test (or "x") "x")
 (test (or '(x)) '(x))
 (test (or '()) '())
-;(test (or '#(x)) '#(x))
+(test (or '#(x)) '#(x))
 
 ; quote
 
@@ -533,7 +533,7 @@
 (test (quote "abc") "abc")
 (test (quote ()) '())
 (test (quote (1 2 3)) '(1 2 3))
-;(test (quote #(1 2 3)) '#(1 2 3))
+(test (quote #(1 2 3)) '#(1 2 3))
 (test (quote (lambda (x) x)) '(lambda (x) x))
 (test '1 '1)
 (test ''1 ''1)
@@ -579,7 +579,7 @@
 ;(test (boolean? (catch (lambda (ct) ct))) #f)
 (test (boolean? "string") #f)
 (test (boolean? 'symbol) #f)
-;(test (boolean? '#(vector)) #f)
+(test (boolean? '#(vector)) #f)
 ;(test (boolean? (current-input-port)) #f)
 ;(test (boolean? (current-output-port)) #f)
 
@@ -605,7 +605,7 @@
 ;(test (char? (catch (lambda (ct) ct))) #f)
 (test (char? "string") #f)
 (test (char? 'symbol) #f)
-;(test (char? '#(vector)) #f)
+(test (char? '#(vector)) #f)
 ;(test (char? (current-input-port)) #f)
 ;(test (char? (current-output-port)) #f)
 
@@ -644,7 +644,7 @@
 ;(test (number? (catch (lambda (ct) ct))) #f)
 (test (number? "string") #f)
 (test (number? 'symbol) #f)
-;(test (number? '#(vector)) #f)
+(test (number? '#(vector)) #f)
 ;(test (number? (current-input-port)) #f)
 ;(test (number? (current-output-port)) #f)
 
@@ -669,7 +669,7 @@
 ;(test (pair? (catch (lambda (ct) ct))) #f)
 (test (pair? "string") #f)
 (test (pair? 'symbol) #f)
-;(test (pair? '#(vector)) #f)
+(test (pair? '#(vector)) #f)
 ;(test (pair? (current-input-port)) #f)
 ;(test (pair? (current-output-port)) #f)
 
@@ -682,7 +682,7 @@
 ;(test (procedure? (catch (lambda (ct) ct))) #f)
 (test (procedure? "string") #f)
 (test (procedure? 'symbol) #f)
-;(test (procedure? '#(vector)) #f)
+(test (procedure? '#(vector)) #f)
 ;(test (procedure? (current-input-port)) #f)
 ;(test (procedure? (current-output-port)) #f)
 
@@ -708,7 +708,7 @@
 ;(test (string? (catch (lambda (ct) ct))) #f)
 (test (string? "string") #t)
 (test (string? 'symbol) #f)
-;(test (string? '#(vector)) #f)
+(test (string? '#(vector)) #f)
 ;(test (string? (current-input-port)) #f)
 ;(test (string? (current-output-port)) #f)
 
@@ -721,7 +721,7 @@
 ;(test (symbol? (catch (lambda (ct) ct))) #f)
 (test (symbol? "string") #f)
 (test (symbol? 'symbol) #t)
-;(test (symbol? '#(vector)) #f)
+(test (symbol? '#(vector)) #f)
 ;(test (symbol? (current-input-port)) #f)
 ;(test (symbol? (current-output-port)) #f)
 
@@ -1042,7 +1042,7 @@
 (test (null? (lambda () #f)) #f)
 (test (null? "string") #f)
 (test (null? 'symbol) #f)
-;(test (null? '#(vector)) #f)
+(test (null? '#(vector)) #f)
 ;(test (null? (current-input-port)) #f)
 ;(test (null? (current-output-port)) #f)
 (test (null? '()) #t)
@@ -1239,7 +1239,7 @@
 (test (not (lambda () #f)) #f)
 (test (not "string") #f)
 (test (not 'symbol) #f)
-;(test (not '#(vector)) #f)
+(test (not '#(vector)) #f)
 ;(test (not (current-input-port)) #f)
 ;(test (not (current-output-port)) #f)
 
@@ -1317,10 +1317,10 @@
 (test (equal? (lambda () #f) (lambda () #f)) #f)
 (test (equal? "string" "string") #t)
 (test (equal? 'symbol 'symbol) #t)
-;(test (equal? '#(vector) #(vector)) #t)
-;(test (equal? '#(vector (list) vector) #(vector (list) vector)) #t)
-;(test (equal? '#(vector #(vector) vector) #(vector #(vector) vector)) #t)
-;(test (equal? '#(vector #(vec1) vector) #(vector #(vec2) vector)) #f)
+(test (equal? '#(vector) #(vector)) #t)
+(test (equal? '#(vector (list) vector) #(vector (list) vector)) #t)
+(test (equal? '#(vector #(vector) vector) #(vector #(vector) vector)) #t)
+(test (equal? '#(vector #(vec1) vector) #(vector #(vec2) vector)) #f)
 (test (equal? tree tree) #t)
 
 (test (equal? #f #\c) #f)
@@ -1329,7 +1329,7 @@
 (test (equal? #f (lambda () #f)) #f)
 (test (equal? #f "string") #f)
 (test (equal? #f 'symbol) #f)
-;(test (equal? #f '#(vector)) #f)
+(test (equal? #f '#(vector)) #f)
 ;(test (equal? #f (current-input-port)) #f)
 ;(test (equal? #f (current-output-port)) #f)
 (test (equal? #\c 1) #f)
@@ -1337,32 +1337,32 @@
 (test (equal? #\c (lambda () #f)) #f)
 (test (equal? #\c "string") #f)
 (test (equal? #\c 'symbol) #f)
-;(test (equal? #\c '#(vector)) #f)
+(test (equal? #\c '#(vector)) #f)
 ;(test (equal? #\c (current-input-port)) #f)
 ;(test (equal? #\c (current-output-port)) #f)
 (test (equal? 1 '(pair)) #f)
 (test (equal? 1 (lambda () #f)) #f)
 (test (equal? 1 "string") #f)
 (test (equal? 1 'symbol) #f)
-;(test (equal? 1 '#(vector)) #f)
+(test (equal? 1 '#(vector)) #f)
 ;(test (equal? 1 (current-input-port)) #f)
 ;(test (equal? 1 (current-output-port)) #f)
 (test (equal? '(pair) (lambda () #f)) #f)
 (test (equal? '(pair) "string") #f)
 (test (equal? '(pair) 'symbol) #f)
-;(test (equal? '(pair) '#(vector)) #f)
+(test (equal? '(pair) '#(vector)) #f)
 ;(test (equal? '(pair) (current-input-port)) #f)
 ;(test (equal? '(pair) (current-output-port)) #f)
 (test (equal? (lambda () #f) "string") #f)
 (test (equal? (lambda () #f) 'symbol) #f)
-;(test (equal? (lambda () #f) '#(vector)) #f)
+(test (equal? (lambda () #f) '#(vector)) #f)
 ;(test (equal? (lambda () #f) (current-input-port)) #f)
 ;(test (equal? (lambda () #f) (current-output-port)) #f)
 (test (equal? "string" 'symbol) #f)
-;(test (equal? "string" '#(vector)) #f)
+(test (equal? "string" '#(vector)) #f)
 ;(test (equal? "string" (current-input-port)) #f)
 ;(test (equal? "string" (current-output-port)) #f)
-;(test (equal? 'symbol '#(vector)) #f)
+(test (equal? 'symbol '#(vector)) #f)
 ;(test (equal? 'symbol (current-input-port)) #f)
 ;(test (equal? 'symbol (current-output-port)) #f)
 ;(test (equal? '#(vector) (current-input-port)) #f)
@@ -1376,8 +1376,8 @@
 
 (test (equal? '(a (b c) (d (e . f) g)) '(a (b c) (d (e . f) g))) #t)
 (test (equal? '(a (b c) (d (e . x) g)) '(a (b c) (d (e . f) g))) #f)
-;(test (equal? '#(a (b c) (d (e . f) g)) '#(a (b c) (d (e . f) g))) #t)
-;(test (equal? '#(a (b c) (d (e . x) g)) '#(a (b c) (d (e . f) g))) #f)
+(test (equal? '#(a (b c) (d (e . f) g)) '#(a (b c) (d (e . f) g))) #t)
+(test (equal? '#(a (b c) (d (e . x) g)) '#(a (b c) (d (e . f) g))) #f)
 
 ;;; Characters
 
@@ -1964,9 +1964,9 @@
 
 ;;; Vectors
 
-;(test (make-vector 0) #())
-;(test (make-vector 1) #(#f))
-;(test (make-vector 3 'x) #(x x x))
+(test (make-vector 0) #())
+;(test (make-vector 1) (#(#f))   ; this is unspecified per specificiation
+(test (make-vector 3 'x) #(x x x))
 
 ;(test (vector) '#())
 ;(test (vector 'x) '#(x))
@@ -1976,15 +1976,15 @@
 ;(test (let ((v (vector))) (vector-fill! v 'x) v) '#())
 ;(test (let ((v (vector 1 2 3))) (vector-fill! v 'z) v) '#(z z z))
 
-;(test (vector-length #()) 0)
-;(test (vector-length #(a)) 1)
-;(test (vector-length #(a b)) 2)
-;(test (vector-length #(a b c)) 3)
-;(test (vector-length #(1 2 3 #(4 5 6) 7 8 9)) 7)
+(test (vector-length #()) 0)
+(test (vector-length #(a)) 1)
+(test (vector-length #(a b)) 2)
+(test (vector-length #(a b c)) 3)
+(test (vector-length #(1 2 3 #(4 5 6) 7 8 9)) 7)
 
-;(test (vector-ref #(a b c) 0) 'a)
-;(test (vector-ref #(a b c) 1) 'b)
-;(test (vector-ref #(a b c) 2) 'c)
+(test (vector-ref #(a b c) 0) 'a)
+(test (vector-ref #(a b c) 1) 'b)
+(test (vector-ref #(a b c) 2) 'c)
 
 ;(define v (vector 1 2 3))
 ;(test (begin (vector-set! v 0 'a) v) '#(a 2 3))
@@ -2403,7 +2403,7 @@
 ; system-command
 ;(test (apply truncate '(5.7)) 5.0)
 ;(test (apply vector->list '(#(foo bar baz))) '(foo bar baz))
-;(test (apply vector-length '(#(foo bar baz))) 3)
+(test (apply vector-length '(#(foo bar baz))) 3)
 ;(test (apply vector? '(#(foo bar baz))) #t)
 (test (apply zero? '(0)) #t)
 
@@ -2472,8 +2472,8 @@
 
 ;(test (string-length (apply make-string '(10))) 10)
 ;(test (apply make-string '(10 #\x)) "xxxxxxxxxx")
-;(test (vector-length (apply make-vector '(10))) 10)
-;(test (apply make-vector '(10 x)) '#(x x x x x x x x x x))
+(test (vector-length (apply make-vector '(10))) 10)
+(test (apply make-vector '(10 x)) '#(x x x x x x x x x x))
 
 ;(test (apply vector-copy '(#(1 2 3))) '#(1 2 3))
 ;(test (apply vector-copy '(#(1 2 3) 2)) '#(3))
@@ -2602,9 +2602,9 @@
 (test (let ((x '(a)))
         (eq? x x))
       #t)
-;(test (let ((x '#()))
-;        (eq? x x))
-;      #t)
+(test (let ((x '#()))
+        (eq? x x))
+      #t)
 (test (let ((p (lambda (x) x)))
         (eq? p p))
       #t)
@@ -2616,9 +2616,9 @@
       #t)
 (test (equal? "abc" "abc") #t)
 (test (equal? 2 2) #t)
-;(test (equal? (make-vector 5 'a)
-;              (make-vector 5 'a))
-;      #t)
+(test (equal? (make-vector 5 'a)
+              (make-vector 5 'a))
+      #t)
 
 ; R4RS tests, 6.3 pairs and lists
 
@@ -2641,7 +2641,7 @@
 (test (pair? '(a . b)) #t)
 (test (pair? '(a b c)) #t)
 (test (pair? '()) #f)
-;(test (pair? '#(a b)) #f)
+(test (pair? '#(a b)) #f)
 
 (test (cons 'a '()) '(a))
 (test (cons '(a) '(b c d)) '((a) b c d))
@@ -2780,11 +2780,11 @@
 
 ; R4RS tests, 6.8 vectors
 
-;(test '#(0 (2 2 2 2) "Anna")  #(0 (2 2 2 2) "Anna"))
+(test '#(0 (2 2 2 2) "Anna")  #(0 (2 2 2 2) "Anna"))
 
 ;(test (vector 'a 'b 'c) #(a b c))
 
-;(test (vector-ref '#(1 1 2 3 5 8 13 21) 5) 8)
+(test (vector-ref '#(1 1 2 3 5 8 13 21) 5) 8)
 
 ;(test (let ((vec (vector 0 '(2 2 2 2) "Anna")))
 ;        (vector-set! vec 1 '("Sue" "Sue"))
@@ -2832,12 +2832,12 @@
 
 ;(test (map + '(1 2 3) '(4 5 6)) '(5 7 9))
 
-;(test (let ((v (make-vector 5)))
-;        (for-each (lambda (i)
-;                    (vector-set! v i (* i i)))
-;                  '(0 1 2 3 4))
-;        v)
-;      '#(0 1 4 9 16))
+(test (let ((v (make-vector 5)))
+        (for-each (lambda (i)
+                    (vector-set! v i (* i i)))
+                  '(0 1 2 3 4))
+        v)
+      '#(0 1 4 9 16))
 
 ;(test (force (delay (+ 1 2))) 3)
 ;(test (let ((p (delay (+ 1 2))))

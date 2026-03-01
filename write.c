@@ -36,7 +36,7 @@ static void print_vector(scm_obj_t obj)
 		scm_write(scm_vector_ref(obj, k));
 		putchar(' ');
 	}
-	scm_write(scm_vector_ref(obj, k));
+	if (k < len) scm_write(scm_vector_ref(obj, k));
 	putchar(')');
 }
 

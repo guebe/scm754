@@ -258,6 +258,18 @@ tail_recurse:
 		goto tail_recurse;
 	}
 
+	if (scm_is_vector(obj1) && scm_is_vector(obj2)) {
+		size_t k1 = scm_vector_length(obj1);
+		size_t k2 = scm_vector_length(obj2);
+		if (k1 != k2) return false;
+		for (size_t i = 0; i < k1; i++) {
+			if (!scm_is_equal(scm_vector_ref(obj1, i),
+					  scm_vector_ref(obj2, i)))
+				return false;
+		}
+		return true;
+	}
+
 	if (scm_is_string(obj1) && scm_is_string(obj2))
 		return (strcmp(scm_string_value(obj1), scm_string_value(obj2)) == 0);
 
