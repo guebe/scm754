@@ -1,5 +1,6 @@
 /* (c) guenter.ebermann@htl-hl.ac.at */
 #include "scm754.h"
+#include <stdarg.h>
 
 extern scm_obj_t scm_error(const char *message, ...)
 {
