@@ -44,7 +44,7 @@ static inline size_t scm_gc_alloc(uint64_t free_bits[], size_t free_bits_size, s
 			return i * 64 + (size_t)bit;
 		}
 	}
-	return free_bits_size;
+	return free_bits_size * 8;
 }
 
 extern void scm_gc_init(void);
