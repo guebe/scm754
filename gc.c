@@ -75,8 +75,8 @@ extern void scm_gc_pop2(void)
 
 static void scm_gc_init_cell(void)
 {
-	memset(cell_free_bits, 0xFF, SCM_CELL_NUM/64);
-	memset(cell_mark_bits, 0, SCM_CELL_NUM/64);
+	memset(cell_free_bits, 0xFF, sizeof(cell_free_bits));
+	memset(cell_mark_bits, 0, sizeof(cell_mark_bits));
 	cell_free_index = 0;
 }
 
@@ -85,8 +85,8 @@ static void scm_gc_init_string(void)
 	for (size_t i = 0; i < SCM_STRING_NUM; i++) {
 		strings[i] = NULL;
 	}
-	memset(string_free_bits, 0xFF, SCM_STRING_NUM/64);
-	memset(string_mark_bits, 0, SCM_STRING_NUM/64);
+	memset(string_free_bits, 0xFF, sizeof(string_free_bits));
+	memset(string_mark_bits, 0, sizeof(string_mark_bits));
 	string_free_index = 0;
 }
 
@@ -96,8 +96,8 @@ static void scm_gc_init_vector(void)
 		vector[i].obj = NULL;
 		vector[i].len = 0;
 	}
-	memset(vector_free_bits, 0xFF, SCM_VECTOR_NUM/64);
-	memset(vector_mark_bits, 0, SCM_VECTOR_NUM/64);
+	memset(vector_free_bits, 0xFF, sizeof(vector_free_bits));
+	memset(vector_mark_bits, 0, sizeof(vector_mark_bits));
 	vector_free_index = 0;
 }
 
