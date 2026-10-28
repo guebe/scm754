@@ -22,7 +22,7 @@ extern scm_pair_t cell[SCM_CELL_NUM];
 extern uint64_t cell_free_bits[SCM_CELL_NUM/64];
 extern size_t cell_free_index;
 
-#define SCM_STRING_NUM 2048U
+#define SCM_STRING_NUM 4096U
 _Static_assert(SCM_STRING_NUM % 64 == 0, "SCM_STRING_NUM must be multiple of 64");
 extern char *strings[SCM_STRING_NUM];
 extern uint64_t string_free_bits[SCM_STRING_NUM/64];
