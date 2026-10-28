@@ -757,8 +757,8 @@
       '#(#t foo 1 #\c "s" (1 2 3) #(u v)))
 (test (list->vector '()) '#())
 
-;(test (string->list "String") '(#\S #\t #\r #\i #\n #\g))
-;(test (string->list "") '())
+(test (string->list "String") '(#\S #\t #\r #\i #\n #\g))
+(test (string->list "") '())
 
 ;(test (string->symbol "foo") 'foo)
 ;(test (string->symbol "string->symbol") 'string->symbol)

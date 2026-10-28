@@ -34,3 +34,10 @@
   (if (zero? r1)
       r0
       (gcd r1 (modulo r0 r1))))
+
+(define (string->list str)
+  (define (recur i lst)
+    (if (< i 0)
+        lst
+        (recur (- i 1) (cons (string-ref str i) lst))))
+  (recur (- (string-length str) 1) '()))
