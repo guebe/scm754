@@ -39,7 +39,8 @@ typedef uint64_t scm_obj_t;
 
 /* Primitives and procedures get a contiguous index for interning the symbols
  * with a stable id. Eases jump-table generation in eval. */
-typedef enum {
+typedef enum
+{
 	/* Primitive and derived expression types
 	 * Argument evaluation: individually by each expression
 	 * Interned: yes

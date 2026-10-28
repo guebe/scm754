@@ -2,7 +2,8 @@
 
 #include "scm754.h"
 
-typedef struct {
+typedef struct
+{
 	const char *name;
 	int8_t arity;
 } scm_ops_t;
